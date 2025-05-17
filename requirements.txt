@@ -1,0 +1,14 @@
+asgiref==3.8.1
+Django==5.1.5
+pillow==11.1.0
+psycopg2-binary==2.9.10
+django-crontab>=0.7.1
+sqlparse==0.5.3
+liqpay==1.0.1
+pip~=23.2.1
+requests~=2.32.3
+certifi~=2025.4.26
+urllib3~=2.4.0
+idna~=3.10
+charset-normalizer~=3.4.2
+python-decouple~=3.8

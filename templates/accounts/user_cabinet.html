@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Мій кабінет</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Особисті дані
+        </div>
+        <div class="card-body">
+            <p><strong>Ім’я:</strong> {{ user.first_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Телефон:</strong> {{ user.phone|default:"(не вказано)" }}</p>
+            <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary mt-2">Редагувати профіль</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            Історія замовлень
+        </div>
+        <div class="card-body">
+            {% if orders %}
+                <ul class="list-group">
+                    {% for order in orders %}
+                        <li class="list-group-item">
+                            <strong>Замовлення №{{ order.id }}</strong><br>
+                            Дата: {{ order.created_at|date:"d.m.Y H:i" }}<br>
+                            Спосіб доставки: {{ order.get_delivery_method_display|default:order.delivery_method }}<br>
+                            Товари:
+                            <ul>
+                                {% for item in order.items.all %}
+                                    <li>
+                                        {{ item.product.assortment_name }}
+                                        {% if item.variant %}
+                                            ({{ item.variant.grams }}г)
+                                        {% endif %}
+                                        — {{ item.quantity }} шт
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <strong>Сума: {{ order.total_price }} грн</strong>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>У вас ще немає замовлень.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

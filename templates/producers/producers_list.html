@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Producers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Наші виробники</h1>
+    <div class="row">
+        {% for producer in producers %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    {% if producer.producer_img %}
+                        <img src="{{ producer.producer_img.url }}" class="card-img-top" alt="{{ producer.producer_name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="{% static 'images/default_producer.jpg' %}" class="card-img-top" alt="No image available" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producer.producer_name }}</h5>
+                        <p class="card-text"><strong>Краіна виробника:</strong> {{ producer.producer_country }}</p>
+                        <p class="card-text"><strong></strong> {{ producer.producer_description }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

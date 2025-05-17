@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ assortment.assortment_name }}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6">
+            {% if assortment.poster %}
+                <img src="{{ assortment.poster.url }}" class="img-fluid" alt="{{ assortment.assortment_name }}">
+            {% else %}
+                <img src="{% static 'images/default.jpg' %}" class="img-fluid" alt="No image available">
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h1 class="montserrat-category-title">{{ assortment.assortment_name }}</h1>
+            <p><strong>Категорія:</strong> {{ assortment.assortment_categories }}</p>
+            <p><strong>Виробник:</strong> {{ assortment.producer.producer_name }}</p>
+            <p><strong>Наявність:</strong> {{ assortment.is_available|yesno:"У наявності,Нема у наявності" }}</p>
+            <p><strong>Опис продукту:</strong></p>
+            <p>{{ assortment.assortment_description }}</p>
+
+            <!-- Отображение цены -->
+            <p class="card-text">
+                <strong id="price-display">
+                    {% if variants.exists %}
+                        {{ variants.first.price }} ₴
+                    {% else %}
+                        {{ assortment.price }} ₴
+                    {% endif %}
+                </strong>
+            </p>
+
+            <!-- Кнопки для изменения граммовки -->
+            {% if variants.exists %}
+                <div class="mb-3">
+                    {% for variant in variants %}
+                        <button class="btn btn-outline-secondary grams-button btn-sm"
+                                data-price="{{ variant.price }} ₴">
+                            {{ variant.grams }}г
+                        </button>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="card-text">{{ assortment.grams }}г</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.grams-button').forEach(button => {
+            button.addEventListener('click', event => {
+                const price = event.target.getAttribute('data-price');
+                const priceDisplay = document.getElementById('price-display');
+
+                console.log(`Кнопка нажата:`, event.target);
+                console.log(`Обновление цены: ${price}`);
+
+                // Обновляем цену
+                if (priceDisplay) {
+                    priceDisplay.textContent = `${price}`;
+                    console.log("Цена успешно обновлена!");
+                } else {
+                    console.error(`Элемент с ID price-display не найден!`);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
