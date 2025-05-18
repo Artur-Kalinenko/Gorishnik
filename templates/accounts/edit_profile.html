@@ -1,16 +1,21 @@
 {% extends "base.html" %}
+
 {% block content %}
+<!-- Форма редактирования профиля -->
 <div class="container mt-5">
     <h2>Редагування профілю</h2>
 
     <form method="post">
         {% csrf_token %}
+
+        <!-- Сообщения (успех/ошибки) -->
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">{{ message }}</div>
             {% endfor %}
         {% endif %}
 
+        <!-- Поля формы -->
         {% for field in form %}
             <div class="mb-3">
                 {{ field.label_tag }}
@@ -21,6 +26,7 @@
             </div>
         {% endfor %}
 
+        <!-- Кнопки -->
         <button type="submit" class="btn btn-primary">Зберегти</button>
         <a href="{% url 'user_cabinet' %}" class="btn btn-secondary ms-2">Скасувати</a>
     </form>

@@ -13,6 +13,7 @@ import base64
 from django.views.decorators.http import require_POST
 
 
+# Получить корзину пользователя или гостя (по session_id), либо создать новую
 def get_or_create_cart(request):
     if request.user.is_authenticated:
         return Cart.objects.filter(user=request.user).first() or Cart.objects.create(user=request.user)
@@ -21,6 +22,7 @@ def get_or_create_cart(request):
         return Cart.objects.filter(session_id=session_id).first() or Cart.objects.create(session_id=session_id)
 
 
+# Добавление товара в корзину (через fetch или JS POST)
 @csrf_exempt
 def add_to_cart(request, product_id):
     if request.method == 'POST':
@@ -61,6 +63,7 @@ def add_to_cart(request, product_id):
     return JsonResponse({'error': 'Неверный запрос'}, status=400)
 
 
+# Обновление количества товара в корзине
 @csrf_exempt
 def update_quantity(request, item_id):
     if request.method == 'POST':
@@ -86,6 +89,7 @@ def update_quantity(request, item_id):
     return JsonResponse({'success': False, 'message': 'Неверный запрос'})
 
 
+# Объединение дублирующихся товаров в корзине (по продукту и варианту)
 def merge_cart_items(cart):
     items = cart.items.all()
     merged = {}
@@ -101,6 +105,7 @@ def merge_cart_items(cart):
             merged[key] = item
 
 
+# Удаление товара из корзины
 def remove_from_cart(request, item_id):
     if request.method == 'POST':
         cart = get_or_create_cart(request)
@@ -118,6 +123,7 @@ def remove_from_cart(request, item_id):
     return JsonResponse({'success': False, 'message': 'Неверный запрос'})
 
 
+# Отображение содержимого корзины
 def cart_view(request):
     cart = get_or_create_cart(request)
     items = cart.items.all()
@@ -130,6 +136,7 @@ def cart_view(request):
     })
 
 
+# Контекст корзины для base.html (отдельно вызывается в `context_processors`)
 def base_context(request):
     session_id = request.session.session_key or request.session.create()
 
@@ -164,6 +171,7 @@ def base_context(request):
         'login_form': LoginForm()
     }
 
+# Оформление заказа + отправка email + очистка корзины
 def checkout_view(request):
     cart = get_or_create_cart(request)
     items = cart.items.all()
@@ -229,6 +237,7 @@ Email: {cd['email']}
     })
 
 
+# Страница оплаты через LiqPay — генерация подписи и данных
 def order_payment_view(request, order_id):
     order = Order.objects.get(id=order_id)
 
@@ -255,7 +264,7 @@ def order_payment_view(request, order_id):
         'signature': signature
     })
 
-
+# Обработка callback-а от LiqPay (POST-запрос с результатом оплаты)
 @csrf_exempt
 def liqpay_callback_view(request):
     data = request.POST.get('data')
@@ -279,11 +288,13 @@ def liqpay_callback_view(request):
     return HttpResponse("OK")
 
 
+# Завершение оформления — отображается после успешной оплаты
 def checkout_done_view(request):
     return render(request, 'cart/checkout_done.html')
 
+# Очистка корзины гостя по session_id (вызов из JS при истечении срока)
 @require_POST
-@csrf_exempt  # если используешь fetch с CSRF — можно убрать эту строку
+@csrf_exempt  # если используется fetch с CSRF, можно убрать
 def clear_guest_cart(request):
     try:
         data = json.loads(request.body)

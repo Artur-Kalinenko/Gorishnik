@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const selectedVariants = {};
 
+    // Обработка клика по кнопке граммовки
     document.querySelectorAll('.grams-button').forEach(button => {
         button.addEventListener('click', event => {
             const productId = event.target.getAttribute('data-product-id');
@@ -14,14 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 priceDisplay.textContent = `${price} ₴`;
             }
 
+            // Подсветка выбранной кнопки
             document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
                 btn.classList.remove('selected');
             });
             event.target.classList.add('selected');
 
+            // Скрываем кнопку "Оберіть грамовку"
             const selectBtn = document.getElementById(`select-variant-${productId}`);
             if (selectBtn) selectBtn.style.display = 'none';
 
+            // Добавляем блок с кнопками, если он ещё не создан
             if (!document.getElementById(`controls-${productId}`)) {
                 const container = document.createElement('div');
                 container.className = 'd-flex align-items-center justify-content-center btn-group-container';
@@ -41,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Назначение обработчиков на кнопки +/- и "В корзину"
     function attachQuantityHandlers(productId) {
         const decreaseBtn = document.querySelector(`#controls-${productId} .decrease-quantity`);
         const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
@@ -85,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Эффект наведения на карточку товара
     document.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('mouseover', () => {
             card.style.transform = 'scale(1.05)';

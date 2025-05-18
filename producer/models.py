@@ -1,5 +1,6 @@
 from django.db import models
 
+# Модель для хранения изготовителя
 class Producer(models.Model):
     producer_name = models.CharField(max_length=100, verbose_name='Назва виробника')
     producer_country = models.CharField(max_length=100, verbose_name='Країна виробника')

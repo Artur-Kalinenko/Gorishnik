@@ -6,8 +6,10 @@
 {% endblock %}
 
 {% block content %}
+<!-- Страница с деталями товара -->
 <div class="container mt-5">
     <div class="row">
+        <!-- Изображение товара -->
         <div class="col-md-6">
             {% if assortment.poster %}
                 <img src="{{ assortment.poster.url }}" class="img-fluid" alt="{{ assortment.assortment_name }}">
@@ -15,6 +17,8 @@
                 <img src="{% static 'images/default.jpg' %}" class="img-fluid" alt="No image available">
             {% endif %}
         </div>
+
+        <!-- Информация о товаре -->
         <div class="col-md-6">
             <h1 class="montserrat-category-title">{{ assortment.assortment_name }}</h1>
             <p><strong>Категорія:</strong> {{ assortment.assortment_categories }}</p>
@@ -23,7 +27,7 @@
             <p><strong>Опис продукту:</strong></p>
             <p>{{ assortment.assortment_description }}</p>
 
-            <!-- Отображение цены -->
+            <!-- Цена -->
             <p class="card-text">
                 <strong id="price-display">
                     {% if variants.exists %}
@@ -34,7 +38,7 @@
                 </strong>
             </p>
 
-            <!-- Кнопки для изменения граммовки -->
+            <!-- Кнопки выбора граммовки -->
             {% if variants.exists %}
                 <div class="mb-3">
                     {% for variant in variants %}
@@ -51,5 +55,6 @@
     </div>
 </div>
 
+<!-- Скрипт обработки выбора граммовки -->
 <script src="{% static 'assortment/assortment_detail.js' %}"></script>
 {% endblock %}

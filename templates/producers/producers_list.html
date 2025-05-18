@@ -4,6 +4,7 @@
 {% block title %}Producers{% endblock %}
 
 {% block content %}
+<!-- Страница с производителями -->
 <div class="container mt-5">
     <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Наші виробники</h1>
     <div class="row">
@@ -17,8 +18,8 @@
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">{{ producer.producer_name }}</h5>
-                        <p class="card-text"><strong>Краіна виробника:</strong> {{ producer.producer_country }}</p>
-                        <p class="card-text"><strong></strong> {{ producer.producer_description }}</p>
+                        <p class="card-text"><strong>Країна виробника:</strong> {{ producer.producer_country }}</p>
+                        <p class="card-text">{{ producer.producer_description }}</p>
                     </div>
                 </div>
             </div>

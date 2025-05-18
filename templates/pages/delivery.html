@@ -4,11 +4,11 @@
 {% block title %}Варіанти доставки{% endblock %}
 
 {% block content %}
-<style ></style>
+<!-- Страница с вариантами доставки -->
 <div class="container mt-5">
     <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Варіанти доставки</h1>
     <div class="row">
-        <!-- Перша картка -->
+        <!-- Карта: Нова Пошта -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm">
                 <img src="/media/pictures/delivery_page/NovaPoshta.jpg" class="card-img-top" alt="Нова Пошта">
@@ -26,14 +26,14 @@
                         <strong>Способи оплати:</strong>
                         <ul>
                             <li>накладений платіж (при замовленні від 200 грн)</li>
-                            <li>оплата на карту – переказ на карту ПриватБанк</li>
+                            <li>оплата на карту</li>
                         </ul>
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Друга картка -->
+        <!-- Карта: Укрпошта -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm">
                 <img src="/media/pictures/delivery_page/UkrPoshta.jpg" class="card-img-top" alt="Укрпошта">
@@ -45,28 +45,28 @@
                         <ol>
                             <li>Прізвище та ім'я</li>
                             <li>Населений пункт</li>
-                            <li>Індекс для Укрпошти</li>
+                            <li>Індекс</li>
                             <li>Номер телефону</li>
                         </ol>
                         <strong>Способи оплати:</strong>
                         <ul>
                             <li>накладений платіж (при замовленні від 200 грн)</li>
-                            <li>оплата на карту – переказ на карту ПриватБанк</li>
+                            <li>оплата на карту</li>
                         </ul>
                     </p>
                 </div>
             </div>
         </div>
 
-        <!-- Третя картка -->
+        <!-- Карта: Самовивіз -->
         <div class="col-md-4">
             <div class="card h-100 shadow-sm">
                 <img src="/media/pictures/delivery_page/OurBase.jpg" class="card-img-top" alt="Наш склад">
                 <div class="card-body">
                     <h5 class="card-title">Самовивіз</h5>
                     <p class="card-text">
-                        Забрати замовлення самостійно з магазину:<br>
-                        <strong>м. Харків, ст. м. Пр. Гагаріна, вул. Вернадського 22</strong><br><br>
+                        Забрати замовлення з магазину:<br>
+                        <strong>м. Харків, вул. Вернадського 22</strong><br><br>
                         <strong>Обов'язкові дані:</strong>
                         <ol>
                             <li>Прізвище та ім'я</li>
@@ -74,8 +74,8 @@
                         </ol>
                         <strong>Способи оплати:</strong>
                         <ul>
-                            <li>оплата на карту – переказ на карту ПриватБанк</li>
-                            <li>по факту отримання замовлення</li>
+                            <li>оплата на карту</li>
+                            <li>оплата при отриманні</li>
                         </ul>
                     </p>
                 </div>
@@ -84,5 +84,6 @@
     </div>
 </div>
 
+<!-- Стили страницы доставки -->
 <link rel="stylesheet" href="{% static 'pages/delivery.css' %}">
 {% endblock %}

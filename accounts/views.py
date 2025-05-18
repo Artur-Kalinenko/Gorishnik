@@ -24,6 +24,7 @@ from social_core.exceptions import AuthCanceled
 from social_django.views import complete
 
 
+# Регистрация нового пользователя
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -73,7 +74,7 @@ def register_view(request):
 
     return render(request, 'accounts/register.html', {'form': form})
 
-
+# Авторизация по email или телефону + перенос корзины из сессии
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -98,7 +99,7 @@ def login_view(request):
                     messages.warning(request, 'Підтвердіть ваш email для входу.')
                     return redirect('verify_email')
 
-                # 🛒 Перенос корзины из сессии
+                # Перенос корзины из сессии
                 session_id = request.session.session_key
                 guest_cart = Cart.objects.filter(session_id=session_id).first()
                 user_cart, _ = Cart.objects.get_or_create(user=user)
@@ -126,7 +127,7 @@ def login_view(request):
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
-
+# Выход из аккаунта
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
@@ -134,8 +135,9 @@ def logout_view(request):
     return redirect('welcome')
 
 
+# Запрос на сброс пароля (отправка кода)
 def password_reset_request_view(request):
-    if request.method == 'POST':
+    if request.method == 'POST': # Генерация и отправка кода на email
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -156,6 +158,7 @@ def password_reset_request_view(request):
     return render(request, 'accounts/password_reset_request.html', {'form': form})
 
 
+# Ввод кода подтверждения для сброса пароля
 def password_reset_code_view(request):
     user_id = request.session.get('reset_user_id')
     if not user_id:
@@ -164,7 +167,7 @@ def password_reset_code_view(request):
     user = CustomUser.objects.get(id=user_id)
 
     if request.method == 'POST':
-        if 'resend' in request.POST:
+        if 'resend' in request.POST: # Ограничение: не чаще 1 раза в минуту
             last_code = VerificationCode.objects.filter(user=user).order_by('-created_at').first()
             if last_code and timezone.now() - last_code.created_at < timedelta(minutes=1):
                 messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
@@ -198,7 +201,7 @@ def password_reset_code_view(request):
     return render(request, 'accounts/password_reset_code.html', {'form': form})
 
 
-
+# Установка нового пароля после подтверждения кода
 def password_reset_new_password_view(request):
     user_id = request.session.get('reset_user_id')
     if not request.session.get('allow_password_change'):
@@ -206,7 +209,7 @@ def password_reset_new_password_view(request):
     user = CustomUser.objects.get(id=user_id)
     if request.method == 'POST':
         form = SetNewPasswordForm(user, request.POST)
-        if form.is_valid():
+        if form.is_valid(): # Очистка сессии и редирект на логин
             form.save()
             del request.session['reset_user_id']
             del request.session['allow_password_change']
@@ -216,6 +219,7 @@ def password_reset_new_password_view(request):
         form = SetNewPasswordForm(user)
     return render(request, 'accounts/password_reset_new.html', {'form': form})
 
+# Подтверждение email при регистрации
 def verify_email_view(request):
     user_id = request.session.get('verify_user_id')
     if not user_id:
@@ -224,7 +228,7 @@ def verify_email_view(request):
     user = CustomUser.objects.get(id=user_id)
 
     if request.method == 'POST':
-        if 'resend' in request.POST:
+        if 'resend' in request.POST: # Повторная отправка кода, если прошло более 1 минуты
             last_code = VerificationCode.objects.filter(user=user).order_by('-created_at').first()
             if last_code and timezone.now() - last_code.created_at < timedelta(minutes=1):
                 messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
@@ -261,7 +265,7 @@ def verify_email_view(request):
 
     return render(request, 'accounts/verify_email.html', {'form': form})
 
-
+# Кабинет пользователя с историей заказов
 @login_required
 def user_cabinet_view(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
@@ -270,6 +274,7 @@ def user_cabinet_view(request):
         'orders': orders,
     })
 
+# Форма редактирования профиля
 class EditProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
@@ -279,6 +284,7 @@ class EditProfileForm(forms.ModelForm):
             'phone': "Телефон",
         }
 
+# Редактирование профиля пользователя
 @login_required
 def edit_profile_view(request):
     if request.method == 'POST':
@@ -292,6 +298,7 @@ def edit_profile_view(request):
 
     return render(request, 'accounts/edit_profile.html', {'form': form})
 
+# Обработка отмены логина через Google
 def google_login_complete_safe(request, backend):
     try:
         return complete(request, backend)

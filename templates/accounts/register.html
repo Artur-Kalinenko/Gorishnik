@@ -1,20 +1,22 @@
 {% extends "base.html" %}
-
 {% load form_tags %}
 
 {% block content %}
+<!-- Страница регистрации -->
 <div class="container mt-5">
     <h2>Реєстрація</h2>
+
     <form method="post" novalidate>
         {% csrf_token %}
 
-        {# Общие ошибки формы #}
+        <!-- Общие ошибки формы -->
         {% if form.non_field_errors %}
             <div class="alert alert-danger">
                 {{ form.non_field_errors }}
             </div>
         {% endif %}
 
+        <!-- Поле: Имя -->
         <div class="mb-3">
             {{ form.first_name.label_tag }}
             {{ form.first_name|add_class:"form-control" }}
@@ -23,6 +25,7 @@
             {% endfor %}
         </div>
 
+        <!-- Поле: Email -->
         <div class="mb-3">
             {{ form.email.label_tag }}
             {{ form.email|add_class:"form-control" }}
@@ -31,6 +34,7 @@
             {% endfor %}
         </div>
 
+        <!-- Поле: Телефон -->
         <div class="mb-3">
             {{ form.phone.label_tag }}
             {{ form.phone|add_class:"form-control" }}
@@ -39,6 +43,7 @@
             {% endfor %}
         </div>
 
+        <!-- Поле: Пароль -->
         <div class="mb-3">
             {{ form.password1.label_tag }}
             {{ form.password1|add_class:"form-control" }}
@@ -47,6 +52,7 @@
             {% endfor %}
         </div>
 
+        <!-- Поле: Подтверждение пароля -->
         <div class="mb-3">
             {{ form.password2.label_tag }}
             {{ form.password2|add_class:"form-control" }}
@@ -55,6 +61,7 @@
             {% endfor %}
         </div>
 
+        <!-- Кнопка отправки формы -->
         <button type="submit" class="btn btn-primary">Зареєструватися</button>
     </form>
 </div>

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
+
 {% block content %}
+<!-- Подтверждение email -->
 <div class="container mt-5">
     <h2>Підтвердження Email</h2>
     <p>Введіть 6-значний код, надісланий вам на пошту.</p>
@@ -14,7 +16,7 @@
         </div>
     {% endif %}
 
-    <!-- Форма подтверждения -->
+    <!-- Форма подтверждения кода -->
     <form method="post">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -30,7 +32,7 @@
         <button type="submit" class="btn btn-primary">Підтвердити</button>
     </form>
 
-    <!-- Отдельная форма для повторной отправки кода -->
+    <!-- Кнопка повторного отправления кода -->
     <form method="post" style="margin-top: 10px;">
         {% csrf_token %}
         <button type="submit" name="resend" class="btn btn-link">Надіслати код повторно</button>

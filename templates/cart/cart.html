@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block title %}Корзина{% endblock %}
+
 {% block content %}
+<!-- Страница корзины -->
 <div class="container mt-5">
     <h1>Корзина</h1>
+
+    <!-- Таблица с товарами в корзине -->
     <table class="table">
         <thead>
             <tr>
@@ -26,6 +30,7 @@
                     {% endif %}
                 </td>
                 <td>
+                    <!-- Кнопки изменения количества -->
                     <div class="d-flex align-items-center">
                         <button class="btn btn-secondary btn-sm update-quantity" data-item-id="{{ item.id }}" data-action="decrease">-</button>
                         <input type="number" value="{{ item.quantity }}" min="1" id="quantity-input-{{ item.id }}" class="form-control mx-2 text-center" style="width: 60px;" readonly>
@@ -47,10 +52,12 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Общая сумма и переход к оформлению -->
     <p>Общая сумма: <strong>₴<span id="cart-total-price">{{ total_price }}</span></strong></p>
     <a href="{% url 'checkout' %}" class="btn btn-success">Сделать заказ</a>
 </div>
 
-<!-- Подключение JS для корзины -->
+<!-- Скрипт корзины -->
 <script src="{% static 'cart/cart.js' %}"></script>
 {% endblock %}

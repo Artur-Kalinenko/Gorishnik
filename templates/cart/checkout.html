@@ -2,20 +2,23 @@
 {% load static %}
 
 {% block content %}
+<!-- Страница оформления заказа -->
 <div class="container mt-5">
     <h2>Оформлення замовлення</h2>
 
+    <!-- Отображение ошибки, если корзина пуста -->
     {% if error %}
         <div class="alert alert-warning">{{ error }}</div>
     {% endif %}
 
+    <!-- Форма заказа -->
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-
         <button type="submit" class="btn btn-success">Відправити замовлення</button>
     </form>
 </div>
 
+<!-- Скрипт, скрывающий поле адреса при выборе самовывоза -->
 <script src="{% static 'cart/checkout.js' %}"></script>
 {% endblock %}

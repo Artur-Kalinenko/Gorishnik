@@ -3,18 +3,21 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 from django.utils.translation import gettext_lazy as _
 
+# Регистрация кастомного пользователя
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ("email", "phone", "is_verified", "is_staff", "is_superuser")
     list_filter = ("is_staff", "is_superuser", "is_verified")
 
+    # Поля при редактировании пользователя
     fieldsets = (
         (None, {"fields": ("email", "phone", "password")}),
         (_("Permissions"), {"fields": ("is_active", "is_verified", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login",)}),
     )
 
+    # Поля при создании пользователя
     add_fieldsets = (
         (None, {
             "classes": ("wide",),

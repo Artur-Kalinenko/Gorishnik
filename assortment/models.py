@@ -1,6 +1,7 @@
 from django.db import models
 from producer.models import Producer
 
+# Основная модель товара
 class Assortment(models.Model):
     assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
     assortment_categories = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name='Назва категорії')
@@ -21,6 +22,7 @@ class Assortment(models.Model):
         ordering = ['assortment_name']
 
 
+# Вариант одного и того же товара (разные граммовки)
 class AssortmentVariant(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='variants', verbose_name='Продукт')
     grams = models.IntegerField(verbose_name='Грамовка продукту')
@@ -34,6 +36,8 @@ class AssortmentVariant(models.Model):
         verbose_name_plural = 'Варіанти продуктів'
         ordering = ['grams']
 
+
+# Категория товара (например, горіхи, сухофрукти и т.д.)
 class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
     button_icon = models.ImageField(upload_to='assortment/category_icons_buttons/', null=True, blank=True)

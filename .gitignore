@@ -19,3 +19,5 @@ db.sqlite3
 # VSCode, macOS, etc.
 .vscode/
 .DS_Store
+
+/staticfiles/

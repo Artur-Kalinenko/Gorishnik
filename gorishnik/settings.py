@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     'producer',
     'cart',
     'accounts',
-    
+    'pages',
 ]
 
 
@@ -57,7 +57,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'cart.views.base_context',
+                'cart.views.base_context', # Контекст корзины доступен во всех шаблонах
             ],
         },
     },
@@ -76,6 +76,7 @@ DATABASES = {
     }
 }
 
+# отключены, используется своя валидация
 AUTH_PASSWORD_VALIDATORS = [
     # {
     #     'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
