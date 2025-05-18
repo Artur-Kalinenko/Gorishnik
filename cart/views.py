@@ -252,7 +252,7 @@ def order_payment_view(request, order_id):
         'version': '3',
         'sandbox': 1 if getattr(settings, 'LIQPAY_SANDBOX', True) else 0,
         'server_url': request.build_absolute_uri('/liqpay-callback/'),
-        'result_url': request.build_absolute_uri('/cart/checkout/done/'),git add .
+        'result_url': request.build_absolute_uri('/cart/checkout/done/'),
     }
 
     data = liqpay.cnb_data(params)
