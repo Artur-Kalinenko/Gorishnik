@@ -1,7 +1,52 @@
+// Функция: назначить обработчики на кнопку +, −, "добавить в корзину"
+function attachQuantityHandlers(productId) {
+    const decreaseBtn = document.querySelector(`#controls-${productId} .decrease-quantity`);
+    const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
+    const addToCartBtn = document.querySelector(`#controls-${productId} .add-to-cart`);
+
+    decreaseBtn?.addEventListener('click', () => {
+        const input = document.getElementById(`quantity-input-${productId}`);
+        const value = parseInt(input.value, 10);
+        if (value > 1) input.value = value - 1;
+    });
+
+    increaseBtn?.addEventListener('click', () => {
+        const input = document.getElementById(`quantity-input-${productId}`);
+        input.value = parseInt(input.value, 10) + 1;
+    });
+
+    addToCartBtn?.addEventListener('click', event => {
+        const input = document.getElementById(`quantity-input-${productId}`);
+        const quantity = input.value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+        const variantId = event.target.dataset.variantId || null;
+
+        fetch(`/cart/add/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity: quantity, variant_id: variantId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.session_id) {
+                localStorage.setItem('session_id', data.session_id);
+            }
+            alert(data.message);
+            input.value = 1;
+        })
+        .catch(error => {
+            console.error('Помилка при додаванні в корзину:', error);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const selectedVariants = {};
 
-    // Обработка клика по кнопке граммовки
+    // Обработка кликов по кнопкам граммовки
     document.querySelectorAll('.grams-button').forEach(button => {
         button.addEventListener('click', event => {
             const productId = event.target.getAttribute('data-product-id');
@@ -15,17 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 priceDisplay.textContent = `${price} ₴`;
             }
 
-            // Подсветка выбранной кнопки
+            // Подсветка выбранной граммовки
             document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
                 btn.classList.remove('selected');
             });
             event.target.classList.add('selected');
 
-            // Скрываем кнопку "Оберіть грамовку"
+            // Скрыть "Оберіть грамовку"
             const selectBtn = document.getElementById(`select-variant-${productId}`);
             if (selectBtn) selectBtn.style.display = 'none';
 
-            // Добавляем блок с кнопками, если он ещё не создан
+            // Если ещё не было блока с кнопками — создать
             if (!document.getElementById(`controls-${productId}`)) {
                 const container = document.createElement('div');
                 container.className = 'd-flex align-items-center justify-content-center btn-group-container';
@@ -45,50 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Назначение обработчиков на кнопки +/- и "В корзину"
-    function attachQuantityHandlers(productId) {
-        const decreaseBtn = document.querySelector(`#controls-${productId} .decrease-quantity`);
-        const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
-        const addToCartBtn = document.querySelector(`#controls-${productId} .add-to-cart`);
-
-        decreaseBtn?.addEventListener('click', () => {
-            const input = document.getElementById(`quantity-input-${productId}`);
-            const value = parseInt(input.value, 10);
-            if (value > 1) input.value = value - 1;
-        });
-
-        increaseBtn?.addEventListener('click', () => {
-            const input = document.getElementById(`quantity-input-${productId}`);
-            input.value = parseInt(input.value, 10) + 1;
-        });
-
-        addToCartBtn?.addEventListener('click', event => {
-            const input = document.getElementById(`quantity-input-${productId}`);
-            const quantity = input.value;
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-            let variantId = selectedVariants[productId] || event.target.dataset.variantId;
-
-            fetch(`/cart/add/${productId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity: quantity, variant_id: variantId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.session_id) {
-                    localStorage.setItem('session_id', data.session_id);
-                }
-                alert(data.message);
-                input.value = 1;
-            })
-            .catch(error => {
-                console.error('Помилка при додаванні в корзину:', error);
-            });
-        });
-    }
+    // Навесить обработчики на все уже отрисованные товары (без вариантов/один вариант)
+    document.querySelectorAll('.btn-group-container[id^="controls-"]').forEach(container => {
+        const productId = container.id.replace('controls-', '');
+        attachQuantityHandlers(productId);
+    });
 
     // Эффект наведения на карточку товара
     document.querySelectorAll('.product-card').forEach(card => {

@@ -19,7 +19,7 @@ from django.utils import timezone
 from django import forms
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from cart.models import Order, Cart
+from cart.models import Order, Cart, CartItem
 from social_core.exceptions import AuthCanceled
 from social_django.views import complete
 
@@ -99,9 +99,14 @@ def login_view(request):
                     messages.warning(request, 'Підтвердіть ваш email для входу.')
                     return redirect('verify_email')
 
-                # Перенос корзины из сессии
+                # Убеждаемся, что у сессии есть ключ
+                if not request.session.session_key:
+                    request.session.create()
+
                 session_id = request.session.session_key
-                guest_cart = Cart.objects.filter(session_id=session_id).first()
+
+                # Перенос корзины
+                guest_cart = Cart.objects.filter(session_id=session_id, user__isnull=True).first()
                 user_cart, _ = Cart.objects.get_or_create(user=user)
 
                 if guest_cart and guest_cart != user_cart:
@@ -114,8 +119,12 @@ def login_view(request):
                             existing.quantity += item.quantity
                             existing.save()
                         else:
-                            item.cart = user_cart
-                            item.save()
+                            CartItem.objects.create(
+                                cart=user_cart,
+                                product=item.product,
+                                quantity=item.quantity,
+                                variant=item.variant
+                            )
                     guest_cart.delete()
 
                 login(request, user)
