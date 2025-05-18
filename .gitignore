@@ -1,13 +1,15 @@
 # Python
 __pycache__/
 *.py[cod]
+*.so
 *.sqlite3
 *.log
+
+# Env / secrets
 .env
 *.env
 *.key
 *.pem
-
 
 # Virtualenv
 venv/
@@ -15,9 +17,15 @@ venv/
 
 # Django
 db.sqlite3
+/media/
+staticfiles/  # сюда попадают файлы из collectstatic
 
-# VSCode, macOS, etc.
+# VSCode, macOS
 .vscode/
 .DS_Store
 
-/staticfiles/
+# PyCharm
+.idea/
+
+# Docker
+*.pid
