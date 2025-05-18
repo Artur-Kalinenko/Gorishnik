@@ -1,0 +1,44 @@
+.montserrat-category-title {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+
+.montserrat-text {
+    font-family: "Montserrat", serif;
+    font-weight: 400;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.navbar,
+.navbar a,
+.navbar .form-control,
+.navbar .btn {
+    font-family: "Montserrat", serif;
+    font-weight: 400;
+}
+
+.container {
+    flex: 1;
+    margin-bottom: 10px;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    font-size: 14px;
+}

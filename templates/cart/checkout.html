@@ -17,22 +17,5 @@
     </form>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deliveryMethod = document.getElementById('delivery-method');
-        const addressField = document.getElementById('address-field');
-
-        function toggleAddressField() {
-            if (deliveryMethod.value === 'pickup') {
-                addressField.parentElement.style.display = 'none';
-                addressField.value = '';
-            } else {
-                addressField.parentElement.style.display = 'block';
-            }
-        }
-
-        toggleAddressField();
-        deliveryMethod.addEventListener('change', toggleAddressField);
-    });
-</script>
+<script src="{% static 'cart/checkout.js' %}"></script>
 {% endblock %}

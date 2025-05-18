@@ -51,25 +51,5 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.grams-button').forEach(button => {
-            button.addEventListener('click', event => {
-                const price = event.target.getAttribute('data-price');
-                const priceDisplay = document.getElementById('price-display');
-
-                console.log(`Кнопка нажата:`, event.target);
-                console.log(`Обновление цены: ${price}`);
-
-                // Обновляем цену
-                if (priceDisplay) {
-                    priceDisplay.textContent = `${price}`;
-                    console.log("Цена успешно обновлена!");
-                } else {
-                    console.error(`Элемент с ID price-display не найден!`);
-                }
-            });
-        });
-    });
-</script>
+<script src="{% static 'assortment/assortment_detail.js' %}"></script>
 {% endblock %}

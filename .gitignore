@@ -15,8 +15,6 @@ venv/
 
 # Django
 db.sqlite3
-/static/
-media/
 
 # VSCode, macOS, etc.
 .vscode/
