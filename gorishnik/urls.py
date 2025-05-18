@@ -11,7 +11,8 @@ from accounts.views import (
     password_reset_new_password_view,
     verify_email_view,
     user_cabinet_view,
-    edit_profile_view
+    edit_profile_view,
+    google_login_complete_safe
 )
 
 
@@ -43,6 +44,7 @@ urlpatterns = [
     # Аутентификация
     path('register/', register_view, name='register'),
     path('verify-email/', verify_email_view, name='verify_email'),
+    path('auth/complete/<str:backend>/', google_login_complete_safe, name='google_complete'),
     path('auth/', include('social_django.urls', namespace='social')),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),

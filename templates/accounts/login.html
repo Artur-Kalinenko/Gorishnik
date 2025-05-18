@@ -3,6 +3,14 @@
 <div class="container mt-5">
     <h2>Вхід</h2>
 
+
+    {# Сообщение если пользователь отменил вход через Google #}
+    {% if request.GET.cancel %}
+        <div class="alert alert-warning">
+            Ви скасували вхід через Google.
+        </div>
+    {% endif %}
+
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-{{ message.tags }}">{{ message }}</div>

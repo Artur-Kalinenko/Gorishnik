@@ -12,7 +12,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', 'localhost', '127.0.0.1']
 
 
 INSTALLED_APPS = [
@@ -146,6 +146,9 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
+SOCIAL_AUTH_LOGIN_ERROR_URL = '/login/?cancel=1'
+
+
 LIQPAY_PUBLIC_KEY = config('LIQPAY_PUBLIC_KEY')
 LIQPAY_PRIVATE_KEY = config('LIQPAY_PRIVATE_KEY')
 LIQPAY_SANDBOX = config('LIQPAY_SANDBOX', cast=bool)
@@ -154,3 +157,4 @@ CRONJOBS = [
     ('0 3 * * *', 'django.core.management.call_command', ['clear_cart']),
 ]
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'

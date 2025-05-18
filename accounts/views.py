@@ -20,6 +20,8 @@ from django import forms
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from cart.models import Order, Cart
+from social_core.exceptions import AuthCanceled
+from social_django.views import complete
 
 
 def register_view(request):
@@ -289,3 +291,9 @@ def edit_profile_view(request):
         form = EditProfileForm(instance=request.user)
 
     return render(request, 'accounts/edit_profile.html', {'form': form})
+
+def google_login_complete_safe(request, backend):
+    try:
+        return complete(request, backend)
+    except AuthCanceled:
+        return redirect('/login/?cancel=1')
