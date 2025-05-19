@@ -84,14 +84,24 @@ class OrderItem(models.Model):
 
     # Общая сумма по позиции
     def total_price(self):
-        price = self.variant.price if self.variant else self.product.price
-        return (price or 0) * self.quantity
+        price = None
+        if self.variant and self.variant.price is not None:
+            price = self.variant.price
+        elif self.product and self.product.price is not None:
+            price = self.product.price
+        else:
+            price = 0
+        return price * self.quantity
 
     # Общий вес
     def total_grams(self):
-        if self.variant:
+        if self.variant and self.variant.grams is not None:
             return self.variant.grams * self.quantity
-        return self.product.grams * self.quantity
+        elif self.product and self.product.grams is not None:
+            return self.product.grams * self.quantity
+        return 0
 
     def __str__(self):
-        return f"{self.product.assortment_name} x {self.quantity}"
+        name = self.product.assortment_name if self.product else "Невідомий продукт"
+        grams = self.total_grams()
+        return f"{name} x {self.quantity} ({grams} г)"

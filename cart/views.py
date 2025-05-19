@@ -35,7 +35,11 @@ def add_to_cart(request, product_id):
             data = request.POST
 
         variant_id = data.get('variant_id')
+        variant_id = int(variant_id) if variant_id not in [None, '', 'null', 'undefined'] else None
         quantity = int(data.get('quantity', 1))
+        print("Получено из запроса:", data)
+        print("variant_id:", variant_id)
+        print("product.id:", product.id)
 
         if variant_id:
             variant = get_object_or_404(AssortmentVariant, id=variant_id, assortment=product)
@@ -204,18 +208,29 @@ def checkout_view(request):
                 )
 
             subject = 'Нове замовлення з сайту'
+            # Формируем список товаров
+            items_text = ""
+            for item in items:
+                name = item.product.assortment_name if item.product else "Невідомий товар"
+                grams = item.variant.grams if item.variant else (item.product.grams if item.product else "-")
+                price = item.variant.price if item.variant else (item.product.price if item.product else 0)
+                quantity = item.quantity
+                total = price * quantity
+                items_text += f"- {name} — {grams}г × {quantity} = {total} грн\n"
+
             message = f"""
-Нове замовлення
+            Нове замовлення
 
-ПІБ: {cd['full_name']}
-Телефон: {cd['phone']}
-Email: {cd['email']}
-Спосіб доставки: {cd['delivery_method']}
-Адреса: {cd['address']}
+            ПІБ: {cd['full_name']}
+            Телефон: {cd['phone']}
+            Email: {cd['email']}
+            Спосіб доставки: {cd['delivery_method']}
+            Адреса: {cd['address']}
 
-Товарів: {items.count()}
-Загальна сума: {order.total_price()} грн
-"""
+            Замовлені товари:
+            {items_text}
+            Загальна сума: {order.total_price()} грн
+            """
             send_mail(
                 subject,
                 message,

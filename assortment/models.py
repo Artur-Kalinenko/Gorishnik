@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from producer.models import Producer
 
 # Основная модель товара
@@ -8,13 +9,20 @@ class Assortment(models.Model):
     price = models.FloatField(null=True, blank=True, verbose_name='Ціна продукту')
     grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
     poster = models.ImageField(upload_to='assortment/posters/', null=True, blank=True, verbose_name='Картинка продукту')
-    producer = models.ForeignKey(Producer, on_delete=models.CASCADE, verbose_name='Назва виробника')
+    producer = models.ForeignKey(Producer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Назва виробника')
     assortment_description = models.TextField(null=True, verbose_name='Опис продукту')
     is_available = models.BooleanField(default=True, verbose_name='Наявність продукту')
     has_variants = models.BooleanField(default=False, verbose_name='Чи є варіанти продукту')
 
     def __str__(self):
         return f'{self.assortment_name}'
+
+    def clean(self):
+        if self.has_variants and (self.price or self.grams):
+            raise ValidationError("Неможливо одночасно вказати фіксовану ціну/грамовку і вибрати 'є варіанти'.")
+
+        if not self.has_variants and not self.price:
+            raise ValidationError("Необхідно або вказати ціну, або активувати 'є варіанти'.")
 
     class Meta:
         verbose_name = 'Товар'
