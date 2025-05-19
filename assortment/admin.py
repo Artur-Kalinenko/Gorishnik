@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import Assortment, AssortmentVariant, Category
-
+from .models import Assortment, AssortmentVariant, Category, FilterGroup, FilterOption
+from producer.models import Producer
 
 # Варианты (граммовки) отображаются прямо внутри товара
 class AssortmentVariantInline(admin.TabularInline):
@@ -10,16 +10,30 @@ class AssortmentVariantInline(admin.TabularInline):
     min_num = 0
     max_num = 10
 
-# Админка для модели Assortment
+# Админка для модели Assortment (товар)
 @admin.register(Assortment)
 class AssortmentAdmin(admin.ModelAdmin):
-    list_display = ['assortment_name', 'assortment_categories', 'is_available', 'producer']
-    list_filter = ['assortment_categories', 'is_available', 'producer']
+    list_display = ['assortment_name', 'assortment_categories', 'producer', 'price', 'is_available']
+    list_filter = ['assortment_categories', 'producer', 'is_available']
     search_fields = ['assortment_name']
     inlines = [AssortmentVariantInline]
+    filter_horizontal = ['filters']
 
 # Админка для категорий
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['category']
     search_fields = ['category']
+
+# Админка для групп фильтров
+@admin.register(FilterGroup)
+class FilterGroupAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+# Админка для опций фильтров
+@admin.register(FilterOption)
+class FilterOptionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'group']
+    list_filter = ['group']
+    search_fields = ['name']

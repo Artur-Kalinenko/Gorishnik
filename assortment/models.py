@@ -6,6 +6,7 @@ from producer.models import Producer
 class Assortment(models.Model):
     assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
     assortment_categories = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name='Назва категорії')
+    filters = models.ManyToManyField('FilterOption', blank=True, related_name='products', verbose_name='Фільтри')
     price = models.FloatField(null=True, blank=True, verbose_name='Ціна продукту')
     grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
     poster = models.ImageField(upload_to='assortment/posters/', null=True, blank=True, verbose_name='Картинка продукту')
@@ -45,7 +46,7 @@ class AssortmentVariant(models.Model):
         ordering = ['grams']
 
 
-# Категория товара (например, горіхи, сухофрукти и т.д.)
+# Категория товара
 class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
     button_icon = models.ImageField(upload_to='assortment/category_icons_buttons/', null=True, blank=True)
@@ -58,3 +59,30 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category
+
+
+# Группа фильтров, например: "Орехи", "Восточные солодощі"
+class FilterGroup(models.Model):
+    name = models.CharField(max_length=255, verbose_name='Назва групи фільтрів')
+
+    class Meta:
+        verbose_name = 'Група фільтрів'
+        verbose_name_plural = 'Групи фільтрів'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+# Конкретная опція фильтра, например: "Фундук", "Кешью"
+class FilterOption(models.Model):
+    group = models.ForeignKey(FilterGroup, on_delete=models.CASCADE, related_name='options', verbose_name='Група')
+    name = models.CharField(max_length=255, verbose_name='Назва опції')
+
+    class Meta:
+        verbose_name = 'Опція фільтра'
+        verbose_name_plural = 'Опції фільтрів'
+        ordering = ['group', 'name']
+
+    def __str__(self):
+        return f"{self.group.name} → {self.name}"

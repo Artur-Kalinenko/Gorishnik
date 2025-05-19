@@ -1,4 +1,4 @@
-// Функция: назначить обработчики на кнопку +, −, "добавить в корзину"
+// Функция: обработка кнопок изменения количества и добавления в корзину
 function attachQuantityHandlers(productId) {
     const decreaseBtn = document.querySelector(`#controls-${productId} .decrease-quantity`);
     const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
@@ -20,8 +20,6 @@ function attachQuantityHandlers(productId) {
         const quantity = input.value;
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
         const variantId = event.target.getAttribute('data-variant-id') || null;
-
-        console.log("Добавляем в корзину:", { productId, variantId, quantity });
 
         fetch(`/cart/add/${productId}/`, {
             method: 'POST',
@@ -48,21 +46,17 @@ function attachQuantityHandlers(productId) {
 document.addEventListener('DOMContentLoaded', () => {
     const selectedVariants = {};
 
-    // Обработка кликов по кнопкам граммовки
+    // === Обработка граммовок ===
     document.querySelectorAll('.grams-button').forEach(button => {
         button.addEventListener('click', event => {
-            const productId = event.target.getAttribute('data-product-id');
-            const variantId = event.target.getAttribute('data-variant-id');
-            const price = event.target.getAttribute('data-price');
+            const productId = event.target.dataset.productId;
+            const variantId = event.target.dataset.variantId;
+            const price = event.target.dataset.price;
             const priceDisplay = document.getElementById(`price-display-${productId}`);
 
             selectedVariants[productId] = variantId;
+            if (priceDisplay) priceDisplay.textContent = `${price} ₴`;
 
-            if (priceDisplay) {
-                priceDisplay.textContent = `${price} ₴`;
-            }
-
-            // Подсветка выбранной граммовки
             document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
                 btn.classList.remove('selected');
             });
@@ -87,22 +81,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn btn-primary increase-quantity" data-product-id="${productId}">+</button>
                     <button class="btn btn-primary add-to-cart" data-product-id="${productId}" data-variant-id="${variantId}">В корзину</button>
                 `;
-
                 const cardBody = event.target.closest('.card-body');
                 cardBody.appendChild(container);
-
                 attachQuantityHandlers(productId);
             }
         });
     });
 
-    // Навесить обработчики на все уже отрисованные товары (без вариантов/один вариант)
+    // === Навесить обработчики на уже отрисованные товары ===
     document.querySelectorAll('.btn-group-container[id^="controls-"]').forEach(container => {
         const productId = container.id.replace('controls-', '');
         attachQuantityHandlers(productId);
     });
 
-    // Эффект наведения на карточку товара
+    // === Эффект наведения на карточку товара ===
     document.querySelectorAll('.product-card').forEach(card => {
         card.addEventListener('mouseover', () => {
             card.style.transform = 'scale(1.05)';
@@ -113,4 +105,72 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.boxShadow = 'none';
         });
     });
+
+    // === Раскрытие фильтров с сохранением состояния ===
+    const OPENED_FILTERS_KEY = 'opened_filter_groups';
+
+    function saveOpenedGroups(openedIds) {
+        localStorage.setItem(OPENED_FILTERS_KEY, JSON.stringify(openedIds));
+    }
+
+    function getOpenedGroups() {
+        try {
+            return JSON.parse(localStorage.getItem(OPENED_FILTERS_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    let openedGroups = getOpenedGroups();
+
+    document.querySelectorAll('.filter-header').forEach(header => {
+        const groupId = header.dataset.groupId;
+        const options = document.getElementById(`group-${groupId}`);
+        const icon = document.getElementById(`icon-${groupId}`);
+
+        if (openedGroups.includes(groupId)) {
+            options.style.display = 'block';
+            icon.textContent = '−';
+        }
+
+        header.addEventListener('click', () => {
+            const isOpen = options.style.display === 'block';
+
+            options.style.display = isOpen ? 'none' : 'block';
+            icon.textContent = isOpen ? '+' : '−';
+
+            if (isOpen) {
+                openedGroups = openedGroups.filter(id => id !== groupId);
+            } else {
+                openedGroups.push(groupId);
+            }
+
+            saveOpenedGroups(openedGroups);
+        });
+    });
+
+    // === Автоотправка формы при изменении чекбоксов ===
+    document.querySelectorAll('#filter-form input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            document.getElementById('filter-form').submit();
+        });
+    });
+
+    // === Очистка фильтров ===
+    const clearBtn = document.getElementById('clear-filters');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            const url = new URL(window.location.href);
+            const params = url.searchParams;
+
+            params.delete('filters');
+            params.delete('q');
+
+            localStorage.removeItem(OPENED_FILTERS_KEY);
+
+            const queryString = params.toString();
+            const target = queryString ? url.pathname + '?' + queryString : url.pathname;
+            window.location.href = target;
+        });
+    }
 });
