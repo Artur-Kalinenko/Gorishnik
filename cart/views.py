@@ -265,6 +265,7 @@ def order_payment_view(request, order_id):
         'sandbox': 1 if getattr(settings, 'LIQPAY_SANDBOX', True) else 0,
         'server_url': request.build_absolute_uri('/liqpay-callback/'),
         'result_url': request.build_absolute_uri('/cart/checkout/done/'),
+        'fail_url': request.build_absolute_uri('/cart/checkout/failed/'),
     }
 
     data = liqpay.cnb_data(params)
@@ -303,6 +304,10 @@ def liqpay_callback_view(request):
 # Завершение оформления — отображается после успешной оплаты
 def checkout_done_view(request):
     return render(request, 'cart/checkout_done.html')
+
+# Отображается после неудачной оплаты
+def checkout_failed_view(request):
+    return render(request, 'cart/checkout_failed.html')
 
 # Очистка корзины гостя по session_id (вызов из JS при истечении срока)
 @require_POST
