@@ -8,6 +8,7 @@ from .views import (
     user_cabinet_view,
     edit_profile_view,
     google_login_complete_safe,
+    save_pre_social_session
 )
 from social_django.urls import urlpatterns as social_urls
 
@@ -32,4 +33,7 @@ urlpatterns = [
     # Кабинет пользователя
     path('cabinet/', user_cabinet_view, name='user_cabinet'),
     path('cabinet/edit/', edit_profile_view, name='edit_profile'),
+
+    # Сохранение сессии
+    path('save-pre-session/', save_pre_social_session, name='save_pre_social_session'),
 ]

@@ -17,12 +17,14 @@ from django.db import IntegrityError
 from datetime import timedelta
 from django.utils import timezone
 from django import forms
-from django.http import HttpResponseRedirect
-from django.urls import reverse
 from cart.models import Order, Cart, CartItem
 from social_core.exceptions import AuthCanceled
 from social_django.views import complete
-
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+# from django.http import HttpResponseRedirect
+# from django.urls import reverse
 
 # Регистрация нового пользователя
 def register_view(request):
@@ -313,3 +315,10 @@ def google_login_complete_safe(request, backend):
         return complete(request, backend)
     except AuthCanceled:
         return redirect('/login/?cancel=1')
+
+# Сохранение session key
+@require_POST
+@csrf_exempt
+def save_pre_social_session(request):
+    request.session['pre_social_auth_session_key'] = request.session.session_key or request.session.create()
+    return JsonResponse({'status': 'ok'})

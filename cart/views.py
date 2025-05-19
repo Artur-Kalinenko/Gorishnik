@@ -37,9 +37,6 @@ def add_to_cart(request, product_id):
         variant_id = data.get('variant_id')
         variant_id = int(variant_id) if variant_id not in [None, '', 'null', 'undefined'] else None
         quantity = int(data.get('quantity', 1))
-        print("Получено из запроса:", data)
-        print("variant_id:", variant_id)
-        print("product.id:", product.id)
 
         if variant_id:
             variant = get_object_or_404(AssortmentVariant, id=variant_id, assortment=product)
