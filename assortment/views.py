@@ -1,9 +1,14 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models import Q, Prefetch, Count, Min, Max, Case, When, F, Value, Subquery, OuterRef, DecimalField
+from django.db.models.functions import Coalesce
+from django.db.models.expressions import OrderBy
+from django.db.models import Q, Prefetch, Count, Min, Max, Case, When, F, Value, Subquery, OuterRef, DecimalField, Avg
 from .models import (
     Assortment, Category,
-    AssortmentVariant, FilterGroup, FilterOption
+    AssortmentVariant, FilterGroup, FilterOption, Review
 )
+from .forms import ReviewForm
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.utils import timezone
 from django.utils.timezone import now
 from datetime import timedelta
@@ -52,6 +57,7 @@ def assortment_list(request):
         ),
         min_price=Subquery(variant_qs.order_by('price').values('price')[:1], output_field=DecimalField()),
         max_price=Subquery(variant_qs.order_by('-price').values('price')[:1], output_field=DecimalField()),
+        avg_rating=Avg('reviews__rating'),
     ).prefetch_related('variants').distinct()
 
     # Сортировка
@@ -63,6 +69,8 @@ def assortment_list(request):
         assortments = assortments.order_by('-created_at')
     elif sort == 'popular':
         assortments = assortments.order_by('-popularity')
+    elif sort == 'rating':
+        assortments = assortments.order_by(OrderBy(F('avg_rating'), descending=True, nulls_last=True))
 
     # ID всех отфильтрованных товаров
     filtered_assortment_ids = assortments.values_list('id', flat=True)
@@ -98,30 +106,50 @@ def assortment_list(request):
 def assortment_detail(request, pk):
     assortment = get_object_or_404(Assortment, pk=pk)
     variants = assortment.variants.all()
+    reviews = assortment.reviews.select_related('user')
 
-    # Получаем словарь просмотренных товаров
+    # Увеличиваем popular только раз в 24 часа
     viewed = request.session.get('viewed_products', {})
-
-    # Время последнего просмотра конкретного товара
     last_viewed_str = viewed.get(str(pk))
-
     should_update = False
     try:
         if last_viewed_str:
             last_viewed = timezone.datetime.fromisoformat(last_viewed_str)
-            if now() - last_viewed > timedelta(hours=24):
+            if timezone.now() - last_viewed > timedelta(hours=24):
                 should_update = True
         else:
             should_update = True
     except Exception:
-        should_update = True  # если что-то пошло не так с форматом
+        should_update = True
 
     if should_update:
         Assortment.objects.filter(pk=pk).update(popularity=F('popularity') + 1)
-        viewed[str(pk)] = now().isoformat()
+        viewed[str(pk)] = timezone.now().isoformat()
         request.session['viewed_products'] = viewed
+
+    # Отзыв
+    form = None
+    user_review = None
+
+    if request.user.is_authenticated:
+        user_review = Review.objects.filter(user=request.user, assortment=assortment).first()
+        if not user_review:
+            if request.method == 'POST':
+                form = ReviewForm(request.POST)
+                if form.is_valid():
+                    review = form.save(commit=False)
+                    review.user = request.user
+                    review.assortment = assortment
+                    review.save()
+                    messages.success(request, "Ваш відгук додано!")
+                    return redirect('assortment_detail', pk=pk)
+            else:
+                form = ReviewForm()
 
     return render(request, 'assortment/assortment_detail.html', {
         'assortment': assortment,
         'variants': variants,
+        'reviews': reviews,
+        'form': form,
+        'user_review': user_review,
     })

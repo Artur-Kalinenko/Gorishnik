@@ -90,6 +90,7 @@
                     <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Новинки</option>
                     <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>За ціною ↑</option>
                     <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>За ціною ↓</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>За рейтингом</option>
                 </select>
             </form>
 

@@ -6,10 +6,9 @@
 {% endblock %}
 
 {% block content %}
-<!-- Страница с деталями товара -->
 <div class="container mt-5">
     <div class="row">
-        <!-- Изображение товара -->
+        <!-- Картинка -->
         <div class="col-md-6">
             {% if assortment.poster %}
                 <img src="{{ assortment.poster.url }}" class="img-fluid" alt="{{ assortment.assortment_name }}">
@@ -18,7 +17,7 @@
             {% endif %}
         </div>
 
-        <!-- Информация о товаре -->
+        <!-- Инфо о товаре -->
         <div class="col-md-6">
             <h1 class="montserrat-category-title">{{ assortment.assortment_name }}</h1>
             <p><strong>Категорія:</strong> {{ assortment.assortment_categories }}</p>
@@ -27,18 +26,29 @@
             <p><strong>Опис продукту:</strong></p>
             <p>{{ assortment.assortment_description }}</p>
 
-            <!-- Цена -->
+            <!-- Ціна -->
             <p class="card-text">
                 <strong id="price-display">
                     {% if variants.exists %}
-                        {{ variants.first.price }} ₴
+                        {% with sorted_variants=variants|dictsort:"price" %}
+                            {% with min=sorted_variants.0.price %}
+                                {% with sorted_variants|last as last_variant %}
+                                    {% if min != last_variant.price %}
+                                        {{ min }} ₴ – {{ last_variant.price }} ₴
+                                    {% else %}
+                                        {{ min }} ₴
+                                    {% endif %}
+                                {% endwith %}
+                            {% endwith %}
+                        {% endwith %}
                     {% else %}
                         {{ assortment.price }} ₴
                     {% endif %}
                 </strong>
             </p>
 
-            <!-- Кнопки выбора граммовки -->
+
+            <!-- Варианты -->
             {% if variants.exists %}
                 <div class="mb-3">
                     {% for variant in variants %}
@@ -53,8 +63,67 @@
             {% endif %}
         </div>
     </div>
+
+    <hr>
+
+    <!-- ⭐ Средний рейтинг -->
+    <h4>Рейтинг:</h4>
+    <p>
+        {% with avg=assortment.average_rating %}
+            {% for _ in "12345" %}
+                {% if forloop.counter <= avg %}
+                    ⭐
+                {% elif forloop.counter <= avg|floatformat:1 %}
+                    ⭐️
+                {% else %}
+                    ☆
+                {% endif %}
+            {% endfor %}
+            ({{ avg|floatformat:1 }} / 5)
+        {% endwith %}
+    </p>
+
+    <!-- 💬 Отзывы -->
+    <h5 class="mt-4">Відгуки:</h5>
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="border rounded p-2 mb-2">
+                <strong>{{ review.user.username }}</strong>
+                <span class="text-muted">— {{ review.created_at|date:"d.m.Y H:i" }}</span><br>
+                <span>
+                    {% for _ in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                            ⭐
+                        {% else %}
+                            ☆
+                        {% endif %}
+                    {% endfor %}
+                </span>
+                {% if review.comment %}
+                    <p>{{ review.comment }}</p>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Немає відгуків.</p>
+    {% endif %}
+
+    <!-- 📝 Форма для оставления отзыва -->
+    {% if user.is_authenticated and not user_review %}
+        <hr>
+        <h5 class="mt-4">Залишити відгук:</h5>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Надіслати</button>
+        </form>
+    {% elif user_review %}
+        <div class="alert alert-info mt-4">Ви вже залишали відгук.</div>
+    {% else %}
+        <div class="alert alert-warning mt-4">Щоб залишити відгук, увійдіть до акаунту.</div>
+    {% endif %}
 </div>
 
-<!-- Скрипт обработки выбора граммовки -->
+<!-- JS для выбора граммовки -->
 <script src="{% static 'assortment/assortment_detail.js' %}"></script>
 {% endblock %}

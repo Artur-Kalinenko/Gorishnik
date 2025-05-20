@@ -2,6 +2,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from producer.models import Producer
 from django.conf import settings
+from django.db.models import Avg
 
 # Основная модель товара
 class Assortment(models.Model):
@@ -27,6 +28,10 @@ class Assortment(models.Model):
 
         if not self.has_variants and not self.price:
             raise ValidationError("Необхідно або вказати ціну, або активувати 'є варіанти'.")
+
+    @property
+    def average_rating(self):
+        return self.reviews.aggregate(avg=Avg('rating'))['avg'] or 0
 
     class Meta:
         verbose_name = 'Товар'
@@ -63,6 +68,20 @@ class Category(models.Model):
     def __str__(self):
         return self.category
 
+# Отзывы о товаре
+class Review(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Користувач')
+    assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='reviews', verbose_name='Продукт')
+    rating = models.PositiveSmallIntegerField(choices=[(i, str(i)) for i in range(1, 6)], verbose_name='Оцінка')
+    comment = models.TextField(blank=True, verbose_name='Відгук')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'assortment')  # 1 отзыв от пользователя
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user} → {self.assortment} ({self.rating})"
 
 # Группа фильтров, например: "Орехи", "Восточные солодощі"
 class FilterGroup(models.Model):
