@@ -1,0 +1,51 @@
+<form method="get" id="filter-form">
+    {% if selected_category %}
+        <input type="hidden" name="category" value="{{ selected_category }}">
+    {% endif %}
+    {% if query %}
+        <input type="hidden" name="q" value="{{ query }}">
+    {% endif %}
+
+    <!-- 🔽 Специальные фильтры -->
+    <div class="filter-group mb-3">
+        <h5 class="filter-header">Додатково</h5>
+        <div class="filter-options">
+            <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="discounted" value="1"
+                       {% if request.GET.discounted %}checked{% endif %}>
+                <label class="form-check-label">Акційні пропозиції</label>
+            </div>
+            <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="new" value="1"
+                       {% if request.GET.new %}checked{% endif %}>
+                <label class="form-check-label">Новинки</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔽 Основные фильтры -->
+    {% for group in filter_groups %}
+        <div class="filter-group mb-3">
+            <h5 class="filter-header d-flex justify-content-between align-items-center"
+                data-group-id="{{ group.id }}" style="cursor: pointer;">
+                {{ group.name }}
+                <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
+            </h5>
+            <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
+                {% for option in group.options.all %}
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" name="filters" value="{{ option.id }}"
+                               {% if option.id in selected_filter_ids %}checked{% endif %}>
+                        <label class="form-check-label">
+                            {{ option.name }} ({{ option.count_in_category }})
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
+        Очистити фільтри
+    </button>
+</form>

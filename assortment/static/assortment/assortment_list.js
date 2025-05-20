@@ -165,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             params.delete('filters');
             params.delete('q');
+            params.delete('discounted');
+            params.delete('new');
 
             localStorage.removeItem(OPENED_FILTERS_KEY);
 

@@ -22,21 +22,26 @@ def assortment_list(request):
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
+    discounted_only = request.GET.get('discounted') == '1'
+    new_only = request.GET.get('new') == '1'
 
     assortments = Assortment.objects.all()
     current_category = None
 
-    # Фильтрация по категории
     if selected_category:
         assortments = assortments.filter(assortment_categories__category=selected_category)
         current_category = categories.filter(category=selected_category).first()
 
-    # Фильтрация по фильтрам
     if selected_filter_ids:
         for filter_id in selected_filter_ids:
             assortments = assortments.filter(filters__id=filter_id)
 
-    # Поиск
+    if discounted_only:
+        assortments = assortments.filter(is_discounted=True)
+
+    if new_only:
+        assortments = assortments.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
+
     if query:
         assortments = assortments.filter(
             Q(assortment_name__icontains=query) |
@@ -47,12 +52,11 @@ def assortment_list(request):
             Q(filters__group__name__icontains=query)
         ).distinct()
 
-    # 🔍 Subquery для min и max цен по вариантам
     variant_qs = AssortmentVariant.objects.filter(assortment=OuterRef('pk'))
 
     if sort == 'price_desc':
         price_subquery = Subquery(variant_qs.order_by('-price').values('price')[:1])
-    else:  # по умолчанию и для price_asc, popular, newest
+    else:
         price_subquery = Subquery(variant_qs.order_by('price').values('price')[:1])
 
     assortments = assortments.annotate(
@@ -66,7 +70,6 @@ def assortment_list(request):
         avg_rating=Avg('reviews__rating'),
     ).prefetch_related('variants').distinct()
 
-    # Сортировка
     if sort == 'price_asc':
         assortments = assortments.order_by('effective_price')
     elif sort == 'price_desc':
@@ -78,10 +81,8 @@ def assortment_list(request):
     elif sort == 'rating':
         assortments = assortments.order_by(OrderBy(F('avg_rating'), descending=True, nulls_last=True))
 
-    # ID всех отфильтрованных товаров
     filtered_assortment_ids = assortments.values_list('id', flat=True)
 
-    # Опции фильтров
     filtered_options = FilterOption.objects.filter(
         products__id__in=filtered_assortment_ids
     ).annotate(
@@ -105,6 +106,8 @@ def assortment_list(request):
         'filter_groups': filter_groups,
         'selected_filter_ids': selected_filter_ids,
         'query': query,
+        'discounted_only': discounted_only,
+        'new_only': new_only,
     })
 
 
@@ -167,20 +170,26 @@ def search_suggest(request):
     results = []
 
     if q:
-        matches = Assortment.objects.filter(
-            Q(assortment_name__icontains=q) |
-            Q(assortment_description__icontains=q) |
-            Q(tags__name__icontains=q) |
-            Q(assortment_categories__category__icontains=q) |
-            Q(filters__name__icontains=q) |
-            Q(filters__group__name__icontains=q)
-        ).distinct()[:6]
+        matches = (
+            Assortment.objects
+            .filter(
+                Q(assortment_name__icontains=q) |
+                Q(assortment_description__icontains=q) |
+                Q(tags__name__icontains=q) |
+                Q(assortment_categories__category__icontains=q) |
+                Q(filters__name__icontains=q) |
+                Q(filters__group__name__icontains=q)
+            )
+            .prefetch_related('assortment_categories')
+            .distinct()[:6]
+        )
 
         for item in matches:
+            first_category = item.assortment_categories.first()
             results.append({
                 'name': item.assortment_name,
                 'url': f"/assortment/{item.pk}/",
-                'category': item.assortment_categories.category if item.assortment_categories else '',
+                'category': first_category.category if first_category else '',
             })
 
     return JsonResponse({'results': results})

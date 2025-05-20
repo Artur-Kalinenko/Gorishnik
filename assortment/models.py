@@ -3,19 +3,22 @@ from django.core.exceptions import ValidationError
 from producer.models import Producer
 from django.conf import settings
 from django.db.models import Avg
+from django import forms
 
 # Основная модель товара
 class Assortment(models.Model):
     assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
-    assortment_categories = models.ManyToManyField('Category', related_name='assortments', verbose_name='Назва категорії', blank=False)
+    assortment_categories = models.ManyToManyField('Category', related_name='assortments', verbose_name='Назва категорії')
     filters = models.ManyToManyField('FilterOption', blank=True, related_name='products', verbose_name='Фільтри')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту')
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна')
     grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
-    poster = models.ImageField(upload_to='assortment/posters/', null=True, blank=True, verbose_name='Картинка продукту')
+    poster = models.ImageField(upload_to='assortment/posters/', null=False, blank=False, verbose_name='Картинка продукту')
     producer = models.ForeignKey(Producer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Назва виробника')
     assortment_description = models.TextField(null=True, verbose_name='Опис продукту')
     is_available = models.BooleanField(default=True, verbose_name='Наявність продукту')
     has_variants = models.BooleanField(default=False, verbose_name='Чи є варіанти продукту')
+    is_discounted = models.BooleanField(default=False, verbose_name='Акційний товар')
     popularity = models.PositiveIntegerField(default=0, verbose_name='Популярність')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата додавання')
     tags = models.ManyToManyField('Tag', blank=True, related_name='products', verbose_name='Мітки')
@@ -30,9 +33,17 @@ class Assortment(models.Model):
         if not self.has_variants and not self.price:
             raise ValidationError("Необхідно або вказати ціну, або активувати 'є варіанти'.")
 
+        if self.is_discounted and not self.has_variants and not self.old_price:
+            raise ValidationError("Акційний товар повинен мати стару ціну (old_price).")
+
     @property
     def average_rating(self):
         return self.reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+
+    @property
+    def is_new(self):
+        from django.utils import timezone
+        return self.created_at >= timezone.now() - timezone.timedelta(days=30)
 
     class Meta:
         verbose_name = 'Товар'
@@ -45,6 +56,7 @@ class AssortmentVariant(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='variants', verbose_name='Продукт')
     grams = models.IntegerField(verbose_name='Грамовка продукту')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна за грамовку')
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна')
 
     def __str__(self):
         return f'{self.grams}г - ₴{self.price}'
@@ -53,6 +65,7 @@ class AssortmentVariant(models.Model):
         verbose_name = 'Варіант продукту'
         verbose_name_plural = 'Варіанти продуктів'
         ordering = ['grams']
+
 
 # Модель тегов для товара
 class Tag(models.Model):
@@ -128,3 +141,15 @@ class FilterOption(models.Model):
 
     def __str__(self):
         return f"{self.group.name} → {self.name}"
+
+# не уверен надо ли
+class AssortmentAdminForm(forms.ModelForm):
+    class Meta:
+        model = Assortment
+        fields = '__all__'
+
+    def clean_filters(self):
+        filters = self.cleaned_data.get('filters')
+        if not filters:
+            raise forms.ValidationError("Товар повинен мати хоча б один фільтр.")
+        return filters

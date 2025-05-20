@@ -100,7 +100,7 @@
     {% if reviews %}
         {% for review in reviews %}
             <div class="border rounded p-2 mb-2">
-                <strong>{{ review.user.username }}</strong>
+                <strong>{{ review.user.first_name|default:review.user.email }}</strong>
                 <span class="text-muted">— {{ review.created_at|date:"d.m.Y H:i" }}</span><br>
                 <span>
                     {% for _ in "12345" %}

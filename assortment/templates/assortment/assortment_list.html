@@ -14,31 +14,28 @@
 {% block content %}
 <div class="container mt-5">
 
-    <!-- Заголовок страницы -->
+    <!-- Заголовок -->
     <h1 class="montserrat-category-title d-flex align-items-center justify-content-center mb-4">
         {% if query %}
             Результати пошуку для: "{{ query }}"
         {% elif current_category and current_category.display_icon %}
-            <img src="{{ current_category.display_icon.url }}" alt="{{ current_category.category }}"
-                 style="height: 60px; width: 60px; margin-right: 15px;">
+            <img src="{{ current_category.display_icon.url }}" alt="{{ current_category.category }}" style="height: 60px; width: 60px; margin-right: 15px;">
             {{ current_category.category }}
         {% else %}
             Асортимент
         {% endif %}
     </h1>
 
-    <!-- Категории -->
+    <!-- Категорії -->
     {% if not query %}
     <div class="d-flex justify-content-center mb-4 flex-wrap">
         <a href="{% url 'assortment_list' %}" class="btn btn-primary mx-2 {% if not current_category %}active{% endif %}">
             Всі товари
         </a>
         {% for category in categories %}
-            <a href="{% url 'assortment_list' %}?category={{ category.category }}"
-               class="btn btn-secondary mx-2 {% if current_category and current_category.category == category.category %}active{% endif %}">
+            <a href="{% url 'assortment_list' %}?category={{ category.category }}" class="btn btn-secondary mx-2 {% if current_category and current_category.category == category.category %}active{% endif %}">
                 {% if category.button_icon %}
-                    <img src="{{ category.button_icon.url }}" alt="{{ category.category }}"
-                         style="height: 30px; width: 30px; margin-right: 5px;">
+                    <img src="{{ category.button_icon.url }}" alt="{{ category.category }}" style="height: 30px; width: 30px; margin-right: 5px;">
                 {% endif %}
                 {{ category.category }}
             </a>
@@ -47,52 +44,15 @@
     {% endif %}
 
     <div class="row">
-        <!-- Сайдбар -->
         <div class="col-md-3">
-            <form method="get" id="filter-form">
-                {% if selected_category %}
-                    <input type="hidden" name="category" value="{{ selected_category }}">
-                {% endif %}
-                {% if query %}
-                    <input type="hidden" name="q" value="{{ query }}">
-                {% endif %}
-
-                {% for group in filter_groups %}
-                    <div class="filter-group mb-3">
-                        <h5 class="filter-header d-flex justify-content-between align-items-center"
-                            data-group-id="{{ group.id }}" style="cursor: pointer;">
-                            {{ group.name }}
-                            <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
-                        </h5>
-                        <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
-                            {% for option in group.options.all %}
-                                <div class="form-check mb-1">
-                                    <input class="form-check-input" type="checkbox" name="filters" value="{{ option.id }}"
-                                           {% if option.id in selected_filter_ids %}checked{% endif %}>
-                                    <label class="form-check-label">
-                                        {{ option.name }} ({{ option.count_in_category }})
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endfor %}
-
-                <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
-                    Очистити фільтри
-                </button>
-            </form>
+            {% include 'assortment/_sidebar_filters.html' %}
         </div>
 
-        <!-- Карточки товаров -->
         <div class="col-md-9">
-
-            <!-- 🔽 Сортировка -->
+            <!-- Сортировка -->
             <form method="get" class="mb-4 d-flex justify-content-end">
                 {% for key, value in request.GET.items %}
-                    {% if key != 'sort' %}
-                        <input type="hidden" name="{{ key }}" value="{{ value }}">
-                    {% endif %}
+                    {% if key != 'sort' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
                 {% endfor %}
                 <select name="sort" onchange="this.form.submit()" class="form-select w-auto">
                     <option value="">Сортувати...</option>
@@ -105,97 +65,109 @@
             </form>
 
             {% if assortments %}
-                <div class="row row-cols-1 row-cols-md-4 g-4">
-                    {% for item in assortments %}
-                        <div class="col">
-                            <div class="card shadow-sm h-100 rounded border-0 product-card" id="card-{{ item.pk }}">
-                                <a href="{% url 'assortment_detail' item.pk %}">
-                                    {% if item.poster %}
-                                        <img src="{{ item.poster.url }}" class="card-img-top" alt="{{ item.assortment_name }}" style="height: 150px; object-fit: cover;">
-                                    {% else %}
-                                        <img src="{% static 'images/default.jpg' %}" class="card-img-top" alt="{{ item.assortment_name }}" style="height: 150px; object-fit: cover;">
-                                    {% endif %}
+            <div class="row row-cols-1 row-cols-md-4 g-4">
+                {% for item in assortments %}
+                <div class="col">
+                    <div class="card shadow-sm h-100 rounded border-0 product-card position-relative">
+                        <!-- Плашки -->
+                        {% if item.is_new %}
+                            <span class="badge bg-success position-absolute top-0 start-0 m-2">Новинка</span>
+                        {% endif %}
+                        {% if item.is_discounted %}
+                            <span class="badge bg-danger position-absolute top-0 end-0 m-2">Акція</span>
+                        {% endif %}
+
+                        <a href="{% url 'assortment_detail' item.pk %}">
+                            {% if item.poster %}
+                                <img src="{{ item.poster.url }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            {% else %}
+                                <img src="{% static 'images/default.jpg' %}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                            {% endif %}
+                        </a>
+                        <div class="card-body text-center">
+                            <h5 class="montserrat-category-title">
+                                <a href="{% url 'assortment_detail' item.pk %}" class="text-decoration-none text-dark">{{ item.assortment_name }}</a>
+                            </h5>
+
+                            {% for cat in item.assortment_categories.all %}
+                                <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="btn btn-outline-info btn-sm mb-2">
+                                    {% if cat.button_icon %}<img src="{{ cat.button_icon.url }}" style="height: 20px; width: 20px; margin-right: 5px;">{% endif %}
+                                    {{ cat.category }}
                                 </a>
-                                <div class="card-body text-center">
-                                    <h5 class="montserrat-category-title">
-                                        <a href="{% url 'assortment_detail' item.pk %}" class="text-decoration-none text-dark">
-                                            {{ item.assortment_name }}
-                                        </a>
-                                    </h5>
+                            {% endfor %}
 
-                                    {% for cat in item.categories.all %}
-                                        <a href="{% url 'assortment_list' %}?category={{ cat.category }}"
-                                           class="btn btn-outline-info btn-sm mb-3">
-                                            {% if cat.button_icon %}
-                                                <img src="{{ cat.button_icon.url }}" alt="{{ cat.category }}"
-                                                     style="height: 20px; width: 20px; margin-right: 5px;">
+                            <!-- Цены -->
+                            <p class="card-text" id="price-display-{{ item.pk }}">
+                                {% if item.variants.exists %}
+                                    {% with sorted_variants=item.variants.all|dictsort:"price" %}
+                                        {% with min=sorted_variants|first max=sorted_variants|last %}
+                                            {% if min.old_price or max.old_price %}
+                                                <span class="text-muted text-decoration-line-through">
+                                                    {% if min.old_price %}{{ min.old_price }} ₴{% endif %}
+                                                    {% if max.old_price and max.old_price != min.old_price %} – {{ max.old_price }} ₴{% endif %}
+                                                </span><br>
                                             {% endif %}
-                                            {{ cat.category }}
-                                        </a>
-                                    {% endfor %}
-
-                                    <p class="card-text">
-                                        <strong id="price-display-{{ item.pk }}">
-                                            {% if item.variants.exists %}
-                                                {{ item.min_price }} ₴ – {{ item.max_price }} ₴
-                                            {% else %}
-                                                {{ item.price }} ₴
-                                            {% endif %}
-                                        </strong>
-                                    </p>
-
-                                    {% if item.variants.count > 1 %}
-                                        <div class="mb-2">
-                                            <a href="{% url 'assortment_detail' item.pk %}"
-                                               class="btn btn-primary btn-sm select-variant-button"
-                                               id="select-variant-{{ item.pk }}">
-                                                Оберіть грамовку
-                                            </a>
-                                        </div>
-                                        <div class="mb-3">
-                                            {% for variant in item.variants.all %}
-                                                <button class="btn btn-outline-secondary grams-button btn-sm"
-                                                        data-product-id="{{ item.pk }}"
-                                                        data-variant-id="{{ variant.id }}"
-                                                        data-price="{{ variant.price }}">
-                                                    {{ variant.grams }}г
-                                                </button>
-                                            {% endfor %}
-                                        </div>
-                                    {% elif item.variants.count == 1 %}
-                                        {% with variant=item.variants.first %}
-                                            <p class="card-text">{{ variant.grams }} г</p>
-                                            <div class="d-flex align-items-center justify-content-center btn-group-container"
-                                                 id="controls-{{ item.pk }}">
-                                                <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                                                <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
-                                                <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                                                <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">
-                                                    В корзину
-                                                </button>
-                                            </div>
+                                            <strong>
+                                                {% if min.price %}
+                                                    {{ min.price }} ₴
+                                                    {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}
+                                                {% else %}
+                                                    {{ max.price }} ₴
+                                                {% endif %}
+                                            </strong>
                                         {% endwith %}
-                                    {% else %}
-                                        <p class="card-text">{{ item.grams }} г</p>
-                                        <div class="d-flex align-items-center justify-content-center btn-group-container"
-                                             id="controls-{{ item.pk }}">
-                                            <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                                            <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
-                                            <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                                            <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}">
-                                                В корзину
-                                            </button>
-                                        </div>
+                                    {% endwith %}
+                                {% else %}
+                                    {% if item.old_price and item.old_price > item.price %}
+                                        <span class="text-muted text-decoration-line-through">{{ item.old_price }} ₴</span><br>
                                     {% endif %}
+                                    <strong>{{ item.price }} ₴</strong>
+                                {% endif %}
+                            </p>
+
+                            <!-- Кнопки -->
+                            {% if item.variants.count > 1 %}
+                                <div class="mb-2">
+                                    <a href="{% url 'assortment_detail' item.pk %}" class="btn btn-primary btn-sm select-variant-button" id="select-variant-{{ item.pk }}">
+                                        Оберіть грамовку
+                                    </a>
                                 </div>
-                            </div>
+                                <div class="mb-3">
+                                    {% for variant in item.variants.all %}
+                                        <button class="btn btn-outline-secondary grams-button btn-sm"
+                                                data-product-id="{{ item.pk }}"
+                                                data-variant-id="{{ variant.id }}"
+                                                data-price="{{ variant.price }}">
+                                            {{ variant.grams }}г
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            {% elif item.variants.count == 1 %}
+                                {% with variant=item.variants.first %}
+                                    <p class="card-text">{{ variant.grams }} г</p>
+                                    <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
+                                        <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                                        <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
+                                        <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                                        <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">В корзину</button>
+                                    </div>
+                                {% endwith %}
+                            {% else %}
+                                <p class="card-text">{{ item.grams }} г</p>
+                                <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
+                                    <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
+                                    <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                                    <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}">В корзину</button>
+                                </div>
+                            {% endif %}
                         </div>
-                    {% endfor %}
+                    </div>
                 </div>
+                {% endfor %}
+            </div>
             {% else %}
-                <div class="alert alert-warning text-center" role="alert">
-                    Результати пошуку відсутні.
-                </div>
+            <div class="alert alert-warning text-center">Результати пошуку відсутні.</div>
             {% endif %}
         </div>
     </div>
