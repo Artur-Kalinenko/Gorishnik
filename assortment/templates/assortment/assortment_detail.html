@@ -20,7 +20,11 @@
         <!-- Инфо о товаре -->
         <div class="col-md-6">
             <h1 class="montserrat-category-title">{{ assortment.assortment_name }}</h1>
-            <p><strong>Категорія:</strong> {{ assortment.assortment_categories }}</p>
+            <p><strong>Категорії:</strong>
+                {% for cat in assortment.categories.all %}
+                    {{ cat.category }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
             <p><strong>Виробник:</strong> {{ assortment.producer.producer_name }}</p>
             <p><strong>Наявність:</strong> {{ assortment.is_available|yesno:"У наявності,Нема у наявності" }}</p>
             <p><strong>Опис продукту:</strong></p>

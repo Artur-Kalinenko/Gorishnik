@@ -7,7 +7,7 @@ from django.db.models import Avg
 # Основная модель товара
 class Assortment(models.Model):
     assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
-    assortment_categories = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name='Назва категорії')
+    assortment_categories = models.ManyToManyField('Category', related_name='assortments', verbose_name='Назва категорії', blank=False)
     filters = models.ManyToManyField('FilterOption', blank=True, related_name='products', verbose_name='Фільтри')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту')
     grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
@@ -81,6 +81,11 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category
+
+    def delete(self, *args, **kwargs):
+        if self.assortments.exists():  # ← Используем related_name
+            raise ValidationError("Неможливо видалити категорію, оскільки до неї прив'язані товари.")
+        super().delete(*args, **kwargs)
 
 # Отзывы о товаре
 class Review(models.Model):

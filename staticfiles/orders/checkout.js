@@ -1,4 +1,6 @@
-document.addEventListener('DOMContentLoaded', function () {
+$(function () {
+    console.log("checkout.js loaded");
+
     const deliveryRadios = document.querySelectorAll('input[name="delivery_method"]');
     const novaPoshtaFields = document.getElementById('nova-poshta-fields');
     const ukrPoshtaFields = document.getElementById('ukr-poshta-fields');

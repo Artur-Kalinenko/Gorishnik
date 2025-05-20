@@ -51,10 +51,14 @@ class VerificationCode(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
+    last_sent_at = models.DateTimeField()
 
     # Проверка, истёк ли срок действия кода
     def is_expired(self):
         return timezone.now() > self.created_at + timezone.timedelta(minutes=15)
+
+    def can_resend(self):
+        return timezone.now() - self.last_sent_at >= timezone.timedelta(seconds=60)
 
     # Генерация случайного 6-значного кода
     @staticmethod

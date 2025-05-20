@@ -123,15 +123,16 @@
                                         </a>
                                     </h5>
 
-                                    <a href="{% url 'assortment_list' %}?category={{ item.assortment_categories.category }}"
-                                       class="btn btn-outline-info btn-sm mb-3">
-                                        {% if item.assortment_categories.button_icon %}
-                                            <img src="{{ item.assortment_categories.button_icon.url }}"
-                                                 alt="{{ item.assortment_categories.category }}"
-                                                 style="height: 20px; width: 20px; margin-right: 5px;">
-                                        {% endif %}
-                                        {{ item.assortment_categories.category }}
-                                    </a>
+                                    {% for cat in item.categories.all %}
+                                        <a href="{% url 'assortment_list' %}?category={{ cat.category }}"
+                                           class="btn btn-outline-info btn-sm mb-3">
+                                            {% if cat.button_icon %}
+                                                <img src="{{ cat.button_icon.url }}" alt="{{ cat.category }}"
+                                                     style="height: 20px; width: 20px; margin-right: 5px;">
+                                            {% endif %}
+                                            {{ cat.category }}
+                                        </a>
+                                    {% endfor %}
 
                                     <p class="card-text">
                                         <strong id="price-display-{{ item.pk }}">

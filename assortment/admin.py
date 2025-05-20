@@ -13,11 +13,15 @@ class AssortmentVariantInline(admin.TabularInline):
 # Админка для модели Assortment (товар)
 @admin.register(Assortment)
 class AssortmentAdmin(admin.ModelAdmin):
-    list_display = ['assortment_name', 'assortment_categories', 'producer', 'price', 'is_available']
-    list_filter = ['assortment_categories', 'producer', 'is_available']
+    list_display = ['assortment_name', 'get_categories', 'producer', 'price', 'is_available']
+    list_filter = ['producer', 'is_available']
     search_fields = ['assortment_name']
     inlines = [AssortmentVariantInline]
-    filter_horizontal = ['filters', 'tags']
+    filter_horizontal = ['filters', 'tags', 'assortment_categories']
+
+    def get_categories(self, obj):
+        return ", ".join([cat.category for cat in obj.assortment_categories.all()])
+    get_categories.short_description = 'Категорії'
 
 
 # Админка для категорий

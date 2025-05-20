@@ -54,7 +54,7 @@ def register_view(request):
 
                 # Создаём и отправляем код подтверждения
                 code = VerificationCode.generate_code()
-                VerificationCode.objects.create(user=user, code=code)
+                VerificationCode.objects.create(user=user, code=code, last_sent_at=timezone.now() - timedelta(minutes=1))
 
                 send_mail(
                     'Підтвердження реєстрації',
@@ -156,7 +156,7 @@ def password_reset_request_view(request):
             user = CustomUser.objects.filter(email=email).first()
             if user:
                 code = VerificationCode.generate_code()
-                VerificationCode.objects.create(user=user, code=code)
+                VerificationCode.objects.create(user=user, code=code, last_sent_at=timezone.now() - timedelta(minutes=1))
                 send_mail(
                     'Скидання пароля',
                     f'Ваш код: {code}',
@@ -179,21 +179,28 @@ def password_reset_code_view(request):
     user = CustomUser.objects.get(id=user_id)
 
     if request.method == 'POST':
-        if 'resend' in request.POST: # Ограничение: не чаще 1 раза в минуту
-            last_code = VerificationCode.objects.filter(user=user).order_by('-created_at').first()
-            if last_code and timezone.now() - last_code.created_at < timedelta(minutes=1):
+        if 'resend' in request.POST:
+            last_code = VerificationCode.objects.filter(user=user).order_by('-last_sent_at').first()
+            if last_code and not last_code.can_resend():
                 messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
             else:
-                VerificationCode.objects.filter(user=user).delete()
-                new_code = VerificationCode.generate_code()
-                VerificationCode.objects.create(user=user, code=new_code)
+                if last_code:
+                    last_code.code = VerificationCode.generate_code()
+                    last_code.last_sent_at = timezone.now()
+                    last_code.save()
+                    code = last_code.code
+                else:
+                    code = VerificationCode.generate_code()
+                    VerificationCode.objects.create(user=user, code=code)
+
                 send_mail(
                     'Новий код для скидання пароля',
-                    f'Ваш новий код: {new_code}',
+                    f'Ваш новий код: {code}',
                     settings.DEFAULT_FROM_EMAIL,
                     [user.email]
                 )
                 messages.success(request, 'Новий код було надіслано на вашу пошту.')
+
             form = PasswordResetCodeForm()
             return render(request, 'accounts/password_reset_code.html', {'form': form})
 
@@ -240,21 +247,27 @@ def verify_email_view(request):
     user = CustomUser.objects.get(id=user_id)
 
     if request.method == 'POST':
-        if 'resend' in request.POST: # Повторная отправка кода, если прошло более 1 минуты
-            last_code = VerificationCode.objects.filter(user=user).order_by('-created_at').first()
-            if last_code and timezone.now() - last_code.created_at < timedelta(minutes=1):
+        if 'resend' in request.POST:
+            last_code = VerificationCode.objects.filter(user=user).order_by('-last_sent_at').first()
+            if last_code and not last_code.can_resend():
                 messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
             else:
-                VerificationCode.objects.filter(user=user).delete()
-                new_code = VerificationCode.generate_code()
-                VerificationCode.objects.create(user=user, code=new_code)
+                if last_code:
+                    last_code.code = VerificationCode.generate_code()
+                    last_code.last_sent_at = timezone.now()
+                    last_code.save()
+                    code = last_code.code
+                else:
+                    code = VerificationCode.generate_code()
+                    VerificationCode.objects.create(user=user, code=code)
                 send_mail(
                     'Новий код підтвердження',
-                    f'Ваш новий код: {new_code}',
+                    f'Ваш новий код: {code}',
                     settings.DEFAULT_FROM_EMAIL,
                     [user.email]
                 )
                 messages.success(request, 'Новий код було надіслано на вашу пошту.')
+
             form = PasswordResetCodeForm()
             return render(request, 'accounts/verify_email.html', {'form': form})
 
