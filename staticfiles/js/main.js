@@ -23,6 +23,49 @@ function saveSessionAndRedirect() {
     });
 }
 
+// AJAX
+document.addEventListener("DOMContentLoaded", function () {
+    const input = document.getElementById("search-input");
+    const suggestions = document.getElementById("suggestions");
+
+    if (!input || !suggestions) return;
+
+    input.addEventListener("input", function () {
+        const query = input.value.trim();
+        if (!query) {
+            suggestions.innerHTML = "";
+            return;
+        }
+
+        fetch(`/assortment/search_suggest/?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                suggestions.innerHTML = "";
+                data.results.forEach(item => {
+                    const link = document.createElement("a");
+                    link.href = item.url;
+                    link.className = "list-group-item list-group-item-action";
+
+                    // Основное название товара
+                    link.innerHTML = `<strong>${item.name}</strong>`;
+
+                    // Если есть категория — показываем под названием
+                    if (item.category) {
+                        link.innerHTML += `<br><small class="text-muted">${item.category}</small>`;
+                    }
+
+                    suggestions.appendChild(link);
+                });
+            });
+    });
+
+    document.addEventListener("click", function (e) {
+        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+            suggestions.innerHTML = "";
+        }
+    });
+});
+
 // Проверка срока жизни корзины
 (function() {
     const CART_TTL_MS = 24 * 60 * 60 * 1000; // 24 часа

@@ -17,7 +17,8 @@ from django.db import IntegrityError
 from datetime import timedelta
 from django.utils import timezone
 from django import forms
-from cart.models import Order, Cart, CartItem
+from cart.models import Cart, CartItem
+from orders.models import Order
 from social_core.exceptions import AuthCanceled
 from social_django.views import complete
 from django.views.decorators.http import require_POST

@@ -1,15 +1,10 @@
-from django.shortcuts import get_object_or_404, redirect, render
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404, render
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Cart, CartItem, Order, OrderItem
+from .models import Cart, CartItem
 from assortment.models import Assortment, AssortmentVariant
-from django.core.mail import send_mail
-from django.conf import settings
-from .forms import OrderForm
-from cart.liqpay_client import LiqPay
 from accounts.forms import LoginForm
 import json
-import base64
 from django.views.decorators.http import require_POST
 
 
@@ -172,142 +167,6 @@ def base_context(request):
         'login_form': LoginForm()
     }
 
-# Оформление заказа + отправка email + очистка корзины
-def checkout_view(request):
-    cart = get_or_create_cart(request)
-    items = cart.items.all()
-
-    if not items:
-        return render(request, 'cart/checkout.html', {
-            'error': 'Кошик порожній'
-        })
-
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-
-            order = Order.objects.create(
-                user=request.user if request.user.is_authenticated else None,
-                full_name=cd['full_name'],
-                phone=cd['phone'],
-                email=cd['email'],
-                delivery_method=cd['delivery_method'],
-                address=cd['address'],
-            )
-
-            for item in items:
-                OrderItem.objects.create(
-                    order=order,
-                    product=item.product,
-                    variant=item.variant,
-                    quantity=item.quantity
-                )
-
-            subject = 'Нове замовлення з сайту'
-            # Формируем список товаров
-            items_text = ""
-            for item in items:
-                name = item.product.assortment_name if item.product else "Невідомий товар"
-                grams = item.variant.grams if item.variant else (item.product.grams if item.product else "-")
-                price = item.variant.price if item.variant else (item.product.price if item.product else 0)
-                quantity = item.quantity
-                total = price * quantity
-                items_text += f"- {name} — {grams}г × {quantity} = {total} грн\n"
-
-            message = f"""
-            Нове замовлення
-
-            ПІБ: {cd['full_name']}
-            Телефон: {cd['phone']}
-            Email: {cd['email']}
-            Спосіб доставки: {cd['delivery_method']}
-            Адреса: {cd['address']}
-
-            Замовлені товари:
-            {items_text}
-            Загальна сума: {order.total_price()} грн
-            """
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                ['kalinenko.a01@gmail.com'],
-                fail_silently=False
-            )
-
-            cart.items.all().delete()
-            return redirect('order_payment', order_id=order.id)
-
-    else:
-        form = OrderForm()
-
-    return render(request, 'cart/checkout.html', {
-        'form': form,
-        'items': items,
-        'total_price': sum(i.total_price() for i in items)
-    })
-
-
-# Страница оплаты через LiqPay — генерация подписи и данных
-def order_payment_view(request, order_id):
-    order = Order.objects.get(id=order_id)
-
-    liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
-
-    params = {
-        'action': 'pay',
-        'amount': float(order.total_price()),
-        'currency': 'UAH',
-        'description': f'Оплата замовлення №{order.id}',
-        'order_id': str(order.id),
-        'version': '3',
-        'sandbox': 1 if getattr(settings, 'LIQPAY_SANDBOX', True) else 0,
-        'server_url': request.build_absolute_uri('/liqpay-callback/'),
-        'result_url': request.build_absolute_uri('/cart/checkout/done/'),
-        'fail_url': request.build_absolute_uri('/cart/checkout/failed/'),
-    }
-
-    data = liqpay.cnb_data(params)
-    signature = liqpay.cnb_signature(params)
-
-    return render(request, 'cart/liqpay_payment.html', {
-        'order': order,
-        'data': data,
-        'signature': signature
-    })
-
-# Обработка callback-а от LiqPay (POST-запрос с результатом оплаты)
-@csrf_exempt
-def liqpay_callback_view(request):
-    data = request.POST.get('data')
-    signature = request.POST.get('signature')
-
-    liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
-
-    if signature == liqpay.str_to_sign(
-        settings.LIQPAY_PRIVATE_KEY + data + settings.LIQPAY_PRIVATE_KEY
-    ):
-        decoded_data = json.loads(base64.b64decode(data).decode('utf-8'))
-        order_id = decoded_data.get('order_id')
-        status = decoded_data.get('status')
-
-        if order_id and status in ['success', 'sandbox']:
-            order = Order.objects.filter(id=order_id).first()
-            if order:
-                order.payment_status = 'paid'
-                order.save()
-
-    return HttpResponse("OK")
-
-
-# Завершение оформления — отображается после успешной оплаты
-def checkout_done_view(request):
-    return render(request, 'cart/checkout_done.html')
-
-# Отображается после неудачной оплаты
-def checkout_failed_view(request):
-    return render(request, 'cart/checkout_failed.html')
 
 # Очистка корзины гостя по session_id (вызов из JS при истечении срока)
 @require_POST
