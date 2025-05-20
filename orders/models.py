@@ -16,6 +16,10 @@ class Order(models.Model):
     delivery_method = models.CharField(max_length=50)
     address = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    # Новая Почта (Refs)
+    city_ref = models.CharField(max_length=64, blank=True, null=True)
+    warehouse_ref = models.CharField(max_length=64, blank=True, null=True)
+
     # Статус оплаты
     payment_status = models.CharField(
         max_length=20,
