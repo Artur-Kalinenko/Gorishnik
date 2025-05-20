@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Assortment, AssortmentVariant, Category, FilterGroup, FilterOption
+from .models import Assortment, AssortmentVariant, Category, FilterGroup, FilterOption, Tag
 from producer.models import Producer
 
 # Варианты (граммовки) отображаются прямо внутри товара
@@ -17,13 +17,19 @@ class AssortmentAdmin(admin.ModelAdmin):
     list_filter = ['assortment_categories', 'producer', 'is_available']
     search_fields = ['assortment_name']
     inlines = [AssortmentVariantInline]
-    filter_horizontal = ['filters']
+    filter_horizontal = ['filters', 'tags']
+
 
 # Админка для категорий
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['category']
     search_fields = ['category']
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
 
 # Админка для групп фильтров
 @admin.register(FilterGroup)

@@ -47,9 +47,10 @@
             </ul>
 
             <div class="d-flex align-items-center">
-                <form class="d-flex align-items-center me-3" method="get" action="{% url 'assortment_list' %}">
+                <form class="d-flex align-items-center me-3 position-relative" method="get" action="{% url 'assortment_list' %}">
                     {% csrf_token %}
-                    <input class="form-control me-2" type="search" name="q" placeholder="Що будемо шукати?" value="{{ query|default:'' }}">
+                    <input class="form-control me-2" type="search" name="q" id="search-input" placeholder="Що будемо шукати?" autocomplete="off" value="{{ query|default:'' }}">
+                    <div id="suggestions" class="list-group position-absolute w-100" style="top: 100%; z-index: 1000;"></div>
                     <button class="btn btn-outline-success" type="submit">Пошук</button>
                 </form>
 

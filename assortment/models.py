@@ -18,6 +18,7 @@ class Assortment(models.Model):
     has_variants = models.BooleanField(default=False, verbose_name='Чи є варіанти продукту')
     popularity = models.PositiveIntegerField(default=0, verbose_name='Популярність')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата додавання')
+    tags = models.ManyToManyField('Tag', blank=True, related_name='products', verbose_name='Мітки')
 
     def __str__(self):
         return f'{self.assortment_name}'
@@ -52,6 +53,19 @@ class AssortmentVariant(models.Model):
         verbose_name = 'Варіант продукту'
         verbose_name_plural = 'Варіанти продуктів'
         ordering = ['grams']
+
+# Модель тегов для товара
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name='Назва мітки')
+
+    class Meta:
+        verbose_name = 'Мітка'
+        verbose_name_plural = 'Мітки'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
 
 
 # Категория товара

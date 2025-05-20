@@ -47,6 +47,14 @@
                 </strong>
             </p>
 
+            <!-- 🏷 Мітки -->
+            {% if assortment.tags.exists %}
+                <div class="mt-2">
+                    {% for tag in assortment.tags.all %}
+                        <span class="badge bg-success me-1">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
 
             <!-- Варианты -->
             {% if variants.exists %}

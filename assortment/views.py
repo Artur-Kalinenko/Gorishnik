@@ -1,6 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models.functions import Coalesce
 from django.db.models.expressions import OrderBy
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 from django.db.models import Q, Prefetch, Count, Min, Max, Case, When, F, Value, Subquery, OuterRef, DecimalField, Avg
 from .models import (
     Assortment, Category,
@@ -38,8 +40,12 @@ def assortment_list(request):
     if query:
         assortments = assortments.filter(
             Q(assortment_name__icontains=query) |
-            Q(assortment_categories__category__icontains=query)
-        )
+            Q(assortment_description__icontains=query) |
+            Q(assortment_categories__category__icontains=query) |
+            Q(tags__name__icontains=query) |
+            Q(filters__name__icontains=query) |
+            Q(filters__group__name__icontains=query)
+        ).distinct()
 
     # 🔍 Subquery для min и max цен по вариантам
     variant_qs = AssortmentVariant.objects.filter(assortment=OuterRef('pk'))
@@ -153,3 +159,28 @@ def assortment_detail(request, pk):
         'form': form,
         'user_review': user_review,
     })
+
+# AJAX поиск
+@require_GET
+def search_suggest(request):
+    q = request.GET.get('q', '').strip()
+    results = []
+
+    if q:
+        matches = Assortment.objects.filter(
+            Q(assortment_name__icontains=q) |
+            Q(assortment_description__icontains=q) |
+            Q(tags__name__icontains=q) |
+            Q(assortment_categories__category__icontains=q) |
+            Q(filters__name__icontains=q) |
+            Q(filters__group__name__icontains=q)
+        ).distinct()[:6]
+
+        for item in matches:
+            results.append({
+                'name': item.assortment_name,
+                'url': f"/assortment/{item.pk}/",
+                'category': item.assortment_categories.category if item.assortment_categories else '',
+            })
+
+    return JsonResponse({'results': results})
