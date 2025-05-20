@@ -76,6 +76,23 @@
 
         <!-- Карточки товаров -->
         <div class="col-md-9">
+
+            <!-- 🔽 Блок сортировки -->
+            <form method="get" class="mb-4 d-flex justify-content-end">
+                {% for key, value in request.GET.items %}
+                    {% if key != 'sort' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+                <select name="sort" onchange="this.form.submit()" class="form-select w-auto">
+                    <option value="">Сортувати...</option>
+                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>За популярністю</option>
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Новинки</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>За ціною ↑</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>За ціною ↓</option>
+                </select>
+            </form>
+
             {% if assortments %}
                 <div class="row row-cols-1 row-cols-md-4 g-4">
                     {% for item in assortments %}
@@ -108,7 +125,7 @@
                                     <p class="card-text">
                                         <strong id="price-display-{{ item.pk }}">
                                             {% if item.variants.exists %}
-                                                {{ item.variants.first.price }} ₴
+                                                {{ item.min_price }} ₴ – {{ item.max_price }} ₴
                                             {% else %}
                                                 {{ item.price }} ₴
                                             {% endif %}

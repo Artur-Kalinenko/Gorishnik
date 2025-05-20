@@ -1,19 +1,22 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from producer.models import Producer
+from django.conf import settings
 
 # Основная модель товара
 class Assortment(models.Model):
     assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
     assortment_categories = models.ForeignKey('Category', on_delete=models.PROTECT, null=True, verbose_name='Назва категорії')
     filters = models.ManyToManyField('FilterOption', blank=True, related_name='products', verbose_name='Фільтри')
-    price = models.FloatField(null=True, blank=True, verbose_name='Ціна продукту')
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту')
     grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
     poster = models.ImageField(upload_to='assortment/posters/', null=True, blank=True, verbose_name='Картинка продукту')
     producer = models.ForeignKey(Producer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Назва виробника')
     assortment_description = models.TextField(null=True, verbose_name='Опис продукту')
     is_available = models.BooleanField(default=True, verbose_name='Наявність продукту')
     has_variants = models.BooleanField(default=False, verbose_name='Чи є варіанти продукту')
+    popularity = models.PositiveIntegerField(default=0, verbose_name='Популярність')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата додавання')
 
     def __str__(self):
         return f'{self.assortment_name}'
@@ -35,7 +38,7 @@ class Assortment(models.Model):
 class AssortmentVariant(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='variants', verbose_name='Продукт')
     grams = models.IntegerField(verbose_name='Грамовка продукту')
-    price = models.FloatField(verbose_name='Ціна за грамовку')
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна за грамовку')
 
     def __str__(self):
         return f'{self.grams}г - ₴{self.price}'
@@ -83,6 +86,7 @@ class FilterOption(models.Model):
         verbose_name = 'Опція фільтра'
         verbose_name_plural = 'Опції фільтрів'
         ordering = ['group', 'name']
+        unique_together = ('group', 'name')
 
     def __str__(self):
         return f"{self.group.name} → {self.name}"

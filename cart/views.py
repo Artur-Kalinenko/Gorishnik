@@ -257,7 +257,7 @@ def order_payment_view(request, order_id):
 
     params = {
         'action': 'pay',
-        'amount': order.total_price(),
+        'amount': float(order.total_price()),
         'currency': 'UAH',
         'description': f'Оплата замовлення №{order.id}',
         'order_id': str(order.id),
