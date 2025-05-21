@@ -1,39 +1,32 @@
 from django.shortcuts import render, redirect
-from .forms import (
-    RegistrationForm,
-    LoginForm,
-    PasswordResetRequestForm,
-    PasswordResetCodeForm,
-    SetNewPasswordForm,
-    ChangeEmailForm,
-    CustomPasswordChangeForm
-)
-from favorites.models import Favorite
-from .models import CustomUser, VerificationCode
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import authenticate
-from django.db import IntegrityError
-from datetime import timedelta
 from django.utils import timezone
-from django import forms
+from django.utils.dateparse import parse_datetime
+from django.db import IntegrityError
+from django.http import JsonResponse
+from itertools import zip_longest
+from datetime import timedelta
+
+from .forms import (
+    RegistrationForm, LoginForm, PasswordResetRequestForm,
+    PasswordResetCodeForm, SetNewPasswordForm,
+    ChangeEmailForm, CustomPasswordChangeForm, EditProfileForm
+)
+from .models import CustomUser, VerificationCode
+from favorites.models import Favorite
 from cart.models import Cart, CartItem
 from orders.models import Order
 from social_core.exceptions import AuthCanceled
 from social_django.views import complete
-from django.views.decorators.http import require_POST
-from django.views.decorators.csrf import csrf_exempt
-from django.http import JsonResponse
-from itertools import zip_longest
-from django.contrib.auth import update_session_auth_hash
-from django.utils.dateparse import parse_datetime
-# from django.http import HttpResponseRedirect
-# from django.urls import reverse
 
-# Регистрация нового пользователя
+# --- Регистрация, вход и выход ---
+
 def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -83,7 +76,7 @@ def register_view(request):
 
     return render(request, 'accounts/register.html', {'form': form})
 
-# Авторизация по email или телефону + перенос корзины из сессии
+# Есть перенос корзины из сессии
 def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -152,6 +145,87 @@ def logout_view(request):
         request.session.flush()
     return redirect('welcome')
 
+# --- Верификация email при регистрации ---
+
+def verify_email_view(request):
+    user_id = request.session.get('verify_user_id')
+    if not user_id:
+        return redirect('register')
+
+    user = CustomUser.objects.get(id=user_id)
+    session_data = request.session.get('verify_email_data', {})
+    sent_at_str = session_data.get('sent_at')
+    is_first = session_data.get('is_first', True)
+
+    if request.method == 'POST':
+        if 'resend' in request.POST:
+            if not is_first and sent_at_str:
+                sent_at = parse_datetime(sent_at_str)
+                now = timezone.now()
+                seconds_passed = (now - sent_at).total_seconds()
+
+                if seconds_passed < 60:
+                    messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
+                    form = PasswordResetCodeForm()
+                    return render(request, 'accounts/confirm_code.html', {
+                        'form': form,
+                        'title': 'Підтвердження Email',
+                        'description': 'Введіть 6-значний код, надісланий вам на пошту.',
+                        'sent_at': sent_at_str,
+                        'is_first': is_first,
+                    })
+
+            # Повторная отправка кода
+            new_code = VerificationCode.generate_code()
+            VerificationCode.objects.create(user=user, code=new_code, last_sent_at=timezone.now())
+
+            request.session['verify_email_data'] = {
+                'sent_at': timezone.now().isoformat(),
+                'is_first': False,
+            }
+
+            from django.core.mail import send_mail
+            from django.conf import settings
+            send_mail(
+                'Новий код підтвердження',
+                f'Ваш новий код: {new_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
+
+            messages.success(request, 'Новий код було надіслано на вашу пошту.')
+            form = PasswordResetCodeForm()
+
+        else:
+            form = PasswordResetCodeForm(request.POST)
+            if form.is_valid():
+                code = form.cleaned_data['code']
+                code_obj = VerificationCode.objects.filter(user=user, code=code).first()
+                if code_obj and not code_obj.is_expired():
+                    code_obj.delete()
+                    user.is_verified = True
+                    user.save()
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    del request.session['verify_user_id']
+                    request.session.pop('verify_email_data', None)
+                    messages.success(request, 'Підтвердження пройшло успішно.')
+                    return redirect('welcome')
+                else:
+                    form.add_error('code', 'Невірний або прострочений код.')
+
+    else:
+        # Только создаём форму, не отправляем ничего повторно
+        form = PasswordResetCodeForm()
+
+    return render(request, 'accounts/confirm_code.html', {
+        'form': form,
+        'title': 'Підтвердження Email',
+        'description': 'Введіть 6-значний код, надісланий вам на пошту.',
+        'sent_at': session_data.get('sent_at', ''),
+        'is_first': session_data.get('is_first', True),
+    })
+
+# --- Сброс пароля ---
 
 # Запрос на сброс пароля (отправка кода)
 def password_reset_request_view(request):
@@ -175,6 +249,13 @@ def password_reset_request_view(request):
                     settings.DEFAULT_FROM_EMAIL,
                     [email]
                 )
+
+                request.session['reset_password'] = {
+                    'code': code,
+                    'sent_at': timezone.now().isoformat(),
+                    'is_first': True,
+                }
+
                 request.session['reset_user_id'] = user.id
                 return redirect('password_reset_code')
     else:
@@ -189,13 +270,12 @@ def password_reset_code_view(request):
         return redirect('login')
 
     user = CustomUser.objects.get(id=user_id)
+    session_data = request.session.get('reset_password', {})
+    sent_at_str = session_data.get('sent_at')
+    is_first = session_data.get('is_first', True)
 
     if request.method == 'POST':
         if 'resend' in request.POST:
-            session_data = request.session.get('reset_password', {})
-            sent_at_str = session_data.get('sent_at')
-            is_first = session_data.get('is_first', True)
-
             if not is_first and sent_at_str:
                 sent_at = parse_datetime(sent_at_str)
                 now = timezone.now()
@@ -203,7 +283,13 @@ def password_reset_code_view(request):
                 if seconds_passed < 60:
                     messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
                     form = PasswordResetCodeForm()
-                    return render(request, 'accounts/password_reset_code.html', {'form': form})
+                    return render(request, 'accounts/confirm_code.html', {
+                        'form': form,
+                        'title': 'Скидання пароля',
+                        'description': 'Введіть код, який ми надіслали на вашу електронну адресу.',
+                        'sent_at': sent_at_str,
+                        'is_first': is_first,
+                    })
 
             new_code = VerificationCode.generate_code()
             session_data = {
@@ -232,26 +318,19 @@ def password_reset_code_view(request):
                     return redirect('set_new_password')
                 else:
                     form.add_error('code', 'Невірний або прострочений код.')
-    else:
-        # Первая отправка
-        new_code = VerificationCode.generate_code()
-        session_data = {
-            'code': new_code,
-            'sent_at': timezone.now().isoformat(),
-            'is_first': True,
-        }
-        request.session['reset_password'] = session_data
 
-        send_mail(
-            'Код для скидання пароля',
-            f'Ваш код: {new_code}',
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email]
-        )
-        messages.info(request, 'Код було надіслано на вашу пошту.')
+    else:
+        # Только форма без повторной отправки
         form = PasswordResetCodeForm()
 
-    return render(request, 'accounts/password_reset_code.html', {'form': form})
+    return render(request, 'accounts/confirm_code.html', {
+        'form': form,
+        'title': 'Скидання пароля',
+        'description': 'Введіть код, який ми надіслали на вашу електронну адресу.',
+        'sent_at': session_data.get('sent_at', ''),
+        'is_first': session_data.get('is_first', True),
+    })
+
 
 # Установка нового пароля после подтверждения кода
 def password_reset_new_password_view(request):
@@ -271,136 +350,7 @@ def password_reset_new_password_view(request):
         form = SetNewPasswordForm(user)
     return render(request, 'accounts/password_reset_new.html', {'form': form})
 
-# Подтверждение email при регистрации
-def verify_email_view(request):
-    user_id = request.session.get('verify_user_id')
-    if not user_id:
-        return redirect('register')
-
-    user = CustomUser.objects.get(id=user_id)
-
-    if request.method == 'POST':
-        if 'resend' in request.POST:
-            session_data = request.session.get('verify_email_data', {})
-            sent_at_str = session_data.get('sent_at')
-            is_first = session_data.get('is_first', True)
-
-            if not is_first and sent_at_str:
-                sent_at = parse_datetime(sent_at_str)
-                now = timezone.now()
-                seconds_passed = (now - sent_at).total_seconds()
-
-                if seconds_passed < 60:
-                    messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
-                    form = PasswordResetCodeForm()
-                    return render(request, 'accounts/verify_email.html', {'form': form})
-
-            new_code = VerificationCode.generate_code()
-            VerificationCode.objects.create(user=user, code=new_code, last_sent_at=timezone.now())
-
-            # Обновляем сессию
-            request.session['verify_email_data'] = {
-                'sent_at': timezone.now().isoformat(),
-                'is_first': False
-            }
-
-            send_mail(
-                'Новий код підтвердження',
-                f'Ваш новий код: {new_code}',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email]
-            )
-            messages.success(request, 'Новий код було надіслано на вашу пошту.')
-            form = PasswordResetCodeForm()
-        else:
-            form = PasswordResetCodeForm(request.POST)
-            if form.is_valid():
-                code = form.cleaned_data['code']
-                code_obj = VerificationCode.objects.filter(user=user, code=code).first()
-                if code_obj and not code_obj.is_expired():
-                    code_obj.delete()
-                    user.is_verified = True
-                    user.save()
-                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                    del request.session['verify_user_id']
-                    request.session.pop('verify_email_data', None)
-                    messages.success(request, 'Підтвердження пройшло успішно.')
-                    return redirect('welcome')
-                else:
-                    form.add_error('code', 'Невірний або прострочений код.')
-    else:
-        # Первая загрузка — установить таймер
-        request.session['verify_email_data'] = {
-            'sent_at': timezone.now().isoformat(),
-            'is_first': True
-        }
-        form = PasswordResetCodeForm()
-
-    return render(request, 'accounts/verify_email.html', {'form': form})
-
-# Хелпер: разбивает список на подсписки по size элементов
-def chunked(iterable, size):
-    it = iter(iterable)
-    return list(zip_longest(*[it] * size, fillvalue=None))
-
-@login_required
-def user_cabinet_view(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
-    favorites = Favorite.objects.filter(user=request.user).select_related('product')
-    favorites_ids = list(favorites.values_list('product_id', flat=True))
-    grouped_favorites = chunked(favorites, 3)  # для карусели по 3 товара
-
-    if request.session.get('change_email'):
-        messages.warning(request,
-                         'Ви намагалися змінити адресу електронної пошти, але не пройшли веріфікацію, будь ласка, спробуйте ще раз.')
-        del request.session['change_email']
-
-    return render(request, 'accounts/user_cabinet.html', {
-        'user': request.user,
-        'orders': orders,
-        'favorites': favorites,
-        'favorites_ids': favorites_ids,
-        'grouped_favorites': grouped_favorites,
-    })
-
-# Форма редактирования профиля
-class EditProfileForm(forms.ModelForm):
-    class Meta:
-        model = CustomUser
-        fields = ['first_name', 'phone']
-        labels = {
-            'first_name': "Ім’я",
-            'phone': "Телефон",
-        }
-
-# Редактирование профиля пользователя
-@login_required
-def edit_profile_view(request):
-    if request.method == 'POST':
-        form = EditProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Профіль успішно оновлено.")
-            return redirect('user_cabinet')
-    else:
-        form = EditProfileForm(instance=request.user)
-
-    return render(request, 'accounts/edit_profile.html', {'form': form})
-
-# Обработка отмены логина через Google
-def google_login_complete_safe(request, backend):
-    try:
-        return complete(request, backend)
-    except AuthCanceled:
-        return redirect('/login/?cancel=1')
-
-# Сохранение session key
-@require_POST
-@csrf_exempt
-def save_pre_social_session(request):
-    request.session['pre_social_auth_session_key'] = request.session.session_key or request.session.create()
-    return JsonResponse({'status': 'ok'})
-
+# --- Смена email ---
 
 @login_required
 def change_email_request_view(request):
@@ -433,19 +383,19 @@ def change_email_request_view(request):
     return render(request, 'accounts/change_email_request.html', {'form': form})
 
 @login_required
+@login_required
 def confirm_change_email_view(request):
     session_data = request.session.get('change_email')
     if not session_data:
         messages.warning(request, 'Ви не ініціювали зміну електронної пошти.')
         return redirect('user_cabinet')
 
+    sent_at_str = session_data.get('sent_at')
+    is_first = session_data.get('is_first', False)
+
     if request.method == 'POST':
         if 'resend' in request.POST:
-            sent_at_str = session_data.get('sent_at')
-            is_first = session_data.get('is_first', False)
-
-            # Разрешаем только первую отправку без ограничений
-            if not is_first:
+            if not is_first and sent_at_str:
                 sent_at = parse_datetime(sent_at_str)
                 now = timezone.now()
                 seconds_passed = (now - sent_at).total_seconds()
@@ -453,9 +403,15 @@ def confirm_change_email_view(request):
                 if seconds_passed < 60:
                     messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
                     form = PasswordResetCodeForm()
-                    return render(request, 'accounts/confirm_change_email.html', {'form': form})
+                    return render(request, 'accounts/confirm_code.html', {
+                        'form': form,
+                        'title': 'Підтвердження нової електронної адреси',
+                        'description': 'Ми надіслали код підтвердження на вашу нову адресу email. Введіть його нижче, щоб завершити зміну.',
+                        'sent_at': sent_at_str,
+                        'is_first': is_first,
+                    })
 
-            # Если прошло 60 сек или это первая отправка — отправляем код
+            # Повторная отправка кода
             new_code = VerificationCode.generate_code()
             session_data = session_data.copy()
             session_data['code'] = new_code
@@ -471,6 +427,7 @@ def confirm_change_email_view(request):
             )
             messages.success(request, 'Новий код надіслано на вашу пошту.')
             form = PasswordResetCodeForm()
+
         else:
             form = PasswordResetCodeForm(request.POST)
             if form.is_valid():
@@ -486,9 +443,15 @@ def confirm_change_email_view(request):
     else:
         form = PasswordResetCodeForm()
 
-    return render(request, 'accounts/confirm_change_email.html', {'form': form})
+    return render(request, 'accounts/confirm_code.html', {
+        'form': form,
+        'title': 'Підтвердження нової електронної адреси',
+        'description': 'Ми надіслали код підтвердження на вашу нову адресу email. Введіть його нижче, щоб завершити зміну.',
+        'sent_at': session_data.get('sent_at', ''),
+        'is_first': session_data.get('is_first', True),
+    })
 
-
+# --- Смена пароля ---
 
 @login_required
 def change_password_view(request):
@@ -527,13 +490,12 @@ def confirm_change_password_view(request):
         messages.warning(request, 'Ви не ініціювали зміну пароля.')
         return redirect('user_cabinet')
 
+    sent_at_str = session_data.get('sent_at')
+    is_first = session_data.get('is_first', False)
+
     if request.method == 'POST':
         if 'resend' in request.POST:
-            sent_at_str = session_data.get('sent_at')
-            is_first = session_data.get('is_first', False)
-
-            # Проверка: если это не первая отправка — проверяем таймер
-            if not is_first:
+            if not is_first and sent_at_str:
                 sent_at = parse_datetime(sent_at_str)
                 now = timezone.now()
                 seconds_passed = (now - sent_at).total_seconds()
@@ -544,9 +506,14 @@ def confirm_change_password_view(request):
                         f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.'
                     )
                     form = PasswordResetCodeForm()
-                    return render(request, 'accounts/confirm_change_password.html', {'form': form})
+                    return render(request, 'accounts/confirm_code.html', {
+                        'form': form,
+                        'title': 'Підтвердження зміни пароля',
+                        'description': 'Ми надіслали код підтвердження на ваш email. Введіть його, щоб підтвердити зміну пароля.',
+                        'sent_at': sent_at_str,
+                        'is_first': is_first,
+                    })
 
-            # Генерация нового кода
             new_code = VerificationCode.generate_code()
             session_data = session_data.copy()
             session_data['code'] = new_code
@@ -578,4 +545,73 @@ def confirm_change_password_view(request):
     else:
         form = PasswordResetCodeForm()
 
-    return render(request, 'accounts/confirm_change_password.html', {'form': form})
+    return render(request, 'accounts/confirm_code.html', {
+        'form': form,
+        'title': 'Підтвердження зміни пароля',
+        'description': 'Ми надіслали код підтвердження на ваш email. Введіть його, щоб підтвердити зміну пароля.',
+        'sent_at': session_data.get('sent_at', ''),
+        'is_first': session_data.get('is_first', True),
+    })
+
+# --- Кабинет пользователя и профиль ---
+
+# Хелпер: разбивает список на подсписки по size элементов
+def chunked(iterable, size):
+    it = iter(iterable)
+    return list(zip_longest(*[it] * size, fillvalue=None))
+
+@login_required
+def user_cabinet_view(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    favorites_ids = list(favorites.values_list('product_id', flat=True))
+    grouped_favorites = chunked(favorites, 3)  # для карусели по 3 товара
+
+    if request.session.get('change_email'):
+        messages.warning(request,
+                         'Ви намагалися змінити адресу електронної пошти, але не пройшли веріфікацію, будь ласка, спробуйте ще раз.')
+        del request.session['change_email']
+
+    return render(request, 'accounts/user_cabinet.html', {
+        'user': request.user,
+        'orders': orders,
+        'favorites': favorites,
+        'favorites_ids': favorites_ids,
+        'grouped_favorites': grouped_favorites,
+    })
+
+# Редактирование профиля пользователя
+@login_required
+def edit_profile_view(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Профіль успішно оновлено.")
+            return redirect('user_cabinet')
+    else:
+        form = EditProfileForm(instance=request.user)
+
+    return render(request, 'accounts/edit_profile.html', {'form': form})
+
+# --- Авторизация через Google ---
+
+# Обработка отмены логина через Google
+def google_login_complete_safe(request, backend):
+    try:
+        return complete(request, backend)
+    except AuthCanceled:
+        return redirect('/login/?cancel=1')
+
+# Сохранение session key
+@require_POST
+@csrf_exempt
+def save_pre_social_session(request):
+    request.session['pre_social_auth_session_key'] = request.session.session_key or request.session.create()
+    return JsonResponse({'status': 'ok'})
+
+
+
+
+
+

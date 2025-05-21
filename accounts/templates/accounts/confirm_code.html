@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Підтвердження Email{% endblock %}
+{% block title %}{{ title|default:"Підтвердження коду" }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Підтвердження Email</h2>
-    <p>Введіть 6-значний код, надісланий вам на пошту.</p>
+    <h2 class="mb-4">{{ title|default:"Підтвердження коду" }}</h2>
+    <p>{{ description|default:"Введіть 6-значний код, надісланий вам на пошту." }}</p>
 
     {% if messages %}
         {% for message in messages %}
@@ -14,7 +14,7 @@
         {% endfor %}
     {% endif %}
 
-    <!-- Основная форма подтверждения кода -->
+    <!-- Форма підтвердження -->
     <form method="post" id="confirm-form">
         {% csrf_token %}
         {{ form.non_field_errors }}
@@ -30,7 +30,7 @@
         <button type="submit" class="btn btn-primary">Підтвердити</button>
     </form>
 
-    <!-- Отдельная форма для повторной отправки кода -->
+    <!-- Форма повторної відправки коду -->
     <form method="post" class="mt-2 d-inline-block" id="resend-form">
         {% csrf_token %}
         <input type="hidden" name="resend" value="1">
@@ -38,13 +38,13 @@
                 id="resend-code-btn"
                 class="btn btn-link p-0"
                 data-code-resend
-                data-sent-at="{{ request.session.verify_email_data.sent_at|default:'' }}"
-                data-is-first="{{ request.session.verify_email_data.is_first|yesno:'true,false' }}">
+                data-sent-at="{{ sent_at|default:'' }}"
+                data-is-first="{{ is_first|yesno:'true,false' }}">
             Надіслати код повторно
         </button>
         <span id="timer-placeholder" class="ms-2 text-muted"></span>
     </form>
 </div>
 
-<script src="{% static 'accounts/code_verification.js' %}"></script>
+<script src="{% static 'accounts/confirm_code.js' %}"></script>
 {% endblock %}

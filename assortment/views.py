@@ -1,9 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from django.db.models.functions import Coalesce
 from django.db.models.expressions import OrderBy
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
-from django.db.models import Q, Prefetch, Count, Min, Max, Case, When, F, Value, Subquery, OuterRef, DecimalField, Avg
+from django.db.models import Q, Prefetch, Count, Case, When, F, Subquery, OuterRef, DecimalField, Avg
 from .models import (
     Assortment, Category,
     AssortmentVariant, FilterGroup, FilterOption, Review
@@ -12,7 +11,6 @@ from .forms import ReviewForm
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
-from django.utils.timezone import now
 from datetime import timedelta
 
 
