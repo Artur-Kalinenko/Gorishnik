@@ -20,6 +20,14 @@
                        {% if request.GET.new %}checked{% endif %}>
                 <label class="form-check-label">Новинки</label>
             </div>
+            {% if user.is_authenticated %}
+            <div class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="my_favorites" value="1"
+                       {% if request.GET.my_favorites == "1" %}checked{% endif %}>
+                <label class="form-check-label">Мої обрані товари</label>
+            </div>
+        {% endif %}
+
         </div>
     </div>
 

@@ -1,0 +1,17 @@
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    background-color: red; /* красный фон */
+    background-size: 50% 50%;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+/* Дополнительно — убрать серый SVG и вставить кастомную иконку */
+.carousel-control-prev-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 8 8'%3E%3Cpath d='M5.5 0L4.09 1.41 6.67 4l-2.58 2.59L5.5 8l4-4z'/%3E%3C/svg%3E");
+}
+
+.carousel-control-next-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 8 8'%3E%3Cpath d='M2.5 0L1.09 1.41 3.67 4l-2.58 2.59L2.5 8l4-4z'/%3E%3C/svg%3E");
+}

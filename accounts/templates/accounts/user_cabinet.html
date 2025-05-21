@@ -1,15 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<!-- Кабинет пользователя -->
 <div class="container mt-5">
     <h2 class="mb-4">Мій кабінет</h2>
 
-    <!-- Блок с личной информацией -->
+    <!-- Особисті дані -->
     <div class="card mb-4">
-        <div class="card-header">
-            Особисті дані
-        </div>
+        <div class="card-header">Особисті дані</div>
         <div class="card-body">
             <p><strong>Ім’я:</strong> {{ user.first_name }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
@@ -18,11 +16,59 @@
         </div>
     </div>
 
-    <!-- Блок с историей заказов -->
-    <div class="card">
-        <div class="card-header">
-            Історія замовлень
+    <!-- Обрані товари -->
+    <div class="card mb-4">
+        <div class="card-header">Обрані товари</div>
+        <div class="card-body">
+            {% if favorites %}
+                {% if favorites|length <= 3 %}
+                    <div class="row justify-content-center favorites-container">
+                        {% for fav in favorites %}
+                            {% with item=fav.product %}
+                                <div class="col-sm-12 col-md-6 col-lg-4 mb-4 d-flex justify-content-center">
+                                    {% include 'assortment/partials/product_card.html' %}
+                                </div>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div id="favoritesCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner favorites-container">
+                            {% for group in grouped_favorites %}
+                                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                    <div class="row justify-content-center">
+                                        {% for fav in group %}
+                                            {% if fav %}
+                                                {% with item=fav.product %}
+                                                    <div class="col-md-4 d-flex justify-content-center mb-3">
+                                                        {% include 'assortment/partials/product_card.html' %}
+                                                    </div>
+                                                {% endwith %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#favoritesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Попередній</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#favoritesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Наступний</span>
+                        </button>
+                    </div>
+                {% endif %}
+            {% else %}
+                <p>У вас ще немає обраних товарів.</p>
+            {% endif %}
         </div>
+    </div>
+
+    <!-- Історія замовлень -->
+    <div class="card">
+        <div class="card-header">Історія замовлень</div>
         <div class="card-body">
             {% if orders %}
                 <ul class="list-group">
@@ -53,4 +99,15 @@
         </div>
     </div>
 </div>
+
+<!-- JS -->
+<script>
+    window.IS_USER_CABINET = true;
+</script>
+<script src="{% static 'assortment/assortment_list.js' %}"></script>
+<script src="{% static 'accounts/user_cabinet.js' %}"></script>
+
+<!-- CSS -->
+<link rel="stylesheet" href="{% static 'assortment/assortment_list.css' %}">
+<link rel="stylesheet" href="{% static 'accounts/user_cabinet.css' %}">
 {% endblock %}

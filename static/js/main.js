@@ -106,3 +106,36 @@ if (window.cartCleared && window.location.pathname === '/cart/') {
         `;
     }
 }
+
+// Тосты
+function showFavoriteToast(message, isAdded) {
+    const toastEl = document.getElementById('favorite-toast');
+    const toastMessage = document.getElementById('favorite-toast-message');
+
+    if (!toastEl || !toastMessage) return;
+
+    // Устанавливаем сообщение и цвет
+    toastMessage.textContent = message;
+    toastEl.classList.remove('bg-success', 'bg-danger');
+    toastEl.classList.add(isAdded ? 'bg-success' : 'bg-danger');
+
+    // Инициализация и показ тоста
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    toast.show();
+}
+
+function hideFavoriteToast() {
+    const toastEl = document.getElementById('favorite-toast');
+    if (!toastEl) return;
+
+    const toast = bootstrap.Toast.getInstance(toastEl);
+    if (toast) toast.hide();
+}
+
+function showCartToast() {
+    const toastEl = document.getElementById('cartToast');
+    if (!toastEl) return;
+
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    toast.show();
+}

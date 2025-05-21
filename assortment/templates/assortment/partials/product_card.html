@@ -1,0 +1,109 @@
+{% load static %}
+
+<div class="card shadow-sm h-100 rounded border-0 product-card position-relative" data-product-id="{{ item.id }}">
+    <!-- Плашки -->
+    {% if item.is_new %}
+        <span class="badge bg-success position-absolute top-0 start-0 m-2">Новинка</span>
+    {% endif %}
+    {% if item.is_discounted %}
+        <span class="badge bg-danger position-absolute top-0 end-0 m-2">Акція</span>
+    {% endif %}
+
+    <!-- Звезда "Обране" -->
+    <div class="favorite-toggle position-absolute bottom-0 end-0 p-2" data-product-id="{{ item.id }}">
+        {% if user.is_authenticated and item.id in favorites_ids %}
+            <i class="fas fa-star text-warning"></i>
+        {% else %}
+            <i class="far fa-star"></i>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'assortment_detail' item.pk %}">
+        {% if item.poster %}
+            <img src="{{ item.poster.url }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+        {% else %}
+            <img src="{% static 'images/default.jpg' %}" class="card-img-top" style="height: 150px; object-fit: cover;">
+        {% endif %}
+    </a>
+
+    <div class="card-body text-center">
+        <h5 class="montserrat-category-title">
+            <a href="{% url 'assortment_detail' item.pk %}" class="text-decoration-none text-dark">{{ item.assortment_name }}</a>
+        </h5>
+
+        {% for cat in item.assortment_categories.all %}
+            <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="btn btn-outline-info btn-sm mb-2">
+                {% if cat.button_icon %}
+                    <img src="{{ cat.button_icon.url }}" style="height: 20px; width: 20px; margin-right: 5px;">
+                {% endif %}
+                {{ cat.category }}
+            </a>
+        {% endfor %}
+
+        <!-- Цены -->
+        <p class="card-text" id="price-display-{{ item.pk }}">
+            {% if item.variants.exists %}
+                {% with sorted_variants=item.variants.all|dictsort:"price" %}
+                    {% with min=sorted_variants|first max=sorted_variants|last %}
+                        {% if min.old_price or max.old_price %}
+                            <span class="text-muted text-decoration-line-through">
+                                {% if min.old_price %}{{ min.old_price }} ₴{% endif %}
+                                {% if max.old_price and max.old_price != min.old_price %} – {{ max.old_price }} ₴{% endif %}
+                            </span><br>
+                        {% endif %}
+                        <strong>
+                            {% if min.price %}
+                                {{ min.price }} ₴
+                                {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}
+                            {% else %}
+                                {{ max.price }} ₴
+                            {% endif %}
+                        </strong>
+                    {% endwith %}
+                {% endwith %}
+            {% else %}
+                {% if item.old_price and item.old_price > item.price %}
+                    <span class="text-muted text-decoration-line-through">{{ item.old_price }} ₴</span><br>
+                {% endif %}
+                <strong>{{ item.price }} ₴</strong>
+            {% endif %}
+        </p>
+
+        <!-- Граммовки и кнопки -->
+        {% if item.variants.count > 1 %}
+            <div class="mb-2">
+                <a href="{% url 'assortment_detail' item.pk %}" class="btn btn-primary btn-sm select-variant-button" id="select-variant-{{ item.pk }}">
+                    Оберіть грамовку
+                </a>
+            </div>
+            <div class="mb-3">
+                {% for variant in item.variants.all %}
+                    <button class="btn btn-outline-secondary grams-button btn-sm"
+                            data-product-id="{{ item.pk }}"
+                            data-variant-id="{{ variant.id }}"
+                            data-price="{{ variant.price }}">
+                        {{ variant.grams }}г
+                    </button>
+                {% endfor %}
+            </div>
+        {% elif item.variants.count == 1 %}
+            {% with variant=item.variants.first %}
+                <p class="card-text">{{ variant.grams }} г</p>
+                <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
+                    <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
+                    <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                    <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">В корзину</button>
+                </div>
+            {% endwith %}
+        {% else %}
+            <p class="card-text">{{ item.grams }} г</p>
+            <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
+                <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
+                <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}">В корзину</button>
+            </div>
+        {% endif %}
+    </div>
+</div>

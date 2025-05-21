@@ -4,43 +4,55 @@ function attachQuantityHandlers(productId) {
     const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
     const addToCartBtn = document.querySelector(`#controls-${productId} .add-to-cart`);
 
-    decreaseBtn?.addEventListener('click', () => {
-        const input = document.getElementById(`quantity-input-${productId}`);
-        const value = parseInt(input.value, 10);
-        if (value > 1) input.value = value - 1;
-    });
-
-    increaseBtn?.addEventListener('click', () => {
-        const input = document.getElementById(`quantity-input-${productId}`);
-        input.value = parseInt(input.value, 10) + 1;
-    });
-
-    addToCartBtn?.addEventListener('click', event => {
-        const input = document.getElementById(`quantity-input-${productId}`);
-        const quantity = input.value;
-        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
-        const variantId = event.target.getAttribute('data-variant-id') || null;
-
-        fetch(`/cart/add/${productId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrfToken,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ quantity, variant_id: variantId }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.session_id) {
-                localStorage.setItem('session_id', data.session_id);
-            }
-            alert(data.message);
-            input.value = 1;
-        })
-        .catch(error => {
-            console.error('Помилка при додаванні в корзину:', error);
+    if (decreaseBtn) {
+        const newDec = decreaseBtn.cloneNode(true);
+        decreaseBtn.parentNode.replaceChild(newDec, decreaseBtn);
+        newDec.addEventListener('click', () => {
+            const input = document.getElementById(`quantity-input-${productId}`);
+            const value = parseInt(input.value, 10);
+            if (value > 1) input.value = value - 1;
         });
-    });
+    }
+
+    if (increaseBtn) {
+        const newInc = increaseBtn.cloneNode(true);
+        increaseBtn.parentNode.replaceChild(newInc, increaseBtn);
+        newInc.addEventListener('click', () => {
+            const input = document.getElementById(`quantity-input-${productId}`);
+            input.value = parseInt(input.value, 10) + 1;
+        });
+    }
+
+    if (addToCartBtn) {
+        const newAdd = addToCartBtn.cloneNode(true);
+        addToCartBtn.parentNode.replaceChild(newAdd, addToCartBtn);
+        newAdd.addEventListener('click', event => {
+            const input = document.getElementById(`quantity-input-${productId}`);
+            const quantity = input.value;
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            const variantId = event.target.getAttribute('data-variant-id') || null;
+
+            fetch(`/cart/add/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity, variant_id: variantId }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.session_id) {
+                    localStorage.setItem('session_id', data.session_id);
+                }
+                alert(data.message);
+                input.value = 1;
+            })
+            .catch(error => {
+                console.error('Помилка при додаванні в корзину:', error);
+            });
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -106,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
     // === Раскрытие фильтров с сохранением состояния ===
     const OPENED_FILTERS_KEY = 'opened_filter_groups';
 
@@ -165,6 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             params.delete('filters');
             params.delete('q');
+            params.delete('discounted');
+            params.delete('new');
 
             localStorage.removeItem(OPENED_FILTERS_KEY);
 
@@ -174,3 +189,43 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// === Обработка избранного ===
+if (!window.IS_USER_CABINET) {
+    document.querySelectorAll('.favorite-toggle').forEach(el => {
+        el.addEventListener('click', function () {
+            const productId = this.dataset.productId;
+
+            fetch(`/favorites/toggle/${productId}/`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
+            .then(response => {
+                if (response.status === 403) {
+                    const toastEl = document.getElementById('loginToast');
+                    if (toastEl) {
+                        const toast = new bootstrap.Toast(toastEl);
+                        toast.show();
+                    }
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+                if (data.status === 'added') {
+                    this.innerHTML = '<i class="fas fa-star text-warning"></i>';
+                    showFavoriteToast('Товар додано в обране', true);
+                } else if (data.status === 'removed') {
+                    this.innerHTML = '<i class="far fa-star"></i>';
+                    showFavoriteToast('Товар видалено з обраного', false);
+                }
+            })
+            .catch(() => {
+                alert('Помилка при додаванні в обрані.');
+            });
+        });
+    });
+}

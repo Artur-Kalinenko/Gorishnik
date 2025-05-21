@@ -6,6 +6,7 @@ from .forms import (
     PasswordResetCodeForm,
     SetNewPasswordForm
 )
+from favorites.models import Favorite
 from .models import CustomUser, VerificationCode
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -24,6 +25,7 @@ from social_django.views import complete
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from itertools import zip_longest
 # from django.http import HttpResponseRedirect
 # from django.urls import reverse
 
@@ -290,13 +292,24 @@ def verify_email_view(request):
 
     return render(request, 'accounts/verify_email.html', {'form': form})
 
-# Кабинет пользователя с историей заказов
+# Хелпер: разбивает список на подсписки по size элементов
+def chunked(iterable, size):
+    it = iter(iterable)
+    return list(zip_longest(*[it] * size, fillvalue=None))
+
 @login_required
 def user_cabinet_view(request):
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    favorites_ids = list(favorites.values_list('product_id', flat=True))
+    grouped_favorites = chunked(favorites, 3)  # для карусели по 3 товара
+
     return render(request, 'accounts/user_cabinet.html', {
         'user': request.user,
         'orders': orders,
+        'favorites': favorites,
+        'favorites_ids': favorites_ids,
+        'grouped_favorites': grouped_favorites,
     })
 
 # Форма редактирования профиля

@@ -12,6 +12,9 @@
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,6 +134,40 @@
 <footer class="footer mt-5 text-center py-3 border-top">
     © 2025 Gorishnik | Всі права захищені
 </footer>
+
+<!-- Глобальный контейнер для всех тостов -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3 d-flex flex-column gap-2" style="z-index: 9999">
+    <!-- Тост для додавання в обране -->
+    <div id="favorite-toast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="d-flex">
+            <div class="toast-body" id="favorite-toast-message">
+                <!-- Динамічне повідомлення -->
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="hideFavoriteToast()" aria-label="Закрити"></button>
+        </div>
+    </div>
+
+    <!-- Тост для неавторизованих -->
+    <div id="loginToast" class="toast text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="7000">
+        <div class="d-flex">
+            <div class="toast-body">
+                Щоб додати товар в <strong>«Обрані товари»</strong>, будь ласка,
+                <a href="#" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#loginModal">увійдіть або зареєструйтесь</a>!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрити"></button>
+        </div>
+    </div>
+
+    <!-- Тост для кошика -->
+    <div id="cartToast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+        <div class="d-flex">
+            <div class="toast-body">
+                Товар додано у <a href="{% url 'cart' %}" class="text-white text-decoration-underline">кошик</a>!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрити"></button>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap JS -->
 <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>

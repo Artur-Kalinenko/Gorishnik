@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Обрані товари</h2>
+
+    <div class="row">
+        {% for fav in favorites %}
+            <div class="col-md-3 mb-4">
+                {% with item=fav.product %}
+                    {% include 'assortment/partials/product_card.html' %}
+                {% endwith %}
+            </div>
+        {% empty %}
+            <div class="alert alert-info text-center">У вас ще немає обраних товарів.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

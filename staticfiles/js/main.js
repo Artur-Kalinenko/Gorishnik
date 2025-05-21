@@ -106,3 +106,26 @@ if (window.cartCleared && window.location.pathname === '/cart/') {
         `;
     }
 }
+
+function showFavoriteToast(message, isAdded) {
+    const toast = document.getElementById('favorite-toast');
+    const toastMessage = document.getElementById('favorite-toast-message');
+
+    if (!toast || !toastMessage) return;
+
+    toastMessage.textContent = message;
+
+    toast.classList.remove('bg-success', 'bg-danger');
+    toast.classList.add(isAdded ? 'bg-success' : 'bg-danger');
+
+    toast.style.display = 'block';
+
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+
+function hideFavoriteToast() {
+    const toast = document.getElementById('favorite-toast');
+    if (toast) toast.style.display = 'none';
+}

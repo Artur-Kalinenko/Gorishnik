@@ -24,6 +24,7 @@ def assortment_list(request):
     sort = request.GET.get('sort')
     discounted_only = request.GET.get('discounted') == '1'
     new_only = request.GET.get('new') == '1'
+    my_favorites_only = request.GET.get('my_favorites') == '1'
 
     assortments = Assortment.objects.all()
     current_category = None
@@ -41,6 +42,11 @@ def assortment_list(request):
 
     if new_only:
         assortments = assortments.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
+
+    if my_favorites_only and request.user.is_authenticated:
+        from favorites.models import Favorite
+        favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+        assortments = assortments.filter(id__in=favorite_ids)
 
     if query:
         assortments = assortments.filter(
@@ -98,6 +104,11 @@ def assortment_list(request):
         Prefetch('options', queryset=filtered_options)
     )
 
+    if request.user.is_authenticated:
+        favorites_ids = list(request.user.favorites.values_list('product_id', flat=True))
+    else:
+        favorites_ids = []
+
     return render(request, 'assortment/assortment_list.html', {
         'assortments': assortments,
         'categories': categories,
@@ -108,6 +119,7 @@ def assortment_list(request):
         'query': query,
         'discounted_only': discounted_only,
         'new_only': new_only,
+        'favorites_ids': favorites_ids,
     })
 
 

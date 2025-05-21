@@ -25,3 +25,19 @@
     color: white;
     border-color: #0d6efd;
 }
+
+.favorite-toggle {
+    cursor: pointer;
+    font-size: 1.4rem;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 6px;
+    border-radius: 50%;
+    z-index: 10;
+}
+
+.favorite-toggle i {
+    color: #ffcc00; /* золотая звезда */
+}
