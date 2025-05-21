@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError
 from .models import CustomUser
 
@@ -68,6 +69,12 @@ class LoginForm(forms.Form):
 class PasswordResetRequestForm(forms.Form):
     email = forms.EmailField(label="Ваша електронна адреса")
 
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError('Користувача з таким email не існує.')
+        return email
+
 # Ввод кода подтверждения при сбросе пароля
 class PasswordResetCodeForm(forms.Form):
     code = forms.CharField(label="Код підтвердження")
@@ -85,4 +92,19 @@ class SetNewPasswordForm(SetPasswordForm):
                 validate_custom_password(password)
             except ValidationError as e:
                 raise forms.ValidationError(e)
+        return password
+
+class ChangeEmailForm(forms.Form):
+    new_email = forms.EmailField(label='Новий email')
+
+    def clean_new_email(self):
+        email = self.cleaned_data['new_email']
+        if CustomUser.objects.filter(email=email, is_verified=True).exists():
+            raise forms.ValidationError("Користувач з таким email вже існує.")
+        return email
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def clean_new_password1(self):
+        password = self.cleaned_data.get('new_password1')
+        validate_custom_password(password)
         return password

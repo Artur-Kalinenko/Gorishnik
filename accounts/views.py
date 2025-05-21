@@ -4,7 +4,9 @@ from .forms import (
     LoginForm,
     PasswordResetRequestForm,
     PasswordResetCodeForm,
-    SetNewPasswordForm
+    SetNewPasswordForm,
+    ChangeEmailForm,
+    CustomPasswordChangeForm
 )
 from favorites.models import Favorite
 from .models import CustomUser, VerificationCode
@@ -26,6 +28,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from itertools import zip_longest
+from django.contrib.auth import update_session_auth_hash
+from django.utils.dateparse import parse_datetime
 # from django.http import HttpResponseRedirect
 # from django.urls import reverse
 
@@ -151,6 +155,12 @@ def logout_view(request):
 
 # Запрос на сброс пароля (отправка кода)
 def password_reset_request_view(request):
+    if not request.session.session_key:
+        request.session.create()
+
+    request.session.pop('reset_user_id', None)
+    request.session.pop('allow_password_change', None)
+
     if request.method == 'POST': # Генерация и отправка кода на email
         form = PasswordResetRequestForm(request.POST)
         if form.is_valid():
@@ -172,7 +182,7 @@ def password_reset_request_view(request):
     return render(request, 'accounts/password_reset_request.html', {'form': form})
 
 
-# Ввод кода подтверждения для сброса пароля
+# Ввод кода для сброса пароля
 def password_reset_code_view(request):
     user_id = request.session.get('reset_user_id')
     if not user_id:
@@ -182,45 +192,66 @@ def password_reset_code_view(request):
 
     if request.method == 'POST':
         if 'resend' in request.POST:
-            last_code = VerificationCode.objects.filter(user=user).order_by('-last_sent_at').first()
-            if last_code and not last_code.can_resend():
-                messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
-            else:
-                if last_code:
-                    last_code.code = VerificationCode.generate_code()
-                    last_code.last_sent_at = timezone.now()
-                    last_code.save()
-                    code = last_code.code
-                else:
-                    code = VerificationCode.generate_code()
-                    VerificationCode.objects.create(user=user, code=code)
+            session_data = request.session.get('reset_password', {})
+            sent_at_str = session_data.get('sent_at')
+            is_first = session_data.get('is_first', True)
 
-                send_mail(
-                    'Новий код для скидання пароля',
-                    f'Ваш новий код: {code}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email]
-                )
-                messages.success(request, 'Новий код було надіслано на вашу пошту.')
+            if not is_first and sent_at_str:
+                sent_at = parse_datetime(sent_at_str)
+                now = timezone.now()
+                seconds_passed = (now - sent_at).total_seconds()
+                if seconds_passed < 60:
+                    messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
+                    form = PasswordResetCodeForm()
+                    return render(request, 'accounts/password_reset_code.html', {'form': form})
 
+            new_code = VerificationCode.generate_code()
+            session_data = {
+                'code': new_code,
+                'sent_at': timezone.now().isoformat(),
+                'is_first': False,
+            }
+            request.session['reset_password'] = session_data
+
+            send_mail(
+                'Новий код для скидання пароля',
+                f'Ваш новий код: {new_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
+            messages.success(request, 'Новий код було надіслано на вашу пошту.')
             form = PasswordResetCodeForm()
-            return render(request, 'accounts/password_reset_code.html', {'form': form})
 
-        form = PasswordResetCodeForm(request.POST)
-        if form.is_valid():
-            entered_code = form.cleaned_data['code']
-            code_obj = VerificationCode.objects.filter(user=user, code=entered_code).first()
-            if code_obj and not code_obj.is_expired():
-                code_obj.delete()
-                request.session['allow_password_change'] = True
-                return redirect('set_new_password')
-            else:
-                form.add_error('code', 'Невірний або прострочений код.')
+        else:
+            form = PasswordResetCodeForm(request.POST)
+            if form.is_valid():
+                code_entered = form.cleaned_data['code']
+                session_data = request.session.get('reset_password')
+                if session_data and code_entered == session_data['code']:
+                    request.session['allow_password_change'] = True
+                    return redirect('set_new_password')
+                else:
+                    form.add_error('code', 'Невірний або прострочений код.')
     else:
+        # Первая отправка
+        new_code = VerificationCode.generate_code()
+        session_data = {
+            'code': new_code,
+            'sent_at': timezone.now().isoformat(),
+            'is_first': True,
+        }
+        request.session['reset_password'] = session_data
+
+        send_mail(
+            'Код для скидання пароля',
+            f'Ваш код: {new_code}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email]
+        )
+        messages.info(request, 'Код було надіслано на вашу пошту.')
         form = PasswordResetCodeForm()
 
     return render(request, 'accounts/password_reset_code.html', {'form': form})
-
 
 # Установка нового пароля после подтверждения кода
 def password_reset_new_password_view(request):
@@ -250,44 +281,59 @@ def verify_email_view(request):
 
     if request.method == 'POST':
         if 'resend' in request.POST:
-            last_code = VerificationCode.objects.filter(user=user).order_by('-last_sent_at').first()
-            if last_code and not last_code.can_resend():
-                messages.warning(request, 'Зачекайте хвилину перед повторною відправкою коду.')
-            else:
-                if last_code:
-                    last_code.code = VerificationCode.generate_code()
-                    last_code.last_sent_at = timezone.now()
-                    last_code.save()
-                    code = last_code.code
-                else:
-                    code = VerificationCode.generate_code()
-                    VerificationCode.objects.create(user=user, code=code)
-                send_mail(
-                    'Новий код підтвердження',
-                    f'Ваш новий код: {code}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email]
-                )
-                messages.success(request, 'Новий код було надіслано на вашу пошту.')
+            session_data = request.session.get('verify_email_data', {})
+            sent_at_str = session_data.get('sent_at')
+            is_first = session_data.get('is_first', True)
 
+            if not is_first and sent_at_str:
+                sent_at = parse_datetime(sent_at_str)
+                now = timezone.now()
+                seconds_passed = (now - sent_at).total_seconds()
+
+                if seconds_passed < 60:
+                    messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
+                    form = PasswordResetCodeForm()
+                    return render(request, 'accounts/verify_email.html', {'form': form})
+
+            new_code = VerificationCode.generate_code()
+            VerificationCode.objects.create(user=user, code=new_code, last_sent_at=timezone.now())
+
+            # Обновляем сессию
+            request.session['verify_email_data'] = {
+                'sent_at': timezone.now().isoformat(),
+                'is_first': False
+            }
+
+            send_mail(
+                'Новий код підтвердження',
+                f'Ваш новий код: {new_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email]
+            )
+            messages.success(request, 'Новий код було надіслано на вашу пошту.')
             form = PasswordResetCodeForm()
-            return render(request, 'accounts/verify_email.html', {'form': form})
-
-        form = PasswordResetCodeForm(request.POST)
-        if form.is_valid():
-            code = form.cleaned_data['code']
-            code_obj = VerificationCode.objects.filter(user=user, code=code).first()
-            if code_obj and not code_obj.is_expired():
-                code_obj.delete()
-                user.is_verified = True
-                user.save()
-                login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-                del request.session['verify_user_id']
-                messages.success(request, 'Підтвердження пройшло успішно.')
-                return redirect('welcome')
-            else:
-                form.add_error('code', 'Невірний або прострочений код.')
+        else:
+            form = PasswordResetCodeForm(request.POST)
+            if form.is_valid():
+                code = form.cleaned_data['code']
+                code_obj = VerificationCode.objects.filter(user=user, code=code).first()
+                if code_obj and not code_obj.is_expired():
+                    code_obj.delete()
+                    user.is_verified = True
+                    user.save()
+                    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+                    del request.session['verify_user_id']
+                    request.session.pop('verify_email_data', None)
+                    messages.success(request, 'Підтвердження пройшло успішно.')
+                    return redirect('welcome')
+                else:
+                    form.add_error('code', 'Невірний або прострочений код.')
     else:
+        # Первая загрузка — установить таймер
+        request.session['verify_email_data'] = {
+            'sent_at': timezone.now().isoformat(),
+            'is_first': True
+        }
         form = PasswordResetCodeForm()
 
     return render(request, 'accounts/verify_email.html', {'form': form})
@@ -303,6 +349,11 @@ def user_cabinet_view(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('product')
     favorites_ids = list(favorites.values_list('product_id', flat=True))
     grouped_favorites = chunked(favorites, 3)  # для карусели по 3 товара
+
+    if request.session.get('change_email'):
+        messages.warning(request,
+                         'Ви намагалися змінити адресу електронної пошти, але не пройшли веріфікацію, будь ласка, спробуйте ще раз.')
+        del request.session['change_email']
 
     return render(request, 'accounts/user_cabinet.html', {
         'user': request.user,
@@ -349,3 +400,182 @@ def google_login_complete_safe(request, backend):
 def save_pre_social_session(request):
     request.session['pre_social_auth_session_key'] = request.session.session_key or request.session.create()
     return JsonResponse({'status': 'ok'})
+
+
+@login_required
+def change_email_request_view(request):
+    if request.method == 'POST':
+        form = ChangeEmailForm(request.POST)
+        if form.is_valid():
+            new_email = form.cleaned_data['new_email']
+            code = VerificationCode.generate_code()
+
+            # Первая отправка: флаг is_first = True
+            request.session['change_email'] = {
+                'new_email': new_email,
+                'code': code,
+                'sent_at': timezone.now().isoformat(),
+                'is_first': True,
+            }
+
+            send_mail(
+                'Підтвердження нової електронної пошти',
+                f'Ваш код підтвердження: {code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [new_email]
+            )
+
+            messages.info(request, 'Код підтвердження надіслано на нову електронну адресу.')
+            return redirect('confirm_change_email')
+    else:
+        form = ChangeEmailForm()
+
+    return render(request, 'accounts/change_email_request.html', {'form': form})
+
+@login_required
+def confirm_change_email_view(request):
+    session_data = request.session.get('change_email')
+    if not session_data:
+        messages.warning(request, 'Ви не ініціювали зміну електронної пошти.')
+        return redirect('user_cabinet')
+
+    if request.method == 'POST':
+        if 'resend' in request.POST:
+            sent_at_str = session_data.get('sent_at')
+            is_first = session_data.get('is_first', False)
+
+            # Разрешаем только первую отправку без ограничений
+            if not is_first:
+                sent_at = parse_datetime(sent_at_str)
+                now = timezone.now()
+                seconds_passed = (now - sent_at).total_seconds()
+
+                if seconds_passed < 60:
+                    messages.warning(request, f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.')
+                    form = PasswordResetCodeForm()
+                    return render(request, 'accounts/confirm_change_email.html', {'form': form})
+
+            # Если прошло 60 сек или это первая отправка — отправляем код
+            new_code = VerificationCode.generate_code()
+            session_data = session_data.copy()
+            session_data['code'] = new_code
+            session_data['sent_at'] = timezone.now().isoformat()
+            session_data['is_first'] = False
+            request.session['change_email'] = session_data
+
+            send_mail(
+                'Новий код підтвердження',
+                f'Ваш код: {new_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [session_data['new_email']]
+            )
+            messages.success(request, 'Новий код надіслано на вашу пошту.')
+            form = PasswordResetCodeForm()
+        else:
+            form = PasswordResetCodeForm(request.POST)
+            if form.is_valid():
+                code_entered = form.cleaned_data['code']
+                if code_entered == session_data['code']:
+                    request.user.email = session_data['new_email']
+                    request.user.save()
+                    del request.session['change_email']
+                    messages.success(request, 'Email успішно змінено.')
+                    return redirect('user_cabinet')
+                else:
+                    form.add_error('code', 'Невірний код.')
+    else:
+        form = PasswordResetCodeForm()
+
+    return render(request, 'accounts/confirm_change_email.html', {'form': form})
+
+
+
+@login_required
+def change_password_view(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(user=request.user, data=request.POST)
+        if form.is_valid():
+            new_password = form.cleaned_data['new_password1']
+            code = VerificationCode.generate_code()
+
+            # Сохраняем пароль и код в сессии
+            request.session['change_password'] = {
+                'code': code,
+                'password': new_password,
+                'sent_at': timezone.now().isoformat(),
+                'is_first': True,
+            }
+
+            send_mail(
+                'Підтвердження зміни пароля',
+                f'Ваш код підтвердження: {code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email]
+            )
+
+            messages.info(request, 'Код підтвердження було надіслано на ваш email.')
+            return redirect('confirm_change_password')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+
+    return render(request, 'accounts/change_password.html', {'form': form})
+
+@login_required
+def confirm_change_password_view(request):
+    session_data = request.session.get('change_password')
+    if not session_data:
+        messages.warning(request, 'Ви не ініціювали зміну пароля.')
+        return redirect('user_cabinet')
+
+    if request.method == 'POST':
+        if 'resend' in request.POST:
+            sent_at_str = session_data.get('sent_at')
+            is_first = session_data.get('is_first', False)
+
+            # Проверка: если это не первая отправка — проверяем таймер
+            if not is_first:
+                sent_at = parse_datetime(sent_at_str)
+                now = timezone.now()
+                seconds_passed = (now - sent_at).total_seconds()
+
+                if seconds_passed < 60:
+                    messages.warning(
+                        request,
+                        f'Зачекайте {int(60 - seconds_passed)} сек. перед повторною відправкою коду.'
+                    )
+                    form = PasswordResetCodeForm()
+                    return render(request, 'accounts/confirm_change_password.html', {'form': form})
+
+            # Генерация нового кода
+            new_code = VerificationCode.generate_code()
+            session_data = session_data.copy()
+            session_data['code'] = new_code
+            session_data['sent_at'] = timezone.now().isoformat()
+            session_data['is_first'] = False
+            request.session['change_password'] = session_data
+
+            send_mail(
+                'Новий код підтвердження',
+                f'Ваш новий код: {new_code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [request.user.email]
+            )
+            messages.success(request, 'Новий код було надіслано на вашу пошту.')
+            form = PasswordResetCodeForm()
+        else:
+            form = PasswordResetCodeForm(request.POST)
+            if form.is_valid():
+                code_entered = form.cleaned_data['code']
+                if code_entered == session_data['code']:
+                    request.user.set_password(session_data['password'])
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                    del request.session['change_password']
+                    messages.success(request, 'Пароль успішно змінено.')
+                    return redirect('user_cabinet')
+                else:
+                    form.add_error('code', 'Невірний код.')
+    else:
+        form = PasswordResetCodeForm()
+
+    return render(request, 'accounts/confirm_change_password.html', {'form': form})

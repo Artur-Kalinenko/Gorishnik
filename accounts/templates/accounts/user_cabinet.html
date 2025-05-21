@@ -13,6 +13,8 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Телефон:</strong> {{ user.phone|default:"(не вказано)" }}</p>
             <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary mt-2">Редагувати профіль</a>
+            <a href="{% url 'change_email' %}" class="btn btn-outline-warning mt-2">Змінити email</a>
+            <a href="{% url 'change_password' %}" class="btn btn-outline-warning mt-2">Змінити пароль</a>
         </div>
     </div>
 

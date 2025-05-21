@@ -45,7 +45,7 @@ function attachQuantityHandlers(productId) {
                 if (data.session_id) {
                     localStorage.setItem('session_id', data.session_id);
                 }
-                alert(data.message);
+                showCartToast();
                 input.value = 1;
             })
             .catch(error => {
@@ -223,8 +223,13 @@ if (!window.IS_USER_CABINET) {
                     showFavoriteToast('Товар видалено з обраного', false);
                 }
             })
-            .catch(() => {
-                alert('Помилка при додаванні в обрані.');
+            .catch(error => {
+                console.error('Помилка при додаванні в обрані:', error);
+                const toastEl = document.getElementById('loginToast');
+                if (toastEl) {
+                    const toast = new bootstrap.Toast(toastEl);
+                    toast.show();
+                }
             });
         });
     });

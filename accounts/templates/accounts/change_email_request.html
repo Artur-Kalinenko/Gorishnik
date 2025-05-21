@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Зміна адреси електронної пошти</h2>
+    <p>Введіть нову адресу email. Ми надішлемо код підтвердження на неї.</p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-3">
+            {{ form.new_email.label_tag }}
+            {{ form.new_email }}
+            {% if form.new_email.errors %}
+                <div class="text-danger small">{{ form.new_email.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Надіслати код підтвердження</button>
+    </form>
+</div>
+{% endblock %}

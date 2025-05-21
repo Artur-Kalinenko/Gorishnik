@@ -107,25 +107,35 @@ if (window.cartCleared && window.location.pathname === '/cart/') {
     }
 }
 
+// Тосты
 function showFavoriteToast(message, isAdded) {
-    const toast = document.getElementById('favorite-toast');
+    const toastEl = document.getElementById('favorite-toast');
     const toastMessage = document.getElementById('favorite-toast-message');
 
-    if (!toast || !toastMessage) return;
+    if (!toastEl || !toastMessage) return;
 
+    // Устанавливаем сообщение и цвет
     toastMessage.textContent = message;
+    toastEl.classList.remove('bg-success', 'bg-danger');
+    toastEl.classList.add(isAdded ? 'bg-success' : 'bg-danger');
 
-    toast.classList.remove('bg-success', 'bg-danger');
-    toast.classList.add(isAdded ? 'bg-success' : 'bg-danger');
-
-    toast.style.display = 'block';
-
-    setTimeout(() => {
-        toast.style.display = 'none';
-    }, 3000);
+    // Инициализация и показ тоста
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    toast.show();
 }
 
 function hideFavoriteToast() {
-    const toast = document.getElementById('favorite-toast');
-    if (toast) toast.style.display = 'none';
+    const toastEl = document.getElementById('favorite-toast');
+    if (!toastEl) return;
+
+    const toast = bootstrap.Toast.getInstance(toastEl);
+    if (toast) toast.hide();
+}
+
+function showCartToast() {
+    const toastEl = document.getElementById('cartToast');
+    if (!toastEl) return;
+
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    toast.show();
 }
