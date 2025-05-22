@@ -9,11 +9,40 @@
 <div class="container mt-5">
     <div class="row">
         <!-- Картинка -->
-        <div class="col-md-6">
+        <div class="col-md-6 text-center">
             {% if assortment.poster %}
-                <img src="{{ assortment.poster.url }}" class="img-fluid" alt="{{ assortment.assortment_name }}">
+                <img id="mainImage"
+                     src="{{ assortment.poster.url }}"
+                     class="main-image"
+                     alt="{{ assortment.assortment_name }}">
             {% else %}
-                <img src="{% static 'images/default.jpg' %}" class="img-fluid" alt="No image available">
+                <img id="mainImage"
+                     src="{% static 'images/default.jpg' %}"
+                     class="main-image"
+                     alt="No image available">
+            {% endif %}
+
+            {% if images %}
+                <div id="thumbnailGallery" class="d-flex flex-wrap justify-content-center mt-2">
+                    {% if assortment.poster %}
+                        <img src="{{ assortment.poster.url }}"
+                             class="img-thumbnail m-1 thumbnail-img active-thumbnail"
+                             style="height: 80px; width: auto; cursor: pointer;"
+                             onclick="changeMainImage(this)">
+                    {% else %}
+                        <img src="{% static 'images/default.jpg' %}"
+                             class="img-thumbnail m-1 thumbnail-img active-thumbnail"
+                             style="height: 80px; width: auto; cursor: pointer;"
+                             onclick="changeMainImage(this)">
+                    {% endif %}
+
+                    {% for img in images %}
+                        <img src="{{ img.image.url }}"
+                             class="img-thumbnail m-1 thumbnail-img"
+                             style="height: 80px; width: auto; cursor: pointer;"
+                             onclick="changeMainImage(this)">
+                    {% endfor %}
+                </div>
             {% endif %}
         </div>
 
@@ -21,8 +50,10 @@
         <div class="col-md-6">
             <h1 class="montserrat-category-title">{{ assortment.assortment_name }}</h1>
             <p><strong>Категорії:</strong>
-                {% for cat in assortment.categories.all %}
-                    {{ cat.category }}{% if not forloop.last %}, {% endif %}
+                {% for cat in assortment.assortment_categories.all %}
+                    <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="text-decoration-none">
+                        {{ cat.category }}
+                    </a>{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
             <p><strong>Виробник:</strong> {{ assortment.producer.producer_name }}</p>
@@ -31,41 +62,43 @@
             <p>{{ assortment.assortment_description }}</p>
 
             <!-- Ціна -->
-            <p class="card-text">
-                <strong id="price-display">
-                    {% if variants.exists %}
-                        {% with sorted_variants=variants|dictsort:"price" %}
-                            {% with min=sorted_variants.0.price %}
-                                {% with sorted_variants|last as last_variant %}
-                                    {% if min != last_variant.price %}
-                                        {{ min }} ₴ – {{ last_variant.price }} ₴
-                                    {% else %}
-                                        {{ min }} ₴
-                                    {% endif %}
-                                {% endwith %}
-                            {% endwith %}
+            <div id="price-display">
+            {% if variants.exists %}
+                {% with sorted_variants=variants|dictsort:"price" %}
+                    {% with min_variant=sorted_variants.0 last_variant=sorted_variants|last %}
+                        {% with min_price=min_variant.price max_price=last_variant.price %}
+                            {% if assortment.is_discounted and min_variant.old_price %}
+                                <p class="mb-1 text-muted text-decoration-line-through">
+                                    {{ min_variant.old_price }} ₴{% if last_variant.old_price != min_variant.old_price %} – {{ last_variant.old_price }} ₴{% endif %}
+                                </p>
+                                <p class="fw-bold text-danger mb-2">
+                                    {{ min_price }} ₴{% if max_price != min_price %} – {{ max_price }} ₴{% endif %}
+                                </p>
+                            {% else %}
+                                <p class="fw-bold mb-2">
+                                    {{ min_price }} ₴{% if max_price != min_price %} – {{ max_price }} ₴{% endif %}
+                                </p>
+                            {% endif %}
                         {% endwith %}
-                    {% else %}
-                        {{ assortment.price }} ₴
-                    {% endif %}
-                </strong>
-            </p>
-
-            <!-- 🏷 Мітки -->
-            {% if assortment.tags.exists %}
-                <div class="mt-2">
-                    {% for tag in assortment.tags.all %}
-                        <span class="badge bg-success me-1">{{ tag.name }}</span>
-                    {% endfor %}
-                </div>
+                    {% endwith %}
+                {% endwith %}
+            {% else %}
+                {% if assortment.is_discounted and assortment.old_price %}
+                    <p class="mb-1 text-muted text-decoration-line-through">{{ assortment.old_price }} ₴</p>
+                    <p class="fw-bold text-danger">{{ assortment.price }} ₴</p>
+                {% else %}
+                    <p class="fw-bold">{{ assortment.price }} ₴</p>
+                {% endif %}
             {% endif %}
+            </div>
 
             <!-- Варианты -->
             {% if variants.exists %}
                 <div class="mb-3">
                     {% for variant in variants %}
                         <button class="btn btn-outline-secondary grams-button btn-sm"
-                                data-price="{{ variant.price }} ₴">
+                                data-price="{{ variant.price }}"
+                                data-old-price="{{ variant.old_price }}">
                             {{ variant.grams }}г
                         </button>
                     {% endfor %}
@@ -76,26 +109,8 @@
         </div>
     </div>
 
-    <hr>
-
-    <!-- ⭐ Средний рейтинг -->
-    <h4>Рейтинг:</h4>
-    <p>
-        {% with avg=assortment.average_rating %}
-            {% for _ in "12345" %}
-                {% if forloop.counter <= avg %}
-                    ⭐
-                {% elif forloop.counter <= avg|floatformat:1 %}
-                    ⭐️
-                {% else %}
-                    ☆
-                {% endif %}
-            {% endfor %}
-            ({{ avg|floatformat:1 }} / 5)
-        {% endwith %}
-    </p>
-
     <!-- 💬 Отзывы -->
+    <hr>
     <h5 class="mt-4">Відгуки:</h5>
     {% if reviews %}
         {% for review in reviews %}
@@ -104,21 +119,13 @@
                 <span class="text-muted">— {{ review.created_at|date:"d.m.Y H:i" }}</span><br>
                 <span>
                     {% for _ in "12345" %}
-                        {% if forloop.counter <= review.rating %}
-                            ⭐
-                        {% else %}
-                            ☆
-                        {% endif %}
+                        {% if forloop.counter <= review.rating %}⭐{% else %}☆{% endif %}
                     {% endfor %}
                 </span>
-                {% if review.comment %}
-                    <p>{{ review.comment }}</p>
-                {% endif %}
-
+                {% if review.comment %}<p>{{ review.comment }}</p>{% endif %}
                 {% if user.is_authenticated and review.user == user %}
                     <div class="mt-2">
                         {% if edit_mode and edit_review.id == review.id %}
-                            <!-- 🔧 Форма редактирования -->
                             <form method="post">
                                 {% csrf_token %}
                                 <input type="hidden" name="edit_review_id" value="{{ review.id }}">
@@ -128,18 +135,14 @@
                             </form>
                         {% else %}
                             <a href="?edit={{ review.id }}" class="btn btn-sm btn-outline-primary me-2">Редагувати</a>
-                            <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger"
-                               onclick="return confirm('Ви впевнені, що хочете видалити відгук?');">Видалити</a>
+                            <a href="{% url 'delete_review' review.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Ви впевнені, що хочете видалити відгук?');">Видалити</a>
                         {% endif %}
                     </div>
                 {% endif %}
             </div>
         {% endfor %}
-    {% else %}
-        <p>Немає відгуків.</p>
-    {% endif %}
+    {% else %}<p>Немає відгуків.</p>{% endif %}
 
-    <!-- 📝 Форма для залишення відгуку -->
     {% if user.is_authenticated and not user_review %}
         <hr>
         <h5 class="mt-4">Залишити відгук:</h5>
@@ -155,5 +158,6 @@
     {% endif %}
 </div>
 
+<link rel="stylesheet" href="{% static 'assortment/assortment_detail.css' %}">
 <script src="{% static 'assortment/assortment_detail.js' %}"></script>
 {% endblock %}

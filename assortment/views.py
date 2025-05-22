@@ -127,6 +127,7 @@ def assortment_detail(request, pk):
     assortment = get_object_or_404(Assortment, pk=pk)
     variants = assortment.variants.all()
     reviews = assortment.reviews.select_related('user')
+    images = assortment.images.all()
 
     # Обновляем популярность товара раз в 24 часа
     viewed = request.session.get('viewed_products', {})
@@ -198,6 +199,7 @@ def assortment_detail(request, pk):
         'user_review': user_review,
         'edit_mode': edit_mode,
         'edit_review': edit_review,
+        'images': images,
     }
 
     return render(request, 'assortment/assortment_detail.html', context)

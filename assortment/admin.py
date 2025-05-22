@@ -4,7 +4,7 @@ from django.forms.models import BaseInlineFormSet
 
 from .models import (
     Assortment, AssortmentVariant, Category,
-    FilterGroup, FilterOption, Tag, AssortmentAdminForm, Review
+    FilterGroup, FilterOption, Tag, AssortmentAdminForm, Review, AssortmentImage
 )
 from producer.models import Producer
 
@@ -40,6 +40,10 @@ class AssortmentVariantInline(admin.TabularInline):
     max_num = 10
 
 
+class AssortmentImageInline(admin.TabularInline):
+    model = AssortmentImage
+    extra = 1
+
 # Админка для модели Assortment (товар)
 @admin.register(Assortment)
 class AssortmentAdmin(admin.ModelAdmin):
@@ -47,12 +51,13 @@ class AssortmentAdmin(admin.ModelAdmin):
     list_display = ['assortment_name', 'get_categories', 'producer', 'price', 'old_price', 'is_discounted', 'is_available']
     list_filter = ['producer', 'is_available', 'is_discounted']
     search_fields = ['assortment_name']
-    inlines = [AssortmentVariantInline]
+    inlines = [AssortmentVariantInline, AssortmentImageInline]
     filter_horizontal = ['filters', 'tags', 'assortment_categories']
 
     def get_categories(self, obj):
         return ", ".join([cat.category for cat in obj.assortment_categories.all()])
     get_categories.short_description = 'Категорії'
+
 
 
 # Админка для категорий

@@ -66,6 +66,14 @@ class AssortmentVariant(models.Model):
         verbose_name_plural = 'Варіанти продуктів'
         ordering = ['grams']
 
+class AssortmentImage(models.Model):
+    assortment = models.ForeignKey('Assortment', related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='assortment/gallery/')
+    alt_text = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"Зображення до: {self.assortment.assortment_name}"
+
 
 # Модель тегов для товара
 class Tag(models.Model):

@@ -1,19 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Обработка кликов по кнопкам граммовки
-    document.querySelectorAll('.grams-button').forEach(button => {
-        button.addEventListener('click', event => {
-            const price = event.target.getAttribute('data-price');
-            const priceDisplay = document.getElementById('price-display');
+    const buttons = document.querySelectorAll('.grams-button');
+    const priceDisplay = document.getElementById('price-display');
+    const mainImage = document.getElementById('mainImage');
+    const thumbnails = document.querySelectorAll('.thumbnail-img');
 
-            console.log(`Кнопка нажата:`, event.target);
-            console.log(`Обновление ціни: ${price}`);
+    // Обновление главного изображения
+    window.changeMainImage = function(thumbnail) {
+        if (mainImage) {
+            mainImage.src = thumbnail.src;
+        }
 
-            // Обновляем отображаемую цену
+        thumbnails.forEach(img => img.classList.remove('active-thumbnail'));
+        thumbnail.classList.add('active-thumbnail');
+    };
+
+    // Обновление цены при выборе граммовки
+    buttons.forEach(button => {
+        button.addEventListener('click', () => {
+            buttons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const price = button.dataset.price;
+            const oldPrice = button.dataset.oldPrice;
+
             if (priceDisplay) {
-                priceDisplay.textContent = `${price}`;
-                console.log("Ціна успішно оновлена!");
-            } else {
-                console.error(`Елемент з ID price-display не знайдено!`);
+                if (oldPrice && oldPrice !== "None") {
+                    priceDisplay.innerHTML = `
+                        <p class="mb-1 text-muted text-decoration-line-through">${oldPrice} ₴</p>
+                        <p class="fw-bold text-danger">${price} ₴</p>
+                    `;
+                } else {
+                    priceDisplay.innerHTML = `
+                        <p class="fw-bold">${price} ₴</p>
+                    `;
+                }
             }
         });
     });

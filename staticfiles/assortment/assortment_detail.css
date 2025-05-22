@@ -1,0 +1,26 @@
+.main-image {
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.thumbnail-img {
+    transition: 0.3s;
+    opacity: 0.6;
+}
+
+.thumbnail-img:hover {
+    opacity: 1;
+}
+
+.active-thumbnail {
+    opacity: 1;
+    filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    border: 2px solid #007bff;
+}

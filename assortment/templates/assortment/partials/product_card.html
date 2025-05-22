@@ -81,7 +81,8 @@
                     <button class="btn btn-outline-secondary grams-button btn-sm"
                             data-product-id="{{ item.pk }}"
                             data-variant-id="{{ variant.id }}"
-                            data-price="{{ variant.price }}">
+                            data-price="{{ variant.price }}"
+                            data-old-price="{{ variant.old_price }}">
                         {{ variant.grams }}г
                     </button>
                 {% endfor %}
