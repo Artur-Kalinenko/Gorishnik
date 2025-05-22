@@ -4,7 +4,7 @@ from django.forms.models import BaseInlineFormSet
 
 from .models import (
     Assortment, AssortmentVariant, Category,
-    FilterGroup, FilterOption, Tag, AssortmentAdminForm
+    FilterGroup, FilterOption, Tag, AssortmentAdminForm, Review
 )
 from producer.models import Producer
 
@@ -78,3 +78,10 @@ class FilterOptionAdmin(admin.ModelAdmin):
     list_display = ['name', 'group']
     list_filter = ['group']
     search_fields = ['name']
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('assortment', 'user', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('user__email', 'assortment__assortment_name', 'comment')
+    readonly_fields = ('created_at',)
