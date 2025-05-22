@@ -64,10 +64,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const productId = event.target.dataset.productId;
             const variantId = event.target.dataset.variantId;
             const price = event.target.dataset.price;
+            const oldPrice = event.target.dataset.oldPrice;
             const priceDisplay = document.getElementById(`price-display-${productId}`);
 
             selectedVariants[productId] = variantId;
-            if (priceDisplay) priceDisplay.textContent = `${price} ₴`;
+            if (priceDisplay) {
+                if (oldPrice && oldPrice !== "None") {
+                    priceDisplay.innerHTML = `
+                        <span class="text-muted text-decoration-line-through">${oldPrice} ₴</span><br>
+                        <strong class="text-danger">${price} ₴</strong>
+                    `;
+                } else {
+                    priceDisplay.innerHTML = `<strong>${price} ₴</strong>`;
+                }
+            }
 
             document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
                 btn.classList.remove('selected');

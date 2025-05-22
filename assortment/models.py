@@ -27,14 +27,19 @@ class Assortment(models.Model):
         return f'{self.assortment_name}'
 
     def clean(self):
+        super().clean()
+
         if self.has_variants and (self.price or self.grams):
             raise ValidationError("Неможливо одночасно вказати фіксовану ціну/грамовку і вибрати 'є варіанти'.")
 
         if not self.has_variants and not self.price:
             raise ValidationError("Необхідно або вказати ціну, або активувати 'є варіанти'.")
 
-        if self.is_discounted and not self.has_variants and not self.old_price:
-            raise ValidationError("Акційний товар повинен мати стару ціну (old_price).")
+        if self.has_variants and self.old_price:
+            raise ValidationError("У товару з варіантами не може бути вказана стара ціна безпосередньо в товарі.")
+
+        if not self.has_variants:
+            self.is_discounted = bool(self.old_price)
 
     @property
     def average_rating(self):
@@ -65,14 +70,6 @@ class AssortmentVariant(models.Model):
         verbose_name = 'Варіант продукту'
         verbose_name_plural = 'Варіанти продуктів'
         ordering = ['grams']
-
-class AssortmentImage(models.Model):
-    assortment = models.ForeignKey('Assortment', related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='assortment/gallery/')
-    alt_text = models.CharField(max_length=100, blank=True)
-
-    def __str__(self):
-        return f"Зображення до: {self.assortment.assortment_name}"
 
 
 # Модель тегов для товара
