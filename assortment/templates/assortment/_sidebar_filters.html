@@ -53,6 +53,25 @@
         </div>
     {% endfor %}
 
+    {% if active_producers %}
+        <div class="filter-group mb-3">
+            <h5 class="filter-header">Виробники</h5>
+            <div class="d-flex flex-wrap gap-2">
+                {% for producer in active_producers %}
+                    <label style="cursor: pointer; opacity: {% if producer.id|stringformat:'s' in selected_producer_ids %}1{% else %}0.4{% endif %};">
+                        <input type="checkbox" name="producer" value="{{ producer.id }}"
+                               class="d-none"
+                               {% if producer.id|stringformat:"s" in selected_producer_ids %}checked{% endif %}>
+                        <img src="{{ producer.producer_img.url }}"
+                             alt="{{ producer.producer_name }}"
+                             style="height: 50px; width: 50px; object-fit: contain;">
+                    </label>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
     <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
         Очистити фільтри
     </button>

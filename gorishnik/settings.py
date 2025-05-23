@@ -100,7 +100,7 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 LANGUAGE_CODE = 'uk'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Kyiv'
 
 USE_I18N = True
 USE_TZ = True
@@ -163,6 +163,8 @@ NOVA_POSHTA_API_KEY = os.getenv('NOVA_POSHTA_API_KEY')
 
 CRONJOBS = [
     ('0 3 * * *', 'django.core.management.call_command', ['clear_cart']),
+    ('0 4 * * *', 'django.core.management.call_command', ['clear_verification_codes']),
+    ('0 5 * * *', 'django.core.management.call_command', ['delete_unverified_users']),
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'

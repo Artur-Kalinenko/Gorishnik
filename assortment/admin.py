@@ -1,11 +1,12 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
 from decimal import Decimal
 
 from .models import (
     Assortment, AssortmentVariant, Category,
-    FilterGroup, FilterOption, Tag, AssortmentAdminForm
+    FilterGroup, FilterOption, Tag, AssortmentAdminForm, AssortmentImage
 )
 from producer.models import Producer
 
@@ -56,6 +57,20 @@ class AssortmentVariantInline(admin.TabularInline):
     min_num = 0
     max_num = 10
 
+class AssortmentImageInline(admin.TabularInline):
+    model = AssortmentImage
+    extra = 1
+    verbose_name = "Зображення"
+    verbose_name_plural = "Галерея зображень"
+
+    # необязательно, но красиво:
+    readonly_fields = ['preview']
+
+    def preview(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height: 100px;">')
+        return ""
+    preview.short_description = "Превʼю"
 
 # Админка для модели Assortment (товар)
 @admin.register(Assortment)
@@ -64,7 +79,7 @@ class AssortmentAdmin(admin.ModelAdmin):
     list_display = ['assortment_name', 'get_categories', 'producer', 'price', 'old_price', 'is_discounted', 'is_available']
     list_filter = ['producer', 'is_available', 'is_discounted']
     search_fields = ['assortment_name']
-    inlines = [AssortmentVariantInline]
+    inlines = [AssortmentVariantInline, AssortmentImageInline]
     filter_horizontal = ['filters', 'tags', 'assortment_categories']
 
     def get_categories(self, obj):

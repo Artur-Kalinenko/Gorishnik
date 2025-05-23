@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             params.delete('q');
             params.delete('discounted');
             params.delete('new');
+            params.delete('producer');
 
             localStorage.removeItem(OPENED_FILTERS_KEY);
 

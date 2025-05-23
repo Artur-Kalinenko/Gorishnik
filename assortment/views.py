@@ -8,6 +8,7 @@ from .models import (
     Assortment, Category,
     AssortmentVariant, FilterGroup, FilterOption, Review
 )
+from producer.models import Producer
 from .forms import ReviewForm
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -64,6 +65,17 @@ def assortment_list(request):
     else:
         price_subquery = Subquery(variant_qs.order_by('price').values('price')[:1])
 
+
+    selected_producer_ids = request.GET.getlist('producer')
+    if selected_producer_ids:
+        assortments = assortments.filter(producer__id__in=selected_producer_ids)
+
+    active_producers = Producer.objects.filter(
+        assortment__in=assortments
+    ).distinct().annotate(
+        product_count=Count('assortment', filter=Q(assortment__in=assortments))
+    )
+
     assortments = assortments.annotate(
         effective_price=Case(
             When(variants__isnull=False, then=price_subquery),
@@ -119,6 +131,8 @@ def assortment_list(request):
         'discounted_only': discounted_only,
         'new_only': new_only,
         'favorites_ids': favorites_ids,
+        'active_producers': active_producers,
+        'selected_producer_ids': request.GET.getlist('producer'),
     })
 
 

@@ -158,3 +158,15 @@ class AssortmentAdminForm(forms.ModelForm):
         if not filters:
             raise forms.ValidationError("Товар повинен мати хоча б один фільтр.")
         return filters
+
+
+class AssortmentImage(models.Model):
+    assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='assortment/gallery/', verbose_name='Фото в галереї')
+
+    def __str__(self):
+        return f'Зображення для {self.assortment}'
+
+    class Meta:
+        verbose_name = 'Зображення товару'
+        verbose_name_plural = 'Галерея зображень'
