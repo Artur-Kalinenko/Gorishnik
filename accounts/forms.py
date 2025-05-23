@@ -2,25 +2,19 @@ from django import forms
 from django.contrib.auth.forms import SetPasswordForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
 from .models import CustomUser
-
-# --- Валидатор пароля ---
-def validate_custom_password(password):
-    errors = []
-    if len(password) < 8:
-        errors.append("Пароль повинен містити щонайменше 8 символів.")
-    if password.isdigit():
-        errors.append("Пароль не може складатися лише з цифр.")
-    common_passwords = ['123456', 'password', 'qwerty', '111111']
-    if password.lower() in common_passwords:
-        errors.append("Пароль надто відомий.")
-    if errors:
-        raise ValidationError(errors)
+from accounts.validators import validate_ukrainian_phone, validate_custom_password
 
 # --- Регистрация и вход ---
 class RegistrationForm(forms.Form):
     first_name = forms.CharField(label="Ім'я", required=True)
     email = forms.EmailField(label='Email', required=True)
-    phone = forms.CharField(label='Телефон', required=False)
+    phone = forms.CharField(
+        label='Телефон',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'id': 'phone-input',
+        })
+    )
     password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput)
     password2 = forms.CharField(label='Підтвердіть пароль', widget=forms.PasswordInput)
 
@@ -34,6 +28,7 @@ class RegistrationForm(forms.Form):
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
         if phone:
+            validate_ukrainian_phone(phone)
             user = CustomUser.objects.filter(phone=phone).first()
             if user and user.is_verified:
                 raise forms.ValidationError("Користувач з таким телефоном вже існує.")
@@ -107,3 +102,9 @@ class EditProfileForm(forms.ModelForm):
             'first_name': "Ім’я",
             'phone': "Телефон",
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['phone'].widget.attrs.update({
+            'id': 'edit-phone-input'
+        })

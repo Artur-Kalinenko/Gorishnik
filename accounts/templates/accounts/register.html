@@ -65,4 +65,20 @@
         <button type="submit" class="btn btn-primary">Зареєструватися</button>
     </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const input = document.getElementById("phone-input");
+    if (input) {
+        Inputmask({
+            mask: "+380 (99) 999-99-99",
+            placeholder: "_",
+            showMaskOnHover: false,
+            showMaskOnFocus: true,
+            clearIncomplete: true,
+        }).mask(input);
+    }
+});
+</script>
 {% endblock %}

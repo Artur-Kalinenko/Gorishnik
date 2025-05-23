@@ -4,6 +4,7 @@ from django.db import models
 from django.utils import timezone
 import random
 import string
+from accounts.validators import validate_ukrainian_phone
 
 
 # Кастомный менеджер для модели пользователя
@@ -36,7 +37,7 @@ class CustomUserManager(BaseUserManager):
 # Кастомная модель пользователя
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=20, blank=True, unique=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, unique=True, null=True, validators=[validate_ukrainian_phone])
     is_verified = models.BooleanField(default=False)
 
     # Убираем стандартное поле username
