@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load assortment_extras %}
 
 {% block title %}
     {% if current_category %}
@@ -19,7 +20,10 @@
         {% if query %}
             Результати пошуку для: "{{ query }}"
         {% elif current_category and current_category.display_icon %}
-            <img src="{{ current_category.display_icon.url }}" alt="{{ current_category.category }}" style="height: 60px; width: 60px; margin-right: 15px;">
+            <img src="{{ current_category.display_icon.url }}" alt="{{ current_category.category }}"
+                 style="height: 60px; width: 60px; margin-right: 15px;">
+            {{ current_category.category }}
+        {% elif current_category %}
             {{ current_category.category }}
         {% else %}
             Асортимент
@@ -28,17 +32,37 @@
 
     <!-- Категорії -->
     {% if not query %}
-    <div class="d-flex justify-content-center mb-4 flex-wrap">
-        <a href="{% url 'assortment_list' %}" class="btn btn-primary mx-2 {% if not current_category %}active{% endif %}">
-            Всі товари
-        </a>
-        {% for category in categories %}
-            <a href="{% url 'assortment_list' %}?category={{ category.category }}" class="btn btn-secondary mx-2 {% if current_category and current_category.category == category.category %}active{% endif %}">
-                {% if category.button_icon %}
-                    <img src="{{ category.button_icon.url }}" alt="{{ category.category }}" style="height: 30px; width: 30px; margin-right: 5px;">
-                {% endif %}
-                {{ category.category }}
+    <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">
+        <!-- Кнопка "Всі товари" -->
+        <div class="text-center mx-2 my-1">
+            <a href="{% url 'assortment_list' %}"
+               class="btn d-block text-white py-1 px-2 text-uppercase {% if not current_category %}btn-primary{% else %}btn-secondary{% endif %}"
+               style="min-width: 110px;">
+                <div style="font-size: 0.9rem;">ВСІ ТОВАРИ</div>
+                <div style="height: 1px; background-color: #fff; opacity: 0.3; margin: 4px 0;"></div>
+                <div style="font-size: 0.65rem;">
+                    {{ total_products }} {{ total_products|pluralize_products_ukr|upper }}
+                </div>
             </a>
+        </div>
+
+        <!-- Остальные категории -->
+        {% for category in categories %}
+            <div class="text-center mx-2 my-1">
+                <a href="{% url 'assortment_list' %}?category={{ category.category }}"
+                   class="btn d-block text-white py-1 px-2 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% else %}btn-secondary{% endif %}"
+                   style="min-width: 110px;">
+                    {% if category.button_icon %}
+                        <img src="{{ category.button_icon.url }}" alt="{{ category.category }}"
+                             style="height: 30px; width: 30px; margin-bottom: 4px;">
+                    {% endif %}
+                    <div style="font-size: 0.9rem;">{{ category.category }}</div>
+                    <div style="height: 1px; background-color: #fff; opacity: 0.3; margin: 4px 0;"></div>
+                    <div style="font-size: 0.65rem;">
+                        {{ category.product_count }} {{ category.product_count|pluralize_products_ukr|upper }}
+                    </div>
+                </a>
+            </div>
         {% endfor %}
     </div>
     {% endif %}
@@ -66,21 +90,12 @@
                 </select>
             </form>
 
-            {% if assortments %}
-            <div class="row row-cols-1 row-cols-md-4 g-4">
-                {% for item in assortments %}
-                    <div class="col">
-                        {% include 'assortment/partials/product_card.html' with item=item favorites_ids=favorites_ids %}
-                    </div>
-                {% endfor %}
-            </div>
-            {% else %}
-                <div class="alert alert-warning text-center">Результати пошуку відсутні.</div>
-            {% endif %}
+            {% include 'assortment/partials/product_grid.html' %}
         </div>
     </div>
 </div>
 
 <link rel="stylesheet" href="{% static 'assortment/assortment_list.css' %}">
 <script src="{% static 'assortment/assortment_list.js' %}"></script>
+<script src="{% static 'assortment/assortment_list_ajax.js' %}"></script>
 {% endblock %}

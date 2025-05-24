@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 from django.core.exceptions import ValidationError
 from django.forms.models import BaseInlineFormSet
 from decimal import Decimal
@@ -11,7 +12,6 @@ from .models import (
 from producer.models import Producer
 
 
-# 🔹 Кастомная валидация: минимум 2 варианта, если включен флаг "є варіанти"
 class AssortmentVariantInlineFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
@@ -48,7 +48,7 @@ class AssortmentVariantInlineFormSet(BaseInlineFormSet):
             else:
                 raise ValidationError("Усі варіанти акційного товару повинні мати заповнене поле old_price або жоден.")
 
-# Варианты (граммовки) отображаются прямо внутри товара
+
 class AssortmentVariantInline(admin.TabularInline):
     model = AssortmentVariant
     formset = AssortmentVariantInlineFormSet
@@ -57,13 +57,12 @@ class AssortmentVariantInline(admin.TabularInline):
     min_num = 0
     max_num = 10
 
+
 class AssortmentImageInline(admin.TabularInline):
     model = AssortmentImage
     extra = 1
     verbose_name = "Зображення"
     verbose_name_plural = "Галерея зображень"
-
-    # необязательно, но красиво:
     readonly_fields = ['preview']
 
     def preview(self, obj):
@@ -72,45 +71,70 @@ class AssortmentImageInline(admin.TabularInline):
         return ""
     preview.short_description = "Превʼю"
 
-# Админка для модели Assortment (товар)
+
 @admin.register(Assortment)
 class AssortmentAdmin(admin.ModelAdmin):
     form = AssortmentAdminForm
-    list_display = ['assortment_name', 'get_categories', 'producer', 'price', 'old_price', 'is_discounted', 'is_available']
+
+    list_display = ['preview', 'assortment_name', 'get_categories', 'producer', 'price', 'old_price', 'is_discounted', 'is_available']
     list_filter = ['producer', 'is_available', 'is_discounted']
     search_fields = ['assortment_name']
-    inlines = [AssortmentVariantInline, AssortmentImageInline]
+    inlines = [AssortmentImageInline, AssortmentVariantInline]
     filter_horizontal = ['filters', 'tags', 'assortment_categories']
+    readonly_fields = ['created_at']
+
+    fieldsets = (
+        ('Основна інформація', {
+            'fields': (
+                'assortment_name', 'poster', 'assortment_description',
+                'assortment_categories', 'filters', 'tags', 'producer'
+            )
+        }),
+        ('Ціни та доступність', {
+            'fields': (
+                'price', 'old_price', 'grams',
+                'is_available', 'is_discounted', 'has_variants'
+            )
+        }),
+        ('Інше', {
+            'fields': ('popularity', 'created_at')
+        }),
+    )
 
     def get_categories(self, obj):
         return ", ".join([cat.category for cat in obj.assortment_categories.all()])
     get_categories.short_description = 'Категорії'
 
+    def preview(self, obj):
+        if obj.poster:
+            return format_html('<img src="{}" style="max-height: 80px;" />', obj.poster.url)
+        return "-"
+    preview.short_description = 'Зображення'
+
     def save_model(self, request, obj, form, change):
-        # 🔹 Автоматически активируем акцию, если old_price заполнен
         if not obj.has_variants and obj.old_price:
             obj.is_discounted = True
         super().save_model(request, obj, form, change)
 
 
-# Админка для категорий
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['category']
     search_fields = ['category']
+
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
-# Админка для групп фильтров
+
 @admin.register(FilterGroup)
 class FilterGroupAdmin(admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
-# Админка для опций фильтров
+
 @admin.register(FilterOption)
 class FilterOptionAdmin(admin.ModelAdmin):
     list_display = ['name', 'group']

@@ -1,0 +1,11 @@
+{% if assortments %}
+<div id="product-grid" class="row row-cols-1 row-cols-md-4 g-4">
+    {% for item in assortments %}
+        <div class="col">
+            {% include 'assortment/partials/product_card.html' with item=item favorites_ids=favorites_ids %}
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="alert alert-warning text-center">Результати пошуку відсутні.</div>
+{% endif %}

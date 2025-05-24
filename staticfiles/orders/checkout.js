@@ -1,6 +1,19 @@
 $(function () {
     console.log("checkout.js loaded");
 
+    // 🎯 Маска телефона
+    const phoneInput = document.getElementById("order-phone-input");
+    if (phoneInput) {
+        Inputmask({
+            mask: "+380 (99) 999-99-99",
+            placeholder: "_",
+            showMaskOnHover: false,
+            showMaskOnFocus: true,
+            clearIncomplete: true,
+        }).mask(phoneInput);
+    }
+
+    // 📦 Логика отображения полей
     const deliveryRadios = document.querySelectorAll('input[name="delivery_method"]');
     const novaPoshtaFields = document.getElementById('nova-poshta-fields');
     const ukrPoshtaFields = document.getElementById('ukr-poshta-fields');
@@ -15,9 +28,9 @@ $(function () {
         radio.addEventListener('change', toggleFields);
     });
 
-    toggleFields(); // первоначальный запуск
+    toggleFields(); // initial
 
-    // Select2 логика
+    // 🏙️ Select2 (city)
     $('#id_city').select2({
         placeholder: 'Оберіть місто',
         ajax: {

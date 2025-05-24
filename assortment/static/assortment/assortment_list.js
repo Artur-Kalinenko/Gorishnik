@@ -199,6 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = target;
         });
     }
+
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.classList.add('fade-in');
+    });
 });
 
 // === Обработка избранного ===

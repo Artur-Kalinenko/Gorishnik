@@ -4,24 +4,65 @@ from producer.models import Producer
 from django.conf import settings
 from django.db.models import Avg
 from django import forms
+from .validators import validate_image
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 # Основная модель товара
 class Assortment(models.Model):
-    assortment_name = models.CharField(max_length=200, verbose_name='Назва продукту')
-    assortment_categories = models.ManyToManyField('Category', related_name='assortments', verbose_name='Назва категорії')
-    filters = models.ManyToManyField('FilterOption', blank=True, related_name='products', verbose_name='Фільтри')
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту')
-    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна')
-    grams = models.IntegerField(null=True, blank=True, verbose_name='Грамовка продукту')
-    poster = models.ImageField(upload_to='assortment/posters/', null=False, blank=False, verbose_name='Картинка продукту')
-    producer = models.ForeignKey(Producer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Назва виробника')
-    assortment_description = models.TextField(null=True, verbose_name='Опис продукту')
-    is_available = models.BooleanField(default=True, verbose_name='Наявність продукту')
-    has_variants = models.BooleanField(default=False, verbose_name='Чи є варіанти продукту')
-    is_discounted = models.BooleanField(default=False, verbose_name='Акційний товар')
-    popularity = models.PositiveIntegerField(default=0, verbose_name='Популярність')
+    assortment_name = models.CharField(
+        max_length=200,
+        verbose_name='Назва продукту',
+        help_text='Наприклад: Кешʼю смажений, Фініки королівські'
+    )
+    assortment_categories = models.ManyToManyField(
+        'Category', related_name='assortments', verbose_name='Назва категорії',
+        help_text='Оберіть одну або декілька категорій'
+    )
+    filters = models.ManyToManyField(
+        'FilterOption', blank=True, related_name='products', verbose_name='Фільтри',
+        help_text='Оберіть відповідні фільтри для цього товару'
+    )
+    price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту',
+        help_text='Залишити порожнім, якщо товар має варіанти'
+    )
+    old_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна',
+        help_text='Вкажіть стару ціну, якщо товар акційний'
+    )
+    grams = models.IntegerField(
+        null=True, blank=True, verbose_name='Грамовка продукту',
+        help_text='Вкажіть вагу у грамах, якщо товар без варіантів'
+    )
+    poster = models.ImageField(
+        upload_to='assortment/posters/', null=False, blank=False, verbose_name='Картинка продукту',
+        help_text='Головне зображення продукту', validators=[validate_image]
+    )
+    producer = models.ForeignKey(
+        Producer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Назва виробника'
+    )
+    assortment_description = models.TextField(
+        null=True, verbose_name='Опис продукту', help_text='Короткий опис або інструкція'
+    )
+    is_available = models.BooleanField(
+        default=True, verbose_name='Наявність продукту',
+        help_text='Чи є товар у наявності'
+    )
+    has_variants = models.BooleanField(
+        default=False, verbose_name='Чи є варіанти продукту',
+        help_text='Відмітьте, якщо у товару є різні грамовки'
+    )
+    is_discounted = models.BooleanField(
+        default=False, verbose_name='Акційний товар'
+    )
+    popularity = models.PositiveIntegerField(
+        default=0, verbose_name='Популярність'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата додавання')
-    tags = models.ManyToManyField('Tag', blank=True, related_name='products', verbose_name='Мітки')
+    tags = models.ManyToManyField(
+        'Tag', blank=True, related_name='products', verbose_name='Мітки',
+        help_text='Можна обрати декілька міток'
+    )
 
     def __str__(self):
         return f'{self.assortment_name}'
@@ -41,6 +82,9 @@ class Assortment(models.Model):
         if not self.has_variants:
             self.is_discounted = bool(self.old_price)
 
+        if self.grams is not None and self.grams <= 0:
+            raise ValidationError("Грамовка повинна бути більше 0.")
+
     @property
     def average_rating(self):
         return self.reviews.aggregate(avg=Avg('rating'))['avg'] or 0
@@ -54,6 +98,7 @@ class Assortment(models.Model):
         verbose_name = 'Товар'
         verbose_name_plural = 'Товари'
         ordering = ['assortment_name']
+
 
 
 # Вариант одного и того же товара (разные граммовки)
@@ -162,7 +207,7 @@ class AssortmentAdminForm(forms.ModelForm):
 
 class AssortmentImage(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='assortment/gallery/', verbose_name='Фото в галереї')
+    image = models.ImageField(upload_to='assortment/gallery/', verbose_name='Фото в галереї', validators=[validate_image])
 
     def __str__(self):
         return f'Зображення для {self.assortment}'

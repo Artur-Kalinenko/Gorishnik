@@ -17,7 +17,9 @@ from datetime import timedelta
 
 
 def assortment_list(request):
-    categories = Category.objects.all()
+    categories = Category.objects.annotate(
+        product_count=Count('assortments', distinct=True)
+    )
     selected_category = request.GET.get('category')
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))
     query = request.GET.get('q', '')
@@ -120,11 +122,20 @@ def assortment_list(request):
     else:
         favorites_ids = []
 
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'assortment/partials/product_grid.html', {
+            'assortments': assortments,
+            'favorites_ids': favorites_ids,
+        })
+
+    total_products = Assortment.objects.count()
+
     return render(request, 'assortment/assortment_list.html', {
         'assortments': assortments,
         'categories': categories,
         'selected_category': selected_category,
         'current_category': current_category,
+        'total_products': total_products,
         'filter_groups': filter_groups,
         'selected_filter_ids': selected_filter_ids,
         'query': query,
