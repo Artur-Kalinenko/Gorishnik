@@ -36,13 +36,9 @@
         <!-- Кнопка "Всі товари" -->
         <div class="text-center mx-2 my-1">
             <a href="{% url 'assortment_list' %}"
-               class="btn d-block text-white py-1 px-2 text-uppercase {% if not current_category %}btn-primary{% else %}btn-secondary{% endif %}"
+               class="btn d-block py-1 px-2 text-uppercase {% if not current_category %}btn-primary{% endif %}"
                style="min-width: 110px;">
                 <div style="font-size: 0.9rem;">ВСІ ТОВАРИ</div>
-                <div style="height: 1px; background-color: #fff; opacity: 0.3; margin: 4px 0;"></div>
-                <div style="font-size: 0.65rem;">
-                    {{ total_products }} {{ total_products|pluralize_products_ukr|upper }}
-                </div>
             </a>
         </div>
 
@@ -50,17 +46,24 @@
         {% for category in categories %}
             <div class="text-center mx-2 my-1">
                 <a href="{% url 'assortment_list' %}?category={{ category.category }}"
-                   class="btn d-block text-white py-1 px-2 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% else %}btn-secondary{% endif %}"
-                   style="min-width: 110px;">
-                    {% if category.button_icon %}
-                        <img src="{{ category.button_icon.url }}" alt="{{ category.category }}"
-                             style="height: 30px; width: 30px; margin-bottom: 4px;">
+                   class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% endif %}"
+                   style="min-width: 150px; gap: 8px;">
+                    {% if category.button_icon_brown %}
+                        {% if current_category and current_category.category == category.category %}
+                            <img src="{{ category.button_icon_white.url }}"
+                                 data-hover="{{ category.button_icon_white.url }}"
+                                 class="category-icon"
+                                 alt="{{ category.category }}"
+                                 style="height: 24px; width: 24px;">
+                        {% else %}
+                            <img src="{{ category.button_icon_brown.url }}"
+                                 data-hover="{{ category.button_icon_white.url }}"
+                                 class="category-icon"
+                                 alt="{{ category.category }}"
+                                 style="height: 24px; width: 24px;">
+                        {% endif %}
                     {% endif %}
-                    <div style="font-size: 0.9rem;">{{ category.category }}</div>
-                    <div style="height: 1px; background-color: #fff; opacity: 0.3; margin: 4px 0;"></div>
-                    <div style="font-size: 0.65rem;">
-                        {{ category.product_count }} {{ category.product_count|pluralize_products_ukr|upper }}
-                    </div>
+                    <span style="font-size: 0.85rem;">{{ category.category }}</span>
                 </a>
             </div>
         {% endfor %}
@@ -97,5 +100,6 @@
 
 <link rel="stylesheet" href="{% static 'assortment/assortment_list.css' %}">
 <script src="{% static 'assortment/assortment_list.js' %}"></script>
-<script src="{% static 'assortment/assortment_list_ajax.js' %}"></script>
+<!--<script src="{% static 'assortment/assortment_list_ajax.js' %}"></script>-->
+<!--<script src="{% static 'assortment/assortment_list_combined.js' %}"></script>-->
 {% endblock %}

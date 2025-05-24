@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models import Avg
 from django import forms
 from .validators import validate_image
+from django.urls import reverse
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 # Основная модель товара
@@ -134,8 +135,8 @@ class Tag(models.Model):
 # Категория товара
 class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
-    button_icon = models.ImageField(upload_to='assortment/category_icons_buttons/', null=True, blank=True)
-    display_icon = models.ImageField(upload_to='assortment/category_icons', blank=True, null=True)
+    button_icon_white = models.ImageField(upload_to='assortment/category_icons_buttons/', null=True, blank=True)
+    button_icon_brown = models.ImageField(upload_to='assortment/category_icons', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Категорія'
@@ -144,6 +145,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.category
+
+    def get_absolute_url(self):
+        return reverse('assortment_list') + f'?category={self.category}'
 
     def delete(self, *args, **kwargs):
         if self.assortments.exists():  # ← Используем related_name

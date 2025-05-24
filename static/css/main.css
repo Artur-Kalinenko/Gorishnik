@@ -1,31 +1,24 @@
-.montserrat-category-title {
-  font-family: "Montserrat", serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
-  font-style: normal;
-  text-align: center;
-  margin-bottom: 20px;
+/* === Цветовая палитра === */
+:root {
+    --bg-main: #f3eee7;
+    --bg-subnav: #ece2d6;
+    --accent: #7a4e2d;
+    --accent-dark: #5c3a21;
+    --text-main: #3b2f2f;
+    --highlight: #e49b2e;
+    --soft-yellow: #fbe5a3;
+    --green: #a3a847;
+    --white: #ffffff;
 }
 
-
-.montserrat-text {
-    font-family: "Montserrat", serif;
-    font-weight: 400;
-}
-
+/* === Общие стили === */
 body {
+    background-color: var(--bg-main);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    font-family: 'Montserrat', sans-serif;
-}
-
-.navbar,
-.navbar a,
-.navbar .form-control,
-.navbar .btn {
-    font-family: "Montserrat", serif;
-    font-weight: 400;
+    font-family: 'Comfortaa', cursive;
+    color: var(--text-main);
 }
 
 .container {
@@ -33,12 +26,297 @@ body {
     margin-bottom: 10px;
 }
 
+/* Заголовки */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+}
+
+/* Кнопки */
+.btn,
+.top-bar .btn,
+.btn-primary,
+.btn-outline-success,
+.btn-outline-primary,
+.btn-outline-secondary {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+}
+
+/* Навбар */
+.main-nav .nav-link {
+    font-weight: 500;
+    font-family: 'Comfortaa', cursive;
+    color: var(--accent-dark);
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.main-nav .nav-link:hover {
+    background-color: var(--accent);
+    color: var(--white);
+    text-decoration: none;
+}
+
+/* Карточки */
+.card-title,
+.card-text,
+.card-price {
+    font-family: 'Comfortaa', cursive;
+}
+
+.card-title {
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.card-text {
+    color: var(--text-main);
+}
+
+.card-price {
+    color: var(--highlight);
+    font-weight: bold;
+}
+
+/* === Верхняя панель навбара === */
+.top-bar {
+    background-color: var(--bg-main);
+    padding: 0.7rem 0;
+    display: flex;
+    align-items: center;
+}
+
+.top-bar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.top-bar .container > * {
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.top-bar form {
+    flex: 1;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.top-bar .form-control {
+    height: 42px;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid var(--accent-dark);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    flex: 1;
+}
+
+.top-bar .btn {
+    height: 42px;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.top-bar .btn-outline-success {
+    border-color: var(--accent);
+    color: var(--accent);
+    background-color: transparent;
+}
+
+.top-bar .btn-outline-success:hover {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+.top-bar .btn-outline-primary {
+    border-color: var(--accent);
+    color: var(--accent);
+    background-color: transparent;
+    margin-left: 0.5rem;
+}
+
+.top-bar .btn-outline-primary:hover {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+.top-bar .btn-outline-secondary {
+    border-color: var(--accent-dark);
+    color: var(--accent-dark);
+    background-color: transparent;
+}
+
+.top-bar .btn-outline-secondary:hover {
+    background-color: var(--accent-dark);
+    color: var(--white);
+}
+
+.top-bar .navbar-brand img {
+    height: 50px;
+    object-fit: contain;
+}
+
+.top-bar .icon-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* === Нижняя панель навбара с dropdown === */
+.main-nav {
+    background-color: var(--bg-subnav);
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    padding: 0.25rem 0;
+}
+
+.main-nav .nav {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.main-nav .nav-left {
+    display: flex;
+    align-items: center;
+    padding-right: 1.2rem;
+    margin-right: 1.2rem;
+    border-right: 3px solid var(--accent-dark);
+    position: relative;
+}
+
+.main-nav .nav-left:hover .dropdown-menu {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.main-nav .nav-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.main-nav .dropdown-menu {
+    background-color: var(--bg-subnav);
+    border: 1px solid var(--accent-dark);
+    border-radius: 6px;
+    padding: 0.5rem 0.5rem;
+    min-width: 220px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    display: block;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 999;
+}
+
+.main-nav .dropdown-item {
+    color: var(--accent-dark);
+    padding: 0.25rem 1rem;
+    border-left: 3px solid transparent;
+    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+}
+
+.main-nav .dropdown-item + .dropdown-item {
+    border-top: 1px solid rgba(90, 70, 50, 0.3);
+}
+
+.main-nav .dropdown-item:hover {
+    background-color: var(--accent-dark);
+    color: var(--white);
+}
+
+.category-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    transition: opacity 0.3s ease;
+    vertical-align: middle;
+    pointer-events: none;
+}
+
+.dropdown-divider {
+    border-top: 1px solid rgba(90, 70, 50, 0.3);
+    margin: 0.4rem 0;
+}
+
+/* === Навбар (Bootstrap остатки) === */
+.navbar {
+    background-color: var(--bg-main);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.navbar-brand img {
+    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+}
+
+/* === Карточка товара === */
+.card {
+    background-color: var(--white);
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.01);
+}
+
+/* === Кнопки === */
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--green);
+    color: var(--white);
+}
+
+/* === Футер === */
 .footer {
-    background-color: #f8f9fa;
+    background-color: var(--soft-yellow);
+    color: var(--accent-dark);
     height: 100px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 500;
     font-size: 14px;
+}
+
+/* === Тосты === */
+.toast.bg-success {
+    background-color: var(--green) !important;
+}
+
+.toast.bg-danger {
+    background-color: #c0392b !important;
 }
