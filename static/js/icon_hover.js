@@ -1,12 +1,14 @@
-document.querySelectorAll('.category-icon').forEach(icon => {
+document.querySelectorAll('img[data-hover]').forEach(icon => {
     const originalSrc = icon.getAttribute("src");
     const hoverSrc = icon.dataset.hover;
 
-    if (hoverSrc) {
-        icon.closest("a").addEventListener("mouseenter", () => {
+    const container = icon.closest("a, button");
+
+    if (hoverSrc && container) {
+        container.addEventListener("mouseenter", () => {
             icon.setAttribute("src", hoverSrc);
         });
-        icon.closest("a").addEventListener("mouseleave", () => {
+        container.addEventListener("mouseleave", () => {
             icon.setAttribute("src", originalSrc);
         });
     }

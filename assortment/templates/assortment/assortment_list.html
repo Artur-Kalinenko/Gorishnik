@@ -33,12 +33,29 @@
     <!-- Категорії -->
     {% if not query %}
     <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">
+        {% get_media_prefix as MEDIA_URL %}
+
         <!-- Кнопка "Всі товари" -->
         <div class="text-center mx-2 my-1">
             <a href="{% url 'assortment_list' %}"
-               class="btn d-block py-1 px-2 text-uppercase {% if not current_category %}btn-primary{% endif %}"
-               style="min-width: 110px;">
-                <div style="font-size: 0.9rem;">ВСІ ТОВАРИ</div>
+               class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if not current_category %}btn-primary{% endif %}"
+               style="min-width: 150px; gap: 8px;">
+                {% if not current_category %}
+                    <img src="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
+                         data-hover="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
+                         data-original="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
+                         class="category-icon"
+                         alt="Всі товари"
+                         style="height: 24px; width: 24px;">
+                {% else %}
+                    <img src="{{ MEDIA_URL }}assortment/category_icons/shop.png"
+                         data-hover="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
+                         data-original="{{ MEDIA_URL }}assortment/category_icons/shop.png"
+                         class="category-icon"
+                         alt="Всі товари"
+                         style="height: 24px; width: 24px;">
+                {% endif %}
+                <span style="font-size: 0.85rem;">ВСІ ТОВАРИ</span>
             </a>
         </div>
 

@@ -34,12 +34,22 @@
                 <img src="/media/pictures/base_page/logo3.png" alt="Logo">
             </a>
 
-            <form class="mx-3 position-relative d-flex flex-fill" method="get" action="{% url 'assortment_list' %}">
+            {% get_media_prefix as MEDIA_URL %}
+            <form class="mx-3 position-relative d-flex flex-fill align-items-stretch" method="get" action="{% url 'assortment_list' %}">
                 {% csrf_token %}
-                <input class="form-control me-2 w-100" type="search" name="q" id="search-input"
+                <input class="form-control w-100 ps-4 pe-5" type="search" name="q" id="search-input"
                        placeholder="Що будемо шукати?" autocomplete="off" value="{{ query|default:'' }}">
                 <div id="suggestions" class="list-group position-absolute w-100"></div>
-                <button class="btn btn-outline-success" type="submit">Пошук</button>
+
+                <button type="submit"
+                        class="search-icon-btn category-btn d-flex align-items-center justify-content-center">
+                    <img src="{{ MEDIA_URL }}assortment/category_icons/search (1).png"
+                         data-hover="{{ MEDIA_URL }}assortment/category_icons/search.png"
+                         data-original="{{ MEDIA_URL }}assortment/category_icons/search (1).png"
+                         alt="Пошук"
+                         class="category-icon"
+                         style="width: 34px; height: 34px;">
+                </button>
             </form>
 
             <a href="{% url 'cart' %}" class="btn btn-outline-secondary me-2 d-flex align-items-center">

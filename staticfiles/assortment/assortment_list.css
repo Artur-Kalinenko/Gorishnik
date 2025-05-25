@@ -53,6 +53,28 @@
 .category-buttons-wrapper .btn {
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    background-color: var(--bg-subnav); /* светлый фон */
+    color: var(--accent-dark);          /* тёмный текст */
+    border: 2px solid var(--accent);    /* шоколадная рамка */
+    border-radius: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
+
+.category-buttons-wrapper .btn:hover {
+    background-color: var(--accent);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+.category-buttons-wrapper .btn-primary {
+    background-color: var(--accent-dark);
+    color: var(--white);
+    border-color: var(--accent-dark);
+}
+
+.category-icon {
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
 .montserrat-category-title {
@@ -68,7 +90,6 @@
     }
 }
 
-/* Анимация при наведении на кнопки */
 .btn.mx-2 {
     transition: background-color 0.3s, color 0.3s, transform 0.2s;
 }
@@ -77,7 +98,6 @@
     transform: scale(1.03);
 }
 
-/* Мягкая смена фона у активных кнопок */
 .btn-primary,
 .btn-secondary {
     transition: background-color 0.3s, color 0.3s;
@@ -105,4 +125,8 @@
         opacity: 0;
         transform: translateY(20px);
     }
+}
+
+h1 {
+    text-transform: uppercase;
 }

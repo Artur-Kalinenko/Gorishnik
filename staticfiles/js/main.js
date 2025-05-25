@@ -23,47 +23,42 @@ function saveSessionAndRedirect() {
     });
 }
 
-// AJAX
+// AJAX автоподсказка поиска
 document.addEventListener("DOMContentLoaded", function () {
     const input = document.getElementById("search-input");
     const suggestions = document.getElementById("suggestions");
 
-    if (!input || !suggestions) return;
-
-    input.addEventListener("input", function () {
-        const query = input.value.trim();
-        if (!query) {
-            suggestions.innerHTML = "";
-            return;
-        }
-
-        fetch(`/assortment/search_suggest/?q=${encodeURIComponent(query)}`)
-            .then(response => response.json())
-            .then(data => {
+    if (input && suggestions) {
+        input.addEventListener("input", function () {
+            const query = input.value.trim();
+            if (!query) {
                 suggestions.innerHTML = "";
-                data.results.forEach(item => {
-                    const link = document.createElement("a");
-                    link.href = item.url;
-                    link.className = "list-group-item list-group-item-action";
+                return;
+            }
 
-                    // Основное название товара
-                    link.innerHTML = `<strong>${item.name}</strong>`;
-
-                    // Если есть категория — показываем под названием
-                    if (item.category) {
-                        link.innerHTML += `<br><small class="text-muted">${item.category}</small>`;
-                    }
-
-                    suggestions.appendChild(link);
+            fetch(`/assortment/search_suggest/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    suggestions.innerHTML = "";
+                    data.results.forEach(item => {
+                        const link = document.createElement("a");
+                        link.href = item.url;
+                        link.className = "list-group-item list-group-item-action";
+                        link.innerHTML = `<strong>${item.name}</strong>`;
+                        if (item.category) {
+                            link.innerHTML += `<br><small class="text-muted">${item.category}</small>`;
+                        }
+                        suggestions.appendChild(link);
+                    });
                 });
-            });
-    });
+        });
 
-    document.addEventListener("click", function (e) {
-        if (!input.contains(e.target) && !suggestions.contains(e.target)) {
-            suggestions.innerHTML = "";
-        }
-    });
+        document.addEventListener("click", function (e) {
+            if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+                suggestions.innerHTML = "";
+            }
+        });
+    }
 });
 
 // Проверка срока жизни корзины
@@ -114,12 +109,10 @@ function showFavoriteToast(message, isAdded) {
 
     if (!toastEl || !toastMessage) return;
 
-    // Устанавливаем сообщение и цвет
     toastMessage.textContent = message;
     toastEl.classList.remove('bg-success', 'bg-danger');
     toastEl.classList.add(isAdded ? 'bg-success' : 'bg-danger');
 
-    // Инициализация и показ тоста
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
     toast.show();
 }
