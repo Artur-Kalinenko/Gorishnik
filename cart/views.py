@@ -6,6 +6,7 @@ from assortment.models import Assortment, AssortmentVariant
 from accounts.forms import LoginForm
 import json
 from django.views.decorators.http import require_POST
+from django.db.models import Sum
 
 
 # Получить корзину пользователя или гостя (по session_id), либо создать новую
@@ -50,9 +51,11 @@ def add_to_cart(request, product_id):
 
         cart_item.save()
 
+        total_quantity = cart.items.aggregate(total=Sum('quantity'))['total'] or 0
+
         return JsonResponse({
-            'message': 'Продукт добавлен в корзину!',
-            'total_items': cart.items.count(),
+            'message': 'Продукт додано в кошик!',
+            'cart_item_count': total_quantity,
             'session_id': cart.session_id
         })
 
@@ -74,10 +77,13 @@ def update_quantity(request, item_id):
             cart = cart_item.cart
             cart_total_price = sum(item.total_price() for item in cart.items.all())
 
+            cart_total_quantity = cart.items.aggregate(total=Sum('quantity'))['total'] or 0
+
             return JsonResponse({
                 'success': True,
                 'item_total_price': cart_item.total_price(),
                 'cart_total_price': cart_total_price,
+                'cart_total_quantity': cart_total_quantity,
             })
         else:
             return JsonResponse({'success': False, 'message': 'Количество должно быть больше 0'})
@@ -162,8 +168,13 @@ def base_context(request):
     else:
         cart = carts.first() if carts.exists() else None
 
+    total_quantity = 0
+    if cart:
+        total_quantity = cart.items.aggregate(total=Sum('quantity'))['total'] or 0
+
     return {
         'cart': cart,
+        'cart_total_quantity': total_quantity,
         'login_form': LoginForm()
     }
 

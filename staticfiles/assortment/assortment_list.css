@@ -42,29 +42,17 @@
     color: #ffcc00; /* золотая звезда */
 }
 
-.category-buttons-wrapper {
-    margin: 0 100px;
+.category-buttons-wrapper .btn span {
+    padding-top: 3px;
+    display: inline-block;
 }
 
 .category-buttons-wrapper a {
-    margin: 6px 8px;
+    margin: 4px 6px;
 }
 
-.category-buttons-wrapper .btn {
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background-color: var(--bg-subnav); /* светлый фон */
-    color: var(--accent-dark);          /* тёмный текст */
-    border: 2px solid var(--accent);    /* шоколадная рамка */
-    border-radius: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-}
 
-.category-buttons-wrapper .btn:hover {
-    background-color: var(--accent);
-    color: var(--white);
-    transform: scale(1.05);
-}
+
 
 .category-buttons-wrapper .btn-primary {
     background-color: var(--accent-dark);

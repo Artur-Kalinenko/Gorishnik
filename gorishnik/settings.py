@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.views.base_context', # Контекст корзины доступен во всех шаблонах
                 'assortment.context_processors.categories_processor',
+                'assortment.context_processors.categories_columns',
             ],
         },
     },

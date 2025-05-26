@@ -135,8 +135,9 @@ class Tag(models.Model):
 # Категория товара
 class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
-    button_icon_white = models.ImageField(upload_to='assortment/category_icons_buttons/', null=True, blank=True)
-    button_icon_brown = models.ImageField(upload_to='assortment/category_icons', blank=True, null=True)
+    button_icon_white = models.ImageField(upload_to='assortment/category_icons_white/', null=True, blank=True)
+    button_icon_brown = models.ImageField(upload_to='assortment/category_icons_brown/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Категорія'

@@ -15,11 +15,14 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from datetime import timedelta
 
+def chunked(iterable, size):
+    for i in range(0, len(iterable), size):
+        yield iterable[i:i + size]
+
 
 def assortment_list(request):
-    categories = Category.objects.annotate(
-        product_count=Count('assortments', distinct=True)
-    )
+    all_categories = Category.objects.all().order_by('created_at')
+
     selected_category = request.GET.get('category')
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))
     query = request.GET.get('q', '')
@@ -33,7 +36,7 @@ def assortment_list(request):
 
     if selected_category:
         assortments = assortments.filter(assortment_categories__category=selected_category)
-        current_category = categories.filter(category=selected_category).first()
+        current_category = all_categories.filter(category=selected_category).first()
 
     if selected_filter_ids:
         for filter_id in selected_filter_ids:
@@ -132,7 +135,6 @@ def assortment_list(request):
 
     return render(request, 'assortment/assortment_list.html', {
         'assortments': assortments,
-        'categories': categories,
         'selected_category': selected_category,
         'current_category': current_category,
         'total_products': total_products,

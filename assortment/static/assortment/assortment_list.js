@@ -28,29 +28,11 @@ function attachQuantityHandlers(productId) {
         addToCartBtn.parentNode.replaceChild(newAdd, addToCartBtn);
         newAdd.addEventListener('click', event => {
             const input = document.getElementById(`quantity-input-${productId}`);
-            const quantity = input.value;
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            const quantity = parseInt(input.value, 10);
             const variantId = event.target.getAttribute('data-variant-id') || null;
 
-            fetch(`/cart/add/${productId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': csrfToken,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ quantity, variant_id: variantId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.session_id) {
-                    localStorage.setItem('session_id', data.session_id);
-                }
-                showCartToast();
-                input.value = 1;
-            })
-            .catch(error => {
-                console.error('Помилка при додаванні в корзину:', error);
-            });
+            addToCart(productId, quantity, variantId);
+            input.value = 1;
         });
     }
 }

@@ -1,29 +1,67 @@
-// === Универсальная инициализация ===
+// === Универсальная инициализация страницы ассортимента ===
 function initAssortmentPage() {
-    animateProductCards();
-    attachQuantityHandlersToAll();
-    attachFavoriteHandlers();
-    setupVariantButtons();
-    setupFilterToggles();  // 👈 Обработчики плюсов в фильтрах
+    setupGramsButtons();
+    setupCartControls();
+    setupCardHover();
+    setupFavorites();
+    initFilterToggles();
+    setupProducerFilterClicks();
 }
 
-// === Анимация карточек ===
-function animateProductCards() {
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.classList.remove('fade-in');
-        void card.offsetWidth;
-        card.classList.add('fade-in');
+// === Граммовки ===
+function setupGramsButtons() {
+    document.querySelectorAll('.grams-button').forEach(button => {
+        button.addEventListener('click', event => {
+            const productId = event.target.dataset.productId;
+            const variantId = event.target.dataset.variantId;
+            const price = event.target.dataset.price;
+            const oldPrice = event.target.dataset.oldPrice;
+            const priceDisplay = document.getElementById(`price-display-${productId}`);
+
+            if (priceDisplay) {
+                if (oldPrice && oldPrice !== "None") {
+                    priceDisplay.innerHTML = `
+                        <span class="text-muted text-decoration-line-through">${oldPrice} ₴</span><br>
+                        <strong class="text-danger">${price} ₴</strong>
+                    `;
+                } else {
+                    priceDisplay.innerHTML = `<strong>${price} ₴</strong>`;
+                }
+            }
+
+            document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+
+            const selectBtn = document.getElementById(`select-variant-${productId}`);
+            if (selectBtn) selectBtn.style.display = 'none';
+
+            const oldControls = document.getElementById(`controls-${productId}`);
+            if (oldControls) {
+                const existingAddButton = oldControls.querySelector('.add-to-cart');
+                if (existingAddButton) {
+                    existingAddButton.setAttribute('data-variant-id', variantId);
+                }
+            } else {
+                const container = document.createElement('div');
+                container.className = 'd-flex align-items-center justify-content-center btn-group-container';
+                container.id = `controls-${productId}`;
+                container.innerHTML = `
+                    <button class="btn btn-primary decrease-quantity" data-product-id="${productId}">−</button>
+                    <input type="number" min="1" value="1" id="quantity-input-${productId}" class="quantity-input text-center" readonly>
+                    <button class="btn btn-primary increase-quantity" data-product-id="${productId}">+</button>
+                    <button class="btn btn-primary add-to-cart" data-product-id="${productId}" data-variant-id="${variantId}">В корзину</button>
+                `;
+                const cardBody = event.target.closest('.card-body');
+                cardBody.appendChild(container);
+                attachQuantityHandlers(productId);
+            }
+        });
     });
 }
 
-// === Обработчики количества и корзины ===
-function attachQuantityHandlersToAll() {
-    document.querySelectorAll('.btn-group-container[id^="controls-"]').forEach(container => {
-        const productId = container.id.replace('controls-', '');
-        attachQuantityHandlers(productId);
-    });
-}
-
+// === Обработчики корзины ===
 function attachQuantityHandlers(productId) {
     const decreaseBtn = document.querySelector(`#controls-${productId} .decrease-quantity`);
     const increaseBtn = document.querySelector(`#controls-${productId} .increase-quantity`);
@@ -80,12 +118,34 @@ function attachQuantityHandlers(productId) {
     }
 }
 
-// === Обработка избранного ===
-function attachFavoriteHandlers() {
+function setupCartControls() {
+    document.querySelectorAll('.btn-group-container[id^="controls-"]').forEach(container => {
+        const productId = container.id.replace('controls-', '');
+        attachQuantityHandlers(productId);
+    });
+}
+
+// === Наведение на карточки ===
+function setupCardHover() {
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('mouseover', () => {
+            card.style.transform = 'scale(1.05)';
+            card.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+        });
+        card.addEventListener('mouseout', () => {
+            card.style.transform = 'scale(1)';
+            card.style.boxShadow = 'none';
+        });
+        card.classList.add('fade-in');
+    });
+}
+
+// === Избранное ===
+function setupFavorites() {
     if (!window.IS_USER_CABINET) {
         document.querySelectorAll('.favorite-toggle').forEach(el => {
             el.addEventListener('click', function () {
-                const productId = el.dataset.productId;
+                const productId = this.dataset.productId;
 
                 fetch(`/favorites/toggle/${productId}/`, {
                     method: 'GET',
@@ -94,10 +154,7 @@ function attachFavoriteHandlers() {
                 .then(response => {
                     if (response.status === 403) {
                         const toastEl = document.getElementById('loginToast');
-                        if (toastEl) {
-                            const toast = new bootstrap.Toast(toastEl);
-                            toast.show();
-                        }
+                        if (toastEl) new bootstrap.Toast(toastEl).show();
                         return;
                     }
                     return response.json();
@@ -105,10 +162,10 @@ function attachFavoriteHandlers() {
                 .then(data => {
                     if (!data) return;
                     if (data.status === 'added') {
-                        el.innerHTML = '<i class="fas fa-star text-warning"></i>';
+                        this.innerHTML = '<i class="fas fa-star text-warning"></i>';
                         showFavoriteToast('Товар додано в обране', true);
                     } else if (data.status === 'removed') {
-                        el.innerHTML = '<i class="far fa-star"></i>';
+                        this.innerHTML = '<i class="far fa-star"></i>';
                         showFavoriteToast('Товар видалено з обраного', false);
                     }
                 })
@@ -120,72 +177,54 @@ function attachFavoriteHandlers() {
     }
 }
 
-// === Обработка выбора граммовки ===
-function setupVariantButtons() {
-    document.querySelectorAll('.grams-button').forEach(button => {
-        button.addEventListener('click', event => {
-            const productId = event.target.dataset.productId;
-            const variantId = event.target.dataset.variantId;
-            const price = event.target.dataset.price;
-            const oldPrice = event.target.dataset.oldPrice;
-            const priceDisplay = document.getElementById(`price-display-${productId}`);
+// === Плюсики фильтров ===
+function initFilterToggles() {
+    const OPENED_FILTERS_KEY = 'opened_filter_groups';
+    function saveOpenedGroups(openedIds) {
+        localStorage.setItem(OPENED_FILTERS_KEY, JSON.stringify(openedIds));
+    }
+    function getOpenedGroups() {
+        try {
+            return JSON.parse(localStorage.getItem(OPENED_FILTERS_KEY)) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+    let openedGroups = getOpenedGroups();
+    document.querySelectorAll('.filter-header').forEach(header => {
+        const groupId = header.dataset.groupId;
+        const options = document.getElementById(`group-${groupId}`);
+        const icon = document.getElementById(`icon-${groupId}`);
 
-            if (priceDisplay) {
-                if (oldPrice && oldPrice !== "None") {
-                    priceDisplay.innerHTML = `<span class="text-muted text-decoration-line-through">${oldPrice} ₴</span><br><strong class="text-danger">${price} ₴</strong>`;
-                } else {
-                    priceDisplay.innerHTML = `<strong>${price} ₴</strong>`;
-                }
-            }
+        if (openedGroups.includes(groupId)) {
+            options.style.display = 'block';
+            icon.textContent = '−';
+        }
 
-            document.querySelectorAll(`.grams-button[data-product-id="${productId}"]`).forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            event.target.classList.add('selected');
-
-            const selectBtn = document.getElementById(`select-variant-${productId}`);
-            if (selectBtn) selectBtn.style.display = 'none';
-
-            const oldControls = document.getElementById(`controls-${productId}`);
-            if (oldControls) {
-                const existingAddButton = oldControls.querySelector('.add-to-cart');
-                if (existingAddButton) {
-                    existingAddButton.setAttribute('data-variant-id', variantId);
-                }
+        header.addEventListener('click', () => {
+            const isOpen = options.style.display === 'block';
+            options.style.display = isOpen ? 'none' : 'block';
+            icon.textContent = isOpen ? '+' : '−';
+            if (isOpen) {
+                openedGroups = openedGroups.filter(id => id !== groupId);
             } else {
-                const container = document.createElement('div');
-                container.className = 'd-flex align-items-center justify-content-center btn-group-container';
-                container.id = `controls-${productId}`;
-                container.innerHTML = `
-                    <button class="btn btn-primary decrease-quantity" data-product-id="${productId}">−</button>
-                    <input type="number" min="1" value="1" id="quantity-input-${productId}" class="quantity-input text-center" readonly>
-                    <button class="btn btn-primary increase-quantity" data-product-id="${productId}">+</button>
-                    <button class="btn btn-primary add-to-cart" data-product-id="${productId}" data-variant-id="${variantId}">В корзину</button>
-                `;
-                const cardBody = event.target.closest('.card-body');
-                cardBody.appendChild(container);
-                attachQuantityHandlers(productId);
+                openedGroups.push(groupId);
             }
+            saveOpenedGroups(openedGroups);
         });
     });
 }
 
-// === Обработка плюсов в сайдбар-фильтре ===
-function setupFilterToggles() {
-    document.querySelectorAll('.filter-header[data-group-id]').forEach(header => {
-        header.addEventListener('click', () => {
-            const groupId = header.dataset.groupId;
-            const options = document.getElementById(`group-${groupId}`);
-            const icon = document.getElementById(`icon-${groupId}`);
-
-            if (options.style.display === 'none') {
-                options.style.display = 'block';
-                icon.textContent = '−';
-            } else {
-                options.style.display = 'none';
-                icon.textContent = '+';
-            }
-        });
+// === Картинки-производители ===
+function setupProducerFilterClicks() {
+    document.querySelectorAll('input[name="producer"]').forEach(input => {
+        const label = input.closest('label');
+        if (label) {
+            label.addEventListener('click', () => {
+                input.checked = !input.checked;
+                document.getElementById('filter-form').dispatchEvent(new Event('change'));
+            });
+        }
     });
 }
 
@@ -200,24 +239,21 @@ function setupAjaxFilterForm() {
         productGrid.classList.add('fade-out');
 
         setTimeout(() => {
-            fetch(url, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const newGrid = doc.getElementById('product-grid');
-                productGrid.innerHTML = newGrid.innerHTML;
-                productGrid.classList.remove('fade-out');
-
-                initAssortmentPage(); // 🔁 Повторная инициализация после фильтрации
-            });
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newGrid = doc.getElementById('product-grid');
+                    productGrid.innerHTML = newGrid.innerHTML;
+                    productGrid.classList.remove('fade-out');
+                    initAssortmentPage();
+                });
         }, 300);
     });
 }
 
-// === Инициализация при загрузке страницы ===
+// === Инициализация при загрузке ===
 document.addEventListener('DOMContentLoaded', () => {
     initAssortmentPage();
     setupAjaxFilterForm();

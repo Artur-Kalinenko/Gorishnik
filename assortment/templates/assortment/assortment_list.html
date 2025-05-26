@@ -32,58 +32,60 @@
 
     <!-- Категорії -->
     {% if not query %}
-    <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">
-        {% get_media_prefix as MEDIA_URL %}
+    <div class="container">
+        <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">
+            {% get_media_prefix as MEDIA_URL %}
 
-        <!-- Кнопка "Всі товари" -->
-        <div class="text-center mx-2 my-1">
-            <a href="{% url 'assortment_list' %}"
-               class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if not current_category %}btn-primary{% endif %}"
-               style="min-width: 150px; gap: 8px;">
-                {% if not current_category %}
-                    <img src="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
-                         data-hover="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
-                         data-original="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
-                         class="category-icon"
-                         alt="Всі товари"
-                         style="height: 24px; width: 24px;">
-                {% else %}
-                    <img src="{{ MEDIA_URL }}assortment/category_icons/shop.png"
-                         data-hover="{{ MEDIA_URL }}assortment/category_icons/shop (1).png"
-                         data-original="{{ MEDIA_URL }}assortment/category_icons/shop.png"
-                         class="category-icon"
-                         alt="Всі товари"
-                         style="height: 24px; width: 24px;">
-                {% endif %}
-                <span style="font-size: 0.85rem;">ВСІ ТОВАРИ</span>
-            </a>
-        </div>
-
-        <!-- Остальные категории -->
-        {% for category in categories %}
+            <!-- Кнопка "Всі товари" -->
             <div class="text-center mx-2 my-1">
-                <a href="{% url 'assortment_list' %}?category={{ category.category }}"
-                   class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% endif %}"
+                <a href="{% url 'assortment_list' %}"
+                   class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if not current_category %}btn-primary{% endif %}"
                    style="min-width: 150px; gap: 8px;">
-                    {% if category.button_icon_brown %}
-                        {% if current_category and current_category.category == category.category %}
-                            <img src="{{ category.button_icon_white.url }}"
-                                 data-hover="{{ category.button_icon_white.url }}"
-                                 class="category-icon"
-                                 alt="{{ category.category }}"
-                                 style="height: 24px; width: 24px;">
-                        {% else %}
-                            <img src="{{ category.button_icon_brown.url }}"
-                                 data-hover="{{ category.button_icon_white.url }}"
-                                 class="category-icon"
-                                 alt="{{ category.category }}"
-                                 style="height: 24px; width: 24px;">
-                        {% endif %}
+                    {% if not current_category %}
+                        <img src="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"
+                             data-hover="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"
+                             data-original="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"
+                             class="category-icon"
+                             alt="Всі товари"
+                             style="height: 24px; width: 24px;">
+                    {% else %}
+                        <img src="{{ MEDIA_URL }}assortment/category_icons_brown/shop_brown.png"
+                             data-hover="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"
+                             data-original="{{ MEDIA_URL }}assortment/category_icons_brown/shop_brown.png"
+                             class="category-icon"
+                             alt="Всі товари"
+                             style="height: 24px; width: 24px;">
                     {% endif %}
-                    <span style="font-size: 0.85rem;">{{ category.category }}</span>
+                    <span style="font-size: 0.85rem;">ВСІ ТОВАРИ</span>
                 </a>
             </div>
-        {% endfor %}
+
+            <!-- Остальные категории -->
+            {% for category in categories %}
+                <div class="text-center mx-2 my-1">
+                    <a href="{% url 'assortment_list' %}?category={{ category.category }}"
+                       class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% endif %}"
+                       style="min-width: 150px; gap: 8px;">
+                        {% if category.button_icon_brown %}
+                            {% if current_category and current_category.category == category.category %}
+                                <img src="{{ category.button_icon_white.url }}"
+                                     data-hover="{{ category.button_icon_white.url }}"
+                                     class="category-icon"
+                                     alt="{{ category.category }}"
+                                     style="height: 24px; width: 24px;">
+                            {% else %}
+                                <img src="{{ category.button_icon_brown.url }}"
+                                     data-hover="{{ category.button_icon_white.url }}"
+                                     class="category-icon"
+                                     alt="{{ category.category }}"
+                                     style="height: 24px; width: 24px;">
+                            {% endif %}
+                        {% endif %}
+                        <span style="font-size: 0.85rem;">{{ category.category }}</span>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 

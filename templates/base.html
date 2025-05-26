@@ -29,43 +29,80 @@
 <header class="shadow-sm">
     <!-- Верхний ярус -->
     <div class="top-bar py-2">
-        <div class="container d-flex flex-wrap justify-content-between align-items-center">
-            <a class="navbar-brand d-flex align-items-center me-3" href="/">
-                <img src="/media/pictures/base_page/logo3.png" alt="Logo">
-            </a>
+        <div class="container d-flex justify-content-between align-items-center">
 
             {% get_media_prefix as MEDIA_URL %}
-            <form class="mx-3 position-relative d-flex flex-fill align-items-stretch" method="get" action="{% url 'assortment_list' %}">
-                {% csrf_token %}
-                <input class="form-control w-100 ps-4 pe-5" type="search" name="q" id="search-input"
-                       placeholder="Що будемо шукати?" autocomplete="off" value="{{ query|default:'' }}">
-                <div id="suggestions" class="list-group position-absolute w-100"></div>
-
-                <button type="submit"
-                        class="search-icon-btn category-btn d-flex align-items-center justify-content-center">
-                    <img src="{{ MEDIA_URL }}assortment/category_icons/search (1).png"
-                         data-hover="{{ MEDIA_URL }}assortment/category_icons/search.png"
-                         data-original="{{ MEDIA_URL }}assortment/category_icons/search (1).png"
-                         alt="Пошук"
+            <!-- Левая колонка: Логотип -->
+            <div class="d-flex align-items-center">
+                <a href="/" id="logo-button" class="category-btn d-flex align-items-center {% if request.path == '/' %}btn-primary{% endif %}" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/logo_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/logo_white.png"
+                         data-original="{{ MEDIA_URL }}icons/logo_brown.png"
+                         alt="Gorishnik"
                          class="category-icon"
-                         style="width: 34px; height: 34px;">
-                </button>
-            </form>
+                         style="width: 28px; height: 28px;">
+                    <span class="logo-label ms-2">Gorishnik_ua</span>
+                </a>
+            </div>
 
-            <a href="{% url 'cart' %}" class="btn btn-outline-secondary me-2 d-flex align-items-center">
-                <i class="bi bi-cart3"></i>
-                <span class="cart-item-count ms-1">{{ cart.items.count|default:0 }}</span>
-            </a>
+            <!-- Центр: Поиск -->
+            <div class="d-flex justify-content-center flex-grow-1">
+                <form class="position-relative d-flex align-items-stretch" method="get" action="{% url 'assortment_list' %}" style="max-width: 500px; width: 100%;">
+                    {% csrf_token %}
+                    <input class="form-control w-100 ps-4 pe-5" type="search" name="q" id="search-input"
+                           placeholder="Що будемо шукати?" autocomplete="off" value="{{ query|default:'' }}">
+                    <div id="suggestions" class="list-group position-absolute w-100"></div>
+                    <button type="submit"
+                            class="search-icon-btn category-btn d-flex align-items-center justify-content-center">
+                        <img src="{{ MEDIA_URL }}icons/search_brown.png"
+                             data-hover="{{ MEDIA_URL }}icons/search_white.png"
+                             data-original="{{ MEDIA_URL }}icons/search_brown.png"
+                             alt="Пошук"
+                             class="category-icon"
+                             style="width: 28px; height: 28px;">
+                    </button>
+                </form>
+            </div>
 
-            {% if user.is_authenticated %}
-                <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
-                <button type="submit" form="logout-form" class="btn btn-outline-danger btn-sm">Вийти</button>
-            {% else %}
-                <button class="btn btn-outline-primary btn-sm d-flex align-items-center"
-                        data-bs-toggle="modal" data-bs-target="#loginModal">
-                    <i class="bi bi-person-circle"></i>
-                </button>
-            {% endif %}
+            <!-- Правая колонка: Кошик + Авторизация -->
+            <div class="d-flex align-items-center gap-2 ms-3">
+                <a href="{% url 'cart' %}" id="cart-button" class="category-btn d-flex align-items-center {% if request.path == '/cart/' %}btn-primary{% endif %}" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/cart_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/cart_white.png"
+                         data-original="{{ MEDIA_URL }}icons/cart_brown.png"
+                         alt="Кошик"
+                         class="category-icon"
+                         style="width: 28px; height: 28px;">
+                    <span id="cart-item-count" class="cart-count ms-2" style="font-weight: bold;">
+                        {{ cart_total_quantity|default:0 }}
+                    </span>
+                </a>
+
+                {% if user.is_authenticated %}
+                    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
+                    <button type="submit" form="logout-form" id="auth-button" class="category-btn d-flex align-items-center" style="padding: 0 12px;">
+                        <img src="{{ MEDIA_URL }}icons/logout_brown.png"
+                             data-hover="{{ MEDIA_URL }}icons/logout_white.png"
+                             data-original="{{ MEDIA_URL }}icons/logout_brown.png"
+                             alt="Вийти"
+                             class="category-icon"
+                             style="width: 28px; height: 28px;">
+                        <span class="auth-label ms-2">Вийти</span>
+                    </button>
+                {% else %}
+                    <button id="auth-button" class="category-btn d-flex align-items-center" style="padding: 0 12px;"
+                            data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <img src="{{ MEDIA_URL }}icons/login_brown.png"
+                             data-hover="{{ MEDIA_URL }}icons/login_white.png"
+                             data-original="{{ MEDIA_URL }}icons/login_brown.png"
+                             alt="Увійти"
+                             class="category-icon"
+                             style="width: 28px; height: 28px;">
+                        <span class="auth-label ms-2">Увійти</span>
+                    </button>
+                {% endif %}
+            </div>
+
         </div>
     </div>
 
@@ -74,22 +111,37 @@
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Левая часть: Асортимент с дропдауном -->
             <div class="nav-left dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="assortmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Асортимент
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="assortmentDropdown">
-                    {% for category in categories %}
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="{{ category.get_absolute_url }}">
-                                {% if category.button_icon_brown %}
-                                    <img src="{{ category.button_icon_brown.url }}"
-                                         data-hover="{{ category.button_icon_white.url }}"
-                                         alt="{{ category.category }}"
-                                         class="category-icon"
-                                         style="height: 20px; width: 20px; margin-right: 8px;">
-                                {% endif %}
-                                {{ category.category }}
-                            </a>
+                <button class="category-btn category-toggle-btn"
+                        id="assortmentDropdown"
+                        type="button">
+                    <img src="{{ MEDIA_URL }}icons/category_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/category_white.png"
+                         data-original="{{ MEDIA_URL }}icons/category_brown.png"
+                         alt="Категорії товарів"
+                         class="category-icon"
+                         style="width: 24px; height: 24px;">
+                    <span class="ms-2">Категорії товарів </span>
+                </button>
+
+                <ul class="dropdown-menu category-dropdown category-dropdown-multicol" aria-labelledby="assortmentDropdown">
+                    {% for column in categories_columns %}
+                        <li class="category-column">
+                            <ul>
+                                {% for category in column %}
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="{{ category.get_absolute_url }}">
+                                            {% if category.button_icon_brown %}
+                                                <img src="{{ category.button_icon_brown.url }}"
+                                                     data-hover="{{ category.button_icon_white.url }}"
+                                                     alt="{{ category.category }}"
+                                                     class="category-icon"
+                                                     style="height: 20px; width: 20px; margin-right: 8px;">
+                                            {% endif %}
+                                            {{ category.category }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
@@ -97,14 +149,63 @@
 
             <!-- Центральная часть -->
             <div class="nav-center">
-                <a class="nav-link" href="/producer/">Виробники</a>
-                <a class="nav-link" href="/delivery/">Доставка</a>
-                <a class="nav-link" href="/reviews/">Відгуки</a>
+                <a class="category-btn d-flex align-items-center {% if request.path == '/assortment/' %}btn-primary{% endif %}" href="{% url 'assortment_list' %}" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
+                         data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
+                         alt="Асортимент"
+                         class="category-icon"
+                         style="width: 24px; height: 24px;">
+                    <span class="ms-2">Асортимент</span>
+                </a>
+                <a class="category-btn d-flex align-items-center {% if request.path == '/producer/' %}btn-primary{% endif %}" href="/producer/" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/factory_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/factory_white.png"
+                         data-original="{{ MEDIA_URL }}icons/factory_brown.png"
+                         alt="Виробники"
+                         class="category-icon"
+                         style="width: 24px; height: 24px;">
+                    <span class="ms-2">Виробники</span>
+                </a>
+                <a class="category-btn d-flex align-items-center {% if request.path == '/delivery/' %}btn-primary{% endif %}" href="/delivery/" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/truck_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/truck_white.png"
+                         data-original="{{ MEDIA_URL }}icons/truck_brown.png"
+                         alt="Доставка"
+                         class="category-icon"
+                         style="width: 24px; height: 24px;">
+                    <span class="ms-2">Доставка</span>
+                </a>
+                <a class="category-btn d-flex align-items-center {% if request.path == '/reviews/' %}btn-primary{% endif %}" href="/reviews/" style="padding: 0 12px;">
+                    <img src="{{ MEDIA_URL }}icons/star_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/star_white.png"
+                         data-original="{{ MEDIA_URL }}icons/star_brown.png"
+                         alt="Відгуки"
+                         class="category-icon"
+                         style="width: 24px; height: 24px;">
+                    <span class="ms-2">Відгуки</span>
+                </a>
                 {% if user.is_authenticated and not user.is_staff %}
-                    <a class="nav-link" href="{% url 'user_cabinet' %}">Мій кабінет</a>
+                    <a class="category-btn d-flex align-items-center {% if request.path == '/cabinet/' %}btn-primary{% endif %}" href="{% url 'user_cabinet' %}" style="padding: 0 12px;">
+                        <img src="{{ MEDIA_URL }}icons/user_brown.png"
+                             data-hover="{{ MEDIA_URL }}icons/user_white.png"
+                             data-original="{{ MEDIA_URL }}icons/user_brown.png"
+                             alt="Мій кабінет"
+                             class="category-icon"
+                             style="width: 24px; height: 24px;">
+                        <span class="ms-2">Мій кабінет</span>
+                    </a>
                 {% endif %}
                 {% if request.user.is_staff %}
-                    <a class="nav-link" href="/admin/">Панель Адміністратора</a>
+                    <a class="category-btn d-flex align-items-center {% if request.path == '/admin/' %}btn-primary{% endif %}" href="/admin/" style="padding: 0 12px;">
+                        <img src="{{ MEDIA_URL }}icons/settings_brown.png"
+                             data-hover="{{ MEDIA_URL }}icons/settings_white.png"
+                             data-original="{{ MEDIA_URL }}icons/settings_brown.png"
+                             alt="Адмін"
+                             class="category-icon"
+                             style="width: 24px; height: 24px;">
+                        <span class="ms-2">Адмін</span>
+                    </a>
                 {% endif %}
             </div>
         </div>

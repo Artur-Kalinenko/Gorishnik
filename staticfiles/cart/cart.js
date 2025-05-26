@@ -24,6 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     quantityInput.value = quantity;
                     document.getElementById(`total-price-${itemId}`).textContent = data.item_total_price;
                     document.getElementById('cart-total-price').textContent = data.cart_total_price;
+
+                    // ✅ Обновляем иконку корзины в шапке
+                    updateCartItemCount(data.cart_total_quantity);
                 } else {
                     console.error(data.message || 'Не вдалося оновити кількість');
                 }

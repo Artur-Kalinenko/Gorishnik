@@ -90,6 +90,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 })();
 
+function updateCartItemCount(count) {
+    const countEl = document.getElementById('cart-item-count');
+    if (countEl) countEl.textContent = count;
+}
+
+function addToCart(productId, quantity = 1, variantId = null) {
+    const csrfToken = getCookie('csrftoken');
+
+    fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity, variant_id: variantId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.session_id) {
+            localStorage.setItem('session_id', data.session_id);
+        }
+        if (data.cart_item_count !== undefined) {
+            updateCartItemCount(data.cart_item_count);
+        }
+        showCartToast();
+    })
+    .catch(error => {
+        console.error('Помилка при додаванні в корзину:', error);
+    });
+}
+
 // Показ уведомления, если корзина была очищена
 if (window.cartCleared && window.location.pathname === '/cart/') {
     const container = document.querySelector('.container');
