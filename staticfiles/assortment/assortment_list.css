@@ -1,3 +1,7 @@
+/* === Цветовая палитра (наследуется от main.css) === */
+
+/* === Стили ассортимента === */
+
 .btn-group-container {
     display: flex;
     gap: 5px;
@@ -39,32 +43,98 @@
 }
 
 .favorite-toggle i {
-    color: #ffcc00; /* золотая звезда */
+    color: #ffcc00;
 }
 
-.category-buttons-wrapper .btn span {
-    padding-top: 3px;
-    display: inline-block;
+/* === Обёртка для кнопок категорий === */
+.category-buttons-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 20px;
+    max-width: 1380px;
+    margin: 0 auto 2rem;
+    padding: 0 15px;
 }
 
+/* Контейнер для одной кнопки */
+.category-buttons-wrapper .text-center {
+    flex: 1 1 220px;
+    max-width: 250px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Стили кнопок категорий */
 .category-buttons-wrapper a {
-    margin: 4px 6px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    background-color: var(--bg-main);
+    color: var(--accent-dark);
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    height: 44px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    gap: 8px;
+    text-decoration: none !important;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
 }
 
-
-
-
-.category-buttons-wrapper .btn-primary {
-    background-color: var(--accent-dark);
+.category-buttons-wrapper a:hover {
+    background-color: var(--accent);
     color: var(--white);
     border-color: var(--accent-dark);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.category-icon {
-    transition: opacity 0.3s ease;
-    pointer-events: none;
+.category-buttons-wrapper a img {
+    height: 24px;
+    width: 24px;
+    transition: filter 0.3s ease;
 }
 
+.category-buttons-wrapper a:hover img {
+    transform: scale(1.1);
+    filter: brightness(0) invert(1);
+}
+
+.category-buttons-wrapper a span {
+    padding-top: 2px;
+    display: inline-block;
+    font-size: 0.85rem;
+}
+
+.category-buttons-wrapper a.btn-primary {
+    background-color: var(--accent-dark) !important;
+    color: var(--white) !important;
+    border-color: var(--accent-dark);
+    transform: none;
+}
+
+.category-buttons-wrapper a.btn-primary img {
+    transform: scale(1.1);
+    filter: brightness(0) invert(1);
+}
+
+.category-buttons-wrapper a.btn-primary:hover {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: var(--white) !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.category-buttons-wrapper a.btn-primary:hover img {
+    filter: brightness(0) invert(1);
+}
+
+/* Анимации */
 .montserrat-category-title {
     opacity: 0;
     transform: translateY(-10px);
@@ -76,19 +146,6 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.btn.mx-2 {
-    transition: background-color 0.3s, color 0.3s, transform 0.2s;
-}
-
-.btn.mx-2:hover {
-    transform: scale(1.03);
-}
-
-.btn-primary,
-.btn-secondary {
-    transition: background-color 0.3s, color 0.3s;
 }
 
 .fade-in {
@@ -115,6 +172,23 @@
     }
 }
 
-h1 {
-    text-transform: uppercase;
+/* Карточки товара */
+.card-title,
+.card-text,
+.card-price {
+    font-family: 'Comfortaa', cursive;
+}
+
+.card-title {
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+.card-text {
+    color: var(--text-main);
+}
+
+.card-price {
+    color: var(--highlight);
+    font-weight: bold;
 }

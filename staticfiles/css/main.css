@@ -1,4 +1,5 @@
-/* === Цветовая палитра === */
+/* === CSS: main.css === */
+
 :root {
     --bg-main: #f3eee7;
     --bg-subnav: #ece2d6;
@@ -11,7 +12,6 @@
     --white: #ffffff;
 }
 
-/* === Общие стили === */
 body {
     background-color: var(--bg-main);
     display: flex;
@@ -26,107 +26,150 @@ body {
     margin-bottom: 10px;
 }
 
-/* Заголовки */
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Comfortaa', cursive;
     font-weight: 600;
 }
 
-/* Кнопки */
+/* === Общие кнопки === */
 .btn,
-.top-bar .btn,
 .btn-primary,
 .btn-outline-success,
 .btn-outline-primary,
-.btn-outline-secondary {
+.btn-outline-secondary,
+.top-bar .btn {
     font-family: 'Comfortaa', cursive;
     font-weight: 600;
-}
-
-/* Общий стиль категорий и кнопки поиска */
-.category-btn,
-.category-buttons-wrapper .btn {
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    background-color: var(--bg-subnav);
-    color: var(--accent-dark);
-    border: 2px solid var(--accent);
-    border-radius: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
     height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none !important;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
 }
 
-.category-btn:hover,
-.category-buttons-wrapper .btn:hover {
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+.btn-outline-success {
+    border-color: var(--accent);
+    color: var(--accent);
+    background-color: transparent;
+}
+
+.btn-outline-success:hover {
+    background-color: var(--green);
+    color: var(--white);
+}
+
+.btn-outline-primary {
+    border-color: var(--accent);
+    color: var(--accent);
+    background-color: transparent;
+    margin-left: 0.5rem;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+.btn-outline-secondary {
+    border-color: var(--accent-dark);
+    color: var(--accent-dark);
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--accent-dark);
+    color: var(--white);
+}
+
+/* === Универсальные кнопки с иконками === */
+.category-btn {
+    letter-spacing: 0.5px;
+    background-color: var(--bg-main);
+    color: var(--accent-dark);
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none !important;
+    padding: 0 12px;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    text-transform: none;
+}
+
+.category-btn:hover {
     background-color: var(--accent);
     color: var(--white);
     transform: scale(1.05);
 }
 
-.category-buttons-wrapper .btn-primary {
+.category-btn img {
+    transition: filter 0.3s ease;
+}
+
+/* Активная кнопка категорий */
+.category-toggle-btn:hover {
+    background-color: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+}
+
+.category-toggle-btn:hover img {
+    filter: brightness(0) invert(1);
+}
+
+.nav-left:hover .category-toggle-btn:not(:hover) {
     background-color: var(--accent-dark);
     color: var(--white);
     border-color: var(--accent-dark);
 }
 
-.search-icon-btn {
-    @apply category-btn;
-    margin-left: 8px;
-    padding: 0 14px;
+.nav-left:hover .category-toggle-btn:not(:hover) img {
+    filter: brightness(0) invert(1);
 }
 
-.search-icon-btn img {
-    padding-left: 6px; /* можно увеличить до 6px или 8px при необходимости */
+.category-toggle-btn {
+    margin-top: 11px;
+    cursor: default;
 }
 
-.top-bar .form-control::placeholder {
-    color: var(--accent-dark);
-    opacity: 1; /* для Safari */
+.category-toggle-btn span {
+    padding-top: 2px;
 }
 
-/* Навбар */
-.main-nav .nav-link {
-    font-weight: 500;
-    font-family: 'Comfortaa', cursive;
-    color: var(--accent-dark);
-    padding: 0.4rem 1.2rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    display: inline-block;
-}
-
-.main-nav .nav-link:hover {
-    background-color: var(--accent);
+/* Подсветка активных кнопок */
+.category-btn.btn-primary {
+    background-color: var(--accent-dark);
     color: var(--white);
-    text-decoration: none;
+    border-color: var(--accent-dark);
 }
 
-/* Карточки */
-.card-title,
-.card-text,
-.card-price {
-    font-family: 'Comfortaa', cursive;
+.category-btn.btn-primary:hover {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--white);
+    transform: scale(1.05);
 }
 
-.card-title {
-    color: var(--accent-dark);
-    font-weight: 600;
+.category-btn.btn-primary img {
+    filter: brightness(0) invert(1);
 }
 
-.card-text {
-    color: var(--text-main);
-}
-
-.card-price {
-    color: var(--highlight);
-    font-weight: bold;
-}
-
-/* === Верхняя панель навбара === */
+/* === Топ бар === */
 .top-bar {
     background-color: var(--bg-main);
     padding: 0.7rem 0;
@@ -146,68 +189,19 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 0.25rem;
 }
 
-.top-bar form {
-    flex: 1;
-    max-width: 500px;
-    margin: 0 auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
 .top-bar .form-control {
     height: 42px;
     padding: 0.375rem 0.75rem;
     border-radius: 6px;
-    border: 2px solid var(--accent-dark); /* фикс: было 1px */
+    border: 2px solid var(--accent-dark);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-    color: var(--accent-dark); /* переносим сюда */
+    color: var(--accent-dark);
     flex: 1;
 }
 
-
-.top-bar .btn {
-    height: 42px;
-    padding-top: 0.375rem;
-    padding-bottom: 0.375rem;
-    margin-left: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.top-bar .btn-outline-success {
-    border-color: var(--accent);
-    color: var(--accent);
-    background-color: transparent;
-}
-
-.top-bar .btn-outline-success:hover {
-    background-color: var(--accent);
-    color: var(--white);
-}
-
-.top-bar .btn-outline-primary {
-    border-color: var(--accent);
-    color: var(--accent);
-    background-color: transparent;
-    margin-left: 0.5rem;
-}
-
-.top-bar .btn-outline-primary:hover {
-    background-color: var(--accent);
-    color: var(--white);
-}
-
-.top-bar .btn-outline-secondary {
-    border-color: var(--accent-dark);
+.top-bar .form-control::placeholder {
     color: var(--accent-dark);
-    background-color: transparent;
-}
-
-.top-bar .btn-outline-secondary:hover {
-    background-color: var(--accent-dark);
-    color: var(--white);
+    opacity: 1;
 }
 
 .top-bar .navbar-brand img {
@@ -221,38 +215,36 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.5rem;
 }
 
-#cart-button .category-icon {
-    margin-right: 4px; /* сдвигаем чуть левее */
+#logo-button .logo-label {
+    text-transform: uppercase;
 }
 
-#cart-item-count.cart-count {
-    margin-top: 4px; /* отступ вниз */
+.search-icon-btn {
+    margin-left: 12px;
 }
 
-#cart-button {
-    text-decoration: none !important;
+.auth-label {
+    text-transform: none;
 }
 
-#cart-button #cart-item-count {
-    text-decoration: none !important;
-}
-
-#auth-button .auth-label {
-    font-family: 'Comfortaa', cursive;
-    font-weight: 600;
-    font-size: 1rem;
-    margin-top: 2px; /* отступ вниз */
-    text-decoration: none;
-    display: inline-block;
-    text-transform: none !important;
-}
-
-/* === Нижняя панель навбара с dropdown === */
+/* === Нижний навбар === */
 .main-nav {
     background-color: var(--bg-subnav);
     border-top: 1px solid rgba(0, 0, 0, 0.04);
     border-bottom: 1px solid rgba(0, 0, 0, 0.04);
     padding: 0.25rem 0;
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+}
+
+.main-nav .nav-left {
+    position: relative;
+    z-index: 3;
+}
+
+.category-dropdown-multicol {
+    z-index: 9999;
 }
 
 .main-nav .nav {
@@ -261,13 +253,22 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
 }
 
-.main-nav .nav-left {
-    display: flex;
-    align-items: center;
-    padding-right: 1.2rem;
-    margin-right: 1.2rem;
-    border-right: 3px solid var(--accent-dark);
-    position: relative;
+.main-nav .nav-link {
+    font-weight: 500;
+    font-family: 'Comfortaa', cursive;
+    color: var(--accent-dark);
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: inline-block;
+    text-transform: none;
+}
+
+.main-nav .nav-link:hover {
+    background-color: var(--accent);
+    color: var(--white);
+    text-decoration: none;
 }
 
 .main-nav .nav-left:hover .dropdown-menu {
@@ -283,93 +284,75 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: center;
     align-items: center;
     gap: 1.5rem;
+    padding-top: 10px;
+    height: 40px;
 }
 
-.main-nav .dropdown-menu {
+/* === Выпадающее меню === */
+.category-dropdown-multicol {
+    display: flex;
+    gap: 20px;
     background-color: var(--bg-subnav);
-    border: 1px solid var(--accent-dark);
-    border-radius: 6px;
-    padding: 0.5rem 0.5rem;
-    min-width: 220px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    display: block;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    pointer-events: none;
+    border: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 16px;
     position: absolute;
     top: 100%;
     left: 0;
+    transform: translateY(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
     z-index: 999;
 }
 
-.main-nav .dropdown-item {
+.main-nav .nav-left:hover .category-dropdown-multicol,
+.category-dropdown-multicol:hover {
+    display: flex;
+    opacity: 1;
+    pointer-events: all;
+}
+
+.category-column {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+}
+
+.category-column li {
+    list-style: none;
+}
+
+.category-column .dropdown-item {
     color: var(--accent-dark);
-    padding: 0.25rem 1rem;
-    border-left: 3px solid transparent;
-    transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+    padding: 0.4rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+    display: flex;
+    align-items: center;
 }
 
-.main-nav .dropdown-item + .dropdown-item {
-    border-top: 1px solid rgba(90, 70, 50, 0.3);
-}
-
-.main-nav .dropdown-item:hover {
-    background-color: var(--accent-dark);
-    color: var(--white);
-}
-
-.category-icon {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-    transition: opacity 0.3s ease;
-    vertical-align: middle;
-    pointer-events: none;
-}
-
-.dropdown-divider {
-    border-top: 1px solid rgba(90, 70, 50, 0.3);
-    margin: 0.4rem 0;
-}
-
-/* === Навбар (Bootstrap остатки) === */
-.navbar {
-    background-color: var(--bg-main);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.navbar-brand img {
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
-}
-
-/* === Карточка товара === */
-.card {
-    background-color: var(--white);
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease;
-}
-
-.card:hover {
-    transform: scale(1.01);
-}
-
-/* === Кнопки === */
-.btn-primary {
+.category-column .dropdown-item:hover {
     background-color: var(--accent);
-    border-color: var(--accent);
-}
-
-.btn-primary:hover {
-    background-color: var(--accent-dark);
-    border-color: var(--accent-dark);
-}
-
-.btn-outline-success:hover {
-    background-color: var(--green);
     color: var(--white);
+    border-color: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+.category-column .dropdown-item:hover img {
+    transform: scale(1.1);
+    filter: brightness(0) invert(1);
+}
+
+.category-column .dropdown-item img {
+    transition: filter 0.1s ease, transform 0.1s ease;
 }
 
 /* === Футер === */

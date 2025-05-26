@@ -54,9 +54,9 @@ def add_to_cart(request, product_id):
         total_quantity = cart.items.aggregate(total=Sum('quantity'))['total'] or 0
 
         return JsonResponse({
+            'status': 'success',
             'message': 'Продукт додано в кошик!',
-            'cart_item_count': total_quantity,
-            'session_id': cart.session_id
+            'cart_total_quantity': total_quantity
         })
 
     return JsonResponse({'error': 'Неверный запрос'}, status=400)

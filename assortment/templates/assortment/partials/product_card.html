@@ -1,16 +1,16 @@
 {% load static %}
 
-<div class="card shadow-sm h-100 rounded border-0 product-card position-relative" data-product-id="{{ item.id }}">
+<div class="product-card" data-product-id="{{ item.id }}">
     <!-- Плашки -->
     {% if item.is_new %}
-        <span class="badge bg-success position-absolute top-0 start-0 m-2">Новинка</span>
+        <span class="badge badge-new">Новинка</span>
     {% endif %}
     {% if item.is_discounted %}
-        <span class="badge bg-danger position-absolute top-0 end-0 m-2">Акція</span>
+        <span class="badge badge-sale">Акція</span>
     {% endif %}
 
     <!-- Звезда "Обране" -->
-    <div class="favorite-toggle position-absolute bottom-0 end-0 p-2" data-product-id="{{ item.id }}">
+    <div class="favorite-toggle" data-product-id="{{ item.id }}">
         {% if user.is_authenticated and item.id in favorites_ids %}
             <i class="fas fa-star text-warning"></i>
         {% else %}
@@ -18,67 +18,68 @@
         {% endif %}
     </div>
 
+    <!-- Картинка -->
     <a href="{% url 'assortment_detail' item.pk %}">
         {% if item.poster %}
-            <img src="{{ item.poster.url }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+            <img src="{{ item.poster.url }}" class="product-image">
         {% else %}
-            <img src="{% static 'images/default.jpg' %}" class="card-img-top" style="height: 150px; object-fit: cover;">
+            <img src="{% static 'images/default.jpg' %}" class="product-image">
         {% endif %}
     </a>
 
-    <div class="card-body text-center">
-        <h5 class="montserrat-category-title">
-            <a href="{% url 'assortment_detail' item.pk %}" class="text-decoration-none text-dark">{{ item.assortment_name }}</a>
+    <div class="product-info">
+        <h5 class="product-name">
+            <a href="{% url 'assortment_detail' item.pk %}" class="product-link">{{ item.assortment_name }}</a>
         </h5>
 
         {% for cat in item.assortment_categories.all %}
-            <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="btn btn-outline-info btn-sm mb-2">
+            <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="category-button">
                 {% if cat.button_icon %}
-                    <img src="{{ cat.button_icon.url }}" style="height: 20px; width: 20px; margin-right: 5px;">
+                    <img src="{{ cat.button_icon.url }}" class="category-icon">
                 {% endif %}
                 {{ cat.category }}
             </a>
         {% endfor %}
 
         <!-- Цены -->
-        <p class="card-text" id="price-display-{{ item.pk }}">
+        <p class="price-block" id="price-display-{{ item.pk }}">
             {% if item.variants.exists %}
                 {% with sorted_variants=item.variants.all|dictsort:"price" %}
                     {% with min=sorted_variants|first max=sorted_variants|last %}
                         {% if min.old_price or max.old_price %}
-                            <span class="text-muted text-decoration-line-through">
+                            <span class="old-price">
                                 {% if min.old_price %}{{ min.old_price }} ₴{% endif %}
                                 {% if max.old_price and max.old_price != min.old_price %} – {{ max.old_price }} ₴{% endif %}
                             </span><br>
                         {% endif %}
-                        <strong>
+                        <span class="price">
                             {% if min.price %}
                                 {{ min.price }} ₴
                                 {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}
                             {% else %}
                                 {{ max.price }} ₴
                             {% endif %}
-                        </strong>
+                        </span>
                     {% endwith %}
                 {% endwith %}
             {% else %}
                 {% if item.old_price and item.old_price > item.price %}
-                    <span class="text-muted text-decoration-line-through">{{ item.old_price }} ₴</span><br>
+                    <span class="old-price">{{ item.old_price }} ₴</span><br>
                 {% endif %}
-                <strong>{{ item.price }} ₴</strong>
+                <span class="price">{{ item.price }} ₴</span>
             {% endif %}
         </p>
 
-        <!-- Граммовки и кнопки -->
+        <!-- Граммовки -->
         {% if item.variants.count > 1 %}
-            <div class="mb-2">
-                <a href="{% url 'assortment_detail' item.pk %}" class="btn btn-primary btn-sm select-variant-button" id="select-variant-{{ item.pk }}">
+            <div class="variant-placeholder">
+                <a href="{% url 'assortment_detail' item.pk %}" class="select-variant-button">
                     Оберіть грамовку
                 </a>
             </div>
-            <div class="mb-3">
+            <div class="grams-buttons">
                 {% for variant in item.variants.all %}
-                    <button class="btn btn-outline-secondary grams-button btn-sm"
+                    <button class="gram-button"
                             data-product-id="{{ item.pk }}"
                             data-variant-id="{{ variant.id }}"
                             data-price="{{ variant.price }}"
@@ -87,23 +88,25 @@
                     </button>
                 {% endfor %}
             </div>
+
+            <div class="cart-controls-placeholder" id="controls-{{ item.pk }}"></div>
         {% elif item.variants.count == 1 %}
             {% with variant=item.variants.first %}
-                <p class="card-text">{{ variant.grams }} г</p>
-                <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
-                    <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
-                    <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                    <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">В корзину</button>
+                <p class="grams-text">{{ variant.grams }} г</p>
+                <div class="cart-controls" id="controls-{{ item.pk }}">
+                    <button class="quantity-btn decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input" readonly>
+                    <button class="quantity-btn increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                    <button class="add-to-cart" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">В корзину</button>
                 </div>
             {% endwith %}
         {% else %}
-            <p class="card-text">{{ item.grams }} г</p>
-            <div class="d-flex align-items-center justify-content-center btn-group-container" id="controls-{{ item.pk }}">
-                <button class="btn btn-primary decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center" readonly>
-                <button class="btn btn-primary increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                <button class="btn btn-primary add-to-cart" data-product-id="{{ item.pk }}">В корзину</button>
+            <p class="grams-text">{{ item.grams }} г</p>
+            <div class="cart-controls" id="controls-{{ item.pk }}">
+                <button class="quantity-btn decrease-quantity" data-product-id="{{ item.pk }}">−</button>
+                <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input" readonly>
+                <button class="quantity-btn increase-quantity" data-product-id="{{ item.pk }}">+</button>
+                <button class="add-to-cart" data-product-id="{{ item.pk }}">В корзину</button>
             </div>
         {% endif %}
     </div>
