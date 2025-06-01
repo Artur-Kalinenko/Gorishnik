@@ -46,21 +46,33 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(255, 255, 255, 0.85);
     border-radius: 50%;
     padding: 6px;
     cursor: pointer;
     z-index: 10;
-    transition: box-shadow 0.2s ease;
+    transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
+    border: 2px solid var(--accent);
 }
 
-.favorite-toggle:hover {
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-}
-
-.favorite-toggle i {
+.favorite-toggle .fa-star, .favorite-toggle .far.fa-star {
     font-size: 1.3rem;
-    color: #ffcc00;
+    color: var(--accent-dark); /* Шоколадный цвет */
+    transition: color 0.2s;
+}
+
+.favorite-toggle.active, .favorite-toggle:hover, .favorite-toggle:focus {
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
+.favorite-toggle.active .fa-star,
+.favorite-toggle.active .far.fa-star,
+.favorite-toggle:hover .fa-star,
+.favorite-toggle:hover .far.fa-star,
+.favorite-toggle:focus .fa-star,
+.favorite-toggle:focus .far.fa-star {
+    color: #fff !important; /* Белая звезда на шоколадном фоне */
 }
 
 /* === Изображение товара === */
@@ -150,19 +162,42 @@
 
 /* === Количество === */
 .quantity-input {
-    text-align: center;
-    width: 44px;
-    min-width: 44px;
-    max-width: 60px;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    border: 2px solid var(--accent);
-    color: var(--accent-dark);
-    background: #f3ede7;
-    font-weight: 600;
-    margin: 0 2px;
-    display: inline-block;
-    box-sizing: border-box;
+    position: unset !important;
+    top: unset !important;
+    width: 48px !important;
+    min-width: 44px !important;
+    max-width: 56px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 1rem !important;
+    font-family: inherit !important;
+    text-align: center !important;
+    border: 2px solid var(--accent) !important;
+    border-radius: 10px !important;
+    background: #f3ede7 !important;
+    color: var(--accent-dark) !important;
+    margin: 0 2px !important;
+    padding: 0 2px !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    overflow: visible !important;
+    display: inline-block !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input.quantity-input:focus, input.quantity-input:hover {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--accent) !important;
 }
 
 /* === Цена === */
@@ -262,4 +297,18 @@
 /* Диагностика и устранение лишнего белого пространства */
 .row, .col {
     height: auto !important;
+}
+
+.favorite-toggle .fa-star,
+.favorite-toggle .far.fa-star {
+    color: var(--accent-dark) !important;
+}
+
+.favorite-toggle.active .fa-star,
+.favorite-toggle.active .far.fa-star,
+.favorite-toggle:hover .fa-star,
+.favorite-toggle:hover .far.fa-star,
+.favorite-toggle:focus .fa-star,
+.favorite-toggle:focus .far.fa-star {
+    color: #fff !important;
 }

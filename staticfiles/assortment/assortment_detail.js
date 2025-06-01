@@ -1,205 +1,130 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Image Gallery
+document.addEventListener('DOMContentLoaded', () => {
+    // --- ГАЛЕРЕЯ ПРОДУКТА ---
     const mainImage = document.getElementById('mainImage');
     const thumbnails = document.querySelectorAll('.thumbnail-img');
-
-    // Make changeMainImage function globally available
-    window.changeMainImage = function(thumbnail) {
-        if (mainImage) {
-            mainImage.src = thumbnail.src;
-            thumbnails.forEach(thumb => thumb.classList.remove('active-thumbnail'));
-            thumbnail.classList.add('active-thumbnail');
-        }
-    };
-
-    // Add click event listeners to thumbnails
     thumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', function() {
-            changeMainImage(this);
-        });
-    });
-
-    // Variant Selection
-    const gramsButtons = document.querySelectorAll('.grams-button');
-    const priceDisplay = document.getElementById('price-display');
-    let minPrice = null, maxPrice = null;
-    if (priceDisplay) {
-        // Сохраняем min-max цену для сброса
-        const priceText = priceDisplay.textContent;
-        const match = priceText.match(/([\d.,]+)\s*₴(?:\s*–\s*([\d.,]+)\s*₴)?/);
-        if (match) {
-            minPrice = match[1];
-            maxPrice = match[2] || match[1];
-        }
-    }
-    gramsButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            gramsButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
-            this.classList.add('btn-primary');
-        });
-        button.addEventListener('mouseleave', function() {
-            gramsButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
-        });
-        button.addEventListener('click', function() {
-            gramsButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
-            this.classList.add('btn-primary', 'active');
-            const price = this.dataset.price;
-            const oldPrice = this.dataset.oldPrice;
-            updatePriceDisplay(price, oldPrice);
-        });
-    });
-
-    function updatePriceDisplay(price, oldPrice) {
-        if (oldPrice && oldPrice !== 'None') {
-            priceDisplay.innerHTML = `
-                <p class="mb-1 text-muted text-decoration-line-through">${oldPrice} ₴</p>
-                <p class="fw-bold text-danger mb-2 fs-4">${price} ₴</p>
-            `;
-        } else {
-            priceDisplay.innerHTML = `
-                <p class="fw-bold mb-2 fs-4">${price} ₴</p>
-            `;
-        }
-    }
-
-    // Сброс цены на min-max при клике вне кнопок
-    document.addEventListener('click', function(e) {
-        if (![...gramsButtons].some(btn => btn.contains(e.target))) {
-            gramsButtons.forEach(btn => btn.classList.remove('btn-primary', 'active'));
-            if (minPrice && maxPrice) {
-                priceDisplay.innerHTML = `<p class=\"fw-bold mb-2 fs-4\">${minPrice} ₴${minPrice !== maxPrice ? ' – ' + maxPrice + ' ₴' : ''}</p>`;
+            if (mainImage) {
+                mainImage.src = this.src;
+                thumbnails.forEach(t => t.classList.remove('active-thumbnail'));
+                this.classList.add('active-thumbnail');
             }
-        }
+        });
     });
 
-    // Quantity controls
-    const quantityInput = document.querySelector('.quantity-input');
-    const decreaseBtn = document.querySelector('.decrease-quantity');
-    const increaseBtn = document.querySelector('.increase-quantity');
-    if (quantityInput && decreaseBtn && increaseBtn) {
-        decreaseBtn.addEventListener('click', function() {
-            let val = parseInt(quantityInput.value, 10);
-            if (val > 1) quantityInput.value = val - 1;
-        });
-        increaseBtn.addEventListener('click', function() {
-            let val = parseInt(quantityInput.value, 10);
-            quantityInput.value = val + 1;
-        });
+    // --- КОРЗИНА, ГРАММОВКИ, ДОБАВЛЕНИЕ ---
+    const cartSwitch = document.querySelector('.cart-switch');
+    if (!cartSwitch) return;
+    const productId = cartSwitch.id.replace('cart-switch-', '');
+
+    // Граммовки
+    const gramButtons = document.querySelectorAll('.gram-button');
+    const priceDisplay = document.getElementById(`price-display-${productId}`);
+    const selectVariantBlock = document.getElementById(`select-variant-${productId}`);
+    const cartControls = document.getElementById(`controls-${productId}`);
+
+    function resetDetailCart() {
+        gramButtons.forEach(b => b.classList.remove('selected'));
+        if (selectVariantBlock) selectVariantBlock.style.display = 'block';
+        if (cartControls) cartControls.style.display = 'none';
+        // Если нужно, можно вернуть диапазон цен тут
     }
 
-    // Add to Cart
-    const addToCartBtn = document.querySelector('.add-to-cart-btn');
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', function() {
-            const productId = this.dataset.productId;
-            const selectedVariant = document.querySelector('.grams-button.active');
-            const variantGrams = selectedVariant ? selectedVariant.dataset.grams : null;
-            const quantity = quantityInput ? parseInt(quantityInput.value, 10) : 1;
-            addToCart(productId, variantGrams, quantity);
+    // Логика выбора граммовки
+    gramButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            gramButtons.forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const variantId = btn.dataset.variantId;
+            const price = btn.dataset.price;
+            // Обновить цену
+            if (priceDisplay) {
+                priceDisplay.innerHTML = `<span class="price">${price} ₴</span>`;
+            }
+            // Показать cart-controls
+            if (selectVariantBlock) selectVariantBlock.style.display = 'none';
+            if (cartControls) {
+                cartControls.style.display = 'flex';
+                // Пропиши variantId на кнопке корзины
+                const addToCartBtn = cartControls.querySelector('.add-to-cart');
+                if (addToCartBtn) {
+                    addToCartBtn.setAttribute('data-variant-id', variantId);
+                    addToCartBtn.setAttribute('data-grams', btn.textContent.trim());
+                }
+            }
+            attachQuantityHandlers(productId);
         });
+    });
+
+    // Управление количеством и добавлением в корзину
+    function attachQuantityHandlers(productId) {
+        const root = document.getElementById(`controls-${productId}`);
+        if (!root) return;
+        const input = root.querySelector(`#quantity-input-${productId}`);
+        const buttons = root.querySelectorAll('.quantity-btn');
+        const addToCartBtn = root.querySelector('.add-to-cart');
+
+        if (buttons.length >= 2) {
+            buttons[0].onclick = () => {
+                const val = parseInt(input.value, 10);
+                if (val > 1) input.value = val - 1;
+            };
+            buttons[1].onclick = () => {
+                input.value = parseInt(input.value, 10) + 1;
+            };
+        }
+        if (addToCartBtn) {
+            addToCartBtn.onclick = (e) => {
+                const variantId = addToCartBtn.getAttribute('data-variant-id') || null;
+                const grams = addToCartBtn.getAttribute('data-grams') || '';
+                if (!variantId && addToCartBtn.hasAttribute('data-variant-id')) {
+                    showCartToast('Оберіть грамовку перед додаванням!');
+                    return;
+                }
+                addToCart(productId, parseInt(input.value, 10), variantId, grams);
+                input.value = 1;
+                resetDetailCart();
+            };
+        }
     }
 
-    function addToCart(productId, variantGrams, quantity) {
-        fetch('/cart/add/', {
+    // Инициализация: скрываем cart-controls, показываем "Оберіть грамовку"
+    resetDetailCart();
+    attachQuantityHandlers(productId);
+
+    // --- Остальные функции (addToCart, showCartToast и т.д.) ---
+    function getCSRFToken() {
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return cookie ? decodeURIComponent(cookie.split('=')[1]) : '';
+    }
+    function addToCart(productId, quantity, variantId = null, grams = '') {
+        fetch(`/cart/add/${productId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
+                'X-CSRFToken': getCSRFToken(),
             },
-            body: JSON.stringify({
-                product_id: productId,
-                variant_grams: variantGrams,
-                quantity: quantity
-            })
+            body: JSON.stringify({ quantity, variant_id: variantId, grams }),
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                showNotification('Товар додано до кошика', 'success');
-                updateCartCount(data.cart_count);
-            } else {
-                showNotification(data.message || 'Помилка при додаванні до кошика', 'error');
+            showCartToast('Товар додано в кошик');
+            if (data.cart_total_quantity !== undefined) {
+                const cartCount = document.getElementById('cart-item-count');
+                if (cartCount) cartCount.textContent = data.cart_total_quantity;
             }
         })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Помилка при додаванні до кошика', 'error');
-        });
+        .catch(err => console.error('Помилка при додаванні:', err));
     }
-
-    // Utility Functions
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+    function showCartToast(message) {
+        const toastEl = document.getElementById('cartToast');
+        if (toastEl) {
+            toastEl.querySelector('.toast-body').textContent = message;
+            // Для Bootstrap 5:
+            if (typeof bootstrap !== "undefined") {
+                const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+                toast.show();
             }
         }
-        return cookieValue;
     }
-
-    function showNotification(message, type = 'success') {
-        const notification = document.createElement('div');
-        notification.className = `alert alert-${type} notification`;
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            min-width: 300px;
-            padding: 15px 20px;
-            border-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease-out;
-        `;
-        notification.textContent = message;
-
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 300);
-        }, 3000);
-    }
-
-    function updateCartCount(count) {
-        const cartCountElement = document.querySelector('.cart-count');
-        if (cartCountElement) {
-            cartCountElement.textContent = count;
-        }
-    }
-
-    // Add CSS for notifications
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 });

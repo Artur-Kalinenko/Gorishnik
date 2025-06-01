@@ -12,7 +12,7 @@
     <!-- Звезда "Обране" -->
     <div class="favorite-toggle" data-product-id="{{ item.id }}">
         {% if user.is_authenticated and item.id in favorites_ids %}
-            <i class="fas fa-star text-warning"></i>
+            <i class="fas fa-star"></i>
         {% else %}
             <i class="far fa-star"></i>
         {% endif %}

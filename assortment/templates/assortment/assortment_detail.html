@@ -12,7 +12,9 @@
             <li class="breadcrumb-item"><a href="{% url 'welcome' %}" class="text-decoration-none">Головна</a></li>
             <li class="breadcrumb-item"><a href="{% url 'assortment_list' %}" class="text-decoration-none">Каталог</a></li>
             {% for cat in assortment.assortment_categories.all %}
-                <li class="breadcrumb-item"><a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a></li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a>
+                </li>
             {% endfor %}
             <li class="breadcrumb-item active" aria-current="page">{{ assortment.assortment_name }}</li>
         </ol>
@@ -51,9 +53,10 @@
                 {% endif %}
             </div>
         </div>
+
         <!-- Инфо о товаре -->
         <div class="col-md-6 d-flex align-items-center">
-            <div class="product-info d-flex flex-column w-100">
+            <div class="product-info d-flex flex-column w-100" data-product-id="{{ assortment.id }}">
                 <h1 class="montserrat-category-title mb-3">{{ assortment.assortment_name }}</h1>
                 <div class="mb-3">
                     {% for cat in assortment.assortment_categories.all %}
@@ -79,60 +82,80 @@
                         {{ assortment.is_available|yesno:"У наявності,Нема у наявності" }}
                     </span>
                 </div>
-                <div id="price-display" class="mb-2">
+                <!-- Цена -->
+                <div id="price-display-{{ assortment.id }}" class="mb-2">
                     {% if variants.exists %}
                         {% with sorted_variants=variants|dictsort:"price" %}
-                            {% with min_variant=sorted_variants.0 last_variant=sorted_variants|last %}
-                                {% with min_price=min_variant.price max_price=last_variant.price %}
-                                    <p class="fw-bold mb-2 fs-4">
-                                        {{ min_price }} ₴{% if max_price != min_price %} – {{ max_price }} ₴{% endif %}
-                                    </p>
-                                {% endwith %}
+                            {% with min=sorted_variants|first max=sorted_variants|last %}
+                                <span class="price">
+                                    {{ min.price }} ₴
+                                    {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}
+                                </span>
                             {% endwith %}
                         {% endwith %}
                     {% else %}
-                        <p class="fw-bold fs-4">{{ assortment.price }} ₴</p>
+                        <span class="price">{{ assortment.price }} ₴</span>
                     {% endif %}
                 </div>
-                {% if variants.exists %}
-                    <div class="variants mb-4">
-                        <label class="form-label">Оберіть вагу:</label>
-                        <div class="d-flex flex-wrap gap-2 grams-buttons">
-                            {% for variant in variants %}
-                                <button class="category-btn grams-button"
-                                        data-price="{{ variant.price }}"
-                                        data-old-price="{{ variant.old_price }}"
-                                        data-grams="{{ variant.grams }}"
-                                        data-variant-id="{{ variant.id }}">
-                                    {{ variant.grams }}г
-                                </button>
-                            {% endfor %}
-                        </div>
+
+                <!-- Граммовки (если есть) -->
+                {% if variants.count > 1 %}
+                    <div class="grams-buttons mb-3">
+                        {% for variant in variants %}
+                            <button class="gram-button category-btn d-inline-flex align-items-center justify-content-center"
+                                    data-product-id="{{ assortment.id }}"
+                                    data-variant-id="{{ variant.id }}"
+                                    data-price="{{ variant.price }}">
+                                {{ variant.grams }}г
+                            </button>
+                        {% endfor %}
                     </div>
+                {% elif variants.count == 1 %}
+                    <p class="grams-text mb-2">{{ variants.first.grams }} г</p>
                 {% else %}
-                    <p class="card-text mb-4">{{ assortment.grams }}г</p>
+                    <p class="grams-text mb-2">{{ assortment.grams }} г</p>
                 {% endif %}
-                <div class="action-buttons mb-4 d-flex gap-3 align-items-center" style="gap: 16px;">
-                    <div class="quantity-controls d-flex align-items-center me-3" style="height: 44px;">
-                        <button class="quantity-btn decrease-quantity" type="button">−</button>
-                        <input type="number" min="1" value="1" class="quantity-input text-center mx-2" readonly style="width: 48px;">
-                        <button class="quantity-btn increase-quantity" type="button">+</button>
-                    </div>
-                    <button class="btn btn-secondary btn-lg flex-grow-1 select-variant-btn d-flex align-items-center justify-content-center" disabled style="display: block;">
-                        Оберіть вагу
-                    </button>
-                    <button class="btn btn-primary btn-lg flex-grow-1 add-to-cart-btn d-flex align-items-center justify-content-center" data-product-id="{{ assortment.id }}" style="display: none;">
-                        <img src="{{ MEDIA_URL }}icons/cart_brown.png"
-                             data-hover="{{ MEDIA_URL }}icons/cart_white.png"
-                             data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                             alt="Кошик"
-                             class="category-icon me-2"
-                             style="width: 24px; height: 24px;">
-                        Додати в кошик
-                    </button>
-                    <div class="favorite-toggle-detail" data-product-id="{{ assortment.id }}" tabindex="0" role="button" aria-label="Додати в обране">
+
+                <!-- Единый блок управления: корзина + избранное -->
+                <div class="cart-row">
+                    {% if variants.count > 1 %}
+                        <div class="cart-switch" id="cart-switch-{{ assortment.id }}">
+                            <div class="select-variant-button-block" id="select-variant-{{ assortment.id }}" style="display: block;">
+                                <button class="select-variant-button category-btn w-100" disabled>Оберіть грамовку</button>
+                            </div>
+                            <div class="cart-controls fade-in" id="controls-{{ assortment.id }}" style="display: none;">
+                                <button class="quantity-btn decrease-quantity" data-product-id="{{ assortment.id }}">−</button>
+                                <input type="number" min="1" value="1" id="quantity-input-{{ assortment.id }}" class="quantity-input" readonly>
+                                <button class="quantity-btn increase-quantity" data-product-id="{{ assortment.id }}">+</button>
+                                <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="{{ assortment.id }}">
+                                    <img src="{{ MEDIA_URL }}icons/cart_brown.png"
+                                         data-hover="{{ MEDIA_URL }}icons/cart_white.png"
+                                         data-original="{{ MEDIA_URL }}icons/cart_brown.png"
+                                         alt="В корзину"
+                                         class="category-icon"
+                                         style="width: 24px; height: 24px;">
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="cart-controls" id="controls-{{ assortment.id }}">
+                            <button class="quantity-btn decrease-quantity" data-product-id="{{ assortment.id }}">−</button>
+                            <input type="number" min="1" value="1" id="quantity-input-{{ assortment.id }}" class="quantity-input text-center mx-1" readonly>
+                            <button class="quantity-btn increase-quantity" data-product-id="{{ assortment.id }}">+</button>
+                            <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="{{ assortment.id }}"
+                                {% if variants.count == 1 %} data-variant-id="{{ variants.first.id }}"{% endif %}>
+                                <img src="{{ MEDIA_URL }}icons/cart_brown.png"
+                                     data-hover="{{ MEDIA_URL }}icons/cart_white.png"
+                                     data-original="{{ MEDIA_URL }}icons/cart_brown.png"
+                                     alt="В корзину"
+                                     class="category-icon"
+                                     style="width: 24px; height: 24px;">
+                            </button>
+                        </div>
+                    {% endif %}
+                    <div class="favorite-toggle-detail" data-product-id="{{ assortment.id }}">
                         {% if user.is_authenticated and assortment.id in favorites_ids %}
-                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star"></i>
                         {% else %}
                             <i class="far fa-star"></i>
                         {% endif %}
@@ -141,6 +164,7 @@
             </div>
         </div>
     </div>
+
     <!-- Описание на всю ширину -->
     <div class="row mt-4">
         <div class="col-12">
@@ -154,12 +178,12 @@
     <!-- Отзывы -->
     <div class="reviews-section mt-5">
         <h3 class="mb-4">Відгуки</h3>
-        
         {% if reviews %}
             <div class="reviews-list">
                 {% for review in reviews %}
                     <div class="review-card border rounded p-3 mb-3">
                         <div class="d-flex justify-content-between align-items-start">
+                            {% if not edit_mode or edit_review.id != review.id %}
                             <div>
                                 <h5 class="mb-1">{{ review.user.first_name|default:review.user.email }}</h5>
                                 <div class="rating mb-2">
@@ -173,24 +197,46 @@
                                 </div>
                                 <p class="text-muted small">{{ review.created_at|date:"d.m.Y H:i" }}</p>
                             </div>
+                            {% endif %}
                             {% if user.is_authenticated and review.user == user %}
                                 <div class="review-actions">
                                     {% if edit_mode and edit_review.id == review.id %}
-                                        <form method="post" class="edit-review-form">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="edit_review_id" value="{{ review.id }}">
-                                            {{ form.as_p }}
-                                            <div class="mt-2">
-                                                <button type="submit" class="btn btn-sm btn-primary">Оновити</button>
-                                                <a href="{% url 'assortment_detail' assortment.id %}" class="btn btn-sm btn-secondary">Скасувати</a>
+                                        <div class="edit-review-row">
+                                            <div class="previous-review">
+                                                <div>
+                                                    <h5 class="mb-1">{{ review.user.first_name|default:review.user.email }}</h5>
+                                                    <div class="rating mb-2">
+                                                        {% for _ in "12345" %}
+                                                            {% if forloop.counter <= review.rating %}
+                                                                <i class="fas fa-star text-warning"></i>
+                                                            {% else %}
+                                                                <i class="far fa-star text-warning"></i>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <p class="text-muted small">{{ review.created_at|date:"d.m.Y H:i" }}</p>
+                                                </div>
+                                                <div class="previous-review-title mt-3">Ваш попередній відгук:</div>
+                                                <div class="previous-review-text">{{ review.comment }}</div>
                                             </div>
-                                        </form>
+                                            <div class="edit-review-section">
+                                                <form method="post" class="edit-review-form">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="edit_review_id" value="{{ review.id }}">
+                                                    {{ form.as_p }}
+                                                    <div class="mt-2">
+                                                        <button type="submit" class="btn btn-sm btn-primary">Оновити</button>
+                                                        <a href="{% url 'assortment_detail' assortment.id %}" class="btn btn-sm btn-secondary">Скасувати</a>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
                                     {% else %}
                                         <div class="btn-group">
                                             <a href="?edit={{ review.id }}" class="btn btn-sm btn-outline-primary">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="{% url 'delete_review' review.id %}" 
+                                            <a href="{% url 'delete_review' review.id %}"
                                                class="btn btn-sm btn-outline-danger"
                                                onclick="return confirm('Ви впевнені, що хочете видалити відгук?');">
                                                 <i class="fas fa-trash"></i>
@@ -201,7 +247,9 @@
                             {% endif %}
                         </div>
                         {% if review.comment %}
-                            <p class="review-comment mt-2">{{ review.comment }}</p>
+                            {% if not edit_mode or edit_review.id != review.id %}
+                                <p class="review-comment mt-2">{{ review.comment }}</p>
+                            {% endif %}
                         {% endif %}
                     </div>
                 {% endfor %}
