@@ -31,29 +31,29 @@ class AssortmentVariantInlineFormSet(BaseInlineFormSet):
                 if price in [None, Decimal('0.00')]:
                     raise ValidationError("Кожен варіант повинен мати вказану ціну.")
 
-            all_have_old_price = all(
-                form.cleaned_data.get('old_price') not in [None, Decimal('0.00')]
-                for form in valid_forms
-            )
+            # all_have_old_price = all(
+            #     form.cleaned_data.get('old_price') not in [None, Decimal('0.00')]
+            #     for form in valid_forms
+            # )
 
-            none_have_old_price = all(
-                form.cleaned_data.get('old_price') in [None, Decimal('0.00')]
-                for form in valid_forms
-            )
+            # none_have_old_price = all(
+            #     form.cleaned_data.get('old_price') in [None, Decimal('0.00')]
+            #     for form in valid_forms
+            # )
 
-            if all_have_old_price:
-                self.instance.is_discounted = True
-            elif none_have_old_price:
-                self.instance.is_discounted = False
-            else:
-                raise ValidationError("Усі варіанти акційного товару повинні мати заповнене поле old_price або жоден.")
+            # if all_have_old_price:
+            #     self.instance.is_discounted = True
+            # elif none_have_old_price:
+            #     self.instance.is_discounted = False
+            # else:
+            #     raise ValidationError("Усі варіанти акційного товару повинні мати заповнене поле old_price або жоден.")
 
 
 class AssortmentVariantInline(admin.TabularInline):
     model = AssortmentVariant
     formset = AssortmentVariantInlineFormSet
     extra = 1
-    fields = ['grams', 'price', 'old_price']
+    fields = ['grams', 'price']  # 'old_price'
     min_num = 0
     max_num = 10
 
@@ -76,8 +76,8 @@ class AssortmentImageInline(admin.TabularInline):
 class AssortmentAdmin(admin.ModelAdmin):
     form = AssortmentAdminForm
 
-    list_display = ['preview', 'assortment_name', 'get_categories', 'producer', 'price', 'old_price', 'is_discounted', 'is_available']
-    list_filter = ['producer', 'is_available', 'is_discounted']
+    list_display = ['preview', 'assortment_name', 'get_categories', 'producer', 'price', 'is_available'] # 'old_price', 'is_discounted',
+    list_filter = ['producer', 'is_available'] # 'is_discounted'
     search_fields = ['assortment_name']
     inlines = [AssortmentImageInline, AssortmentVariantInline]
     filter_horizontal = ['filters', 'tags', 'assortment_categories']
@@ -92,14 +92,14 @@ class AssortmentAdmin(admin.ModelAdmin):
         }),
         ('Ціни та доступність', {
             'fields': (
-                'price', 'old_price', 'grams',
-                'is_available', 'is_discounted', 'has_variants'
+                'price', 'grams',
+                'is_available', 'has_variants'
             )
         }),
         ('Інше', {
             'fields': ('popularity', 'created_at')
         }),
-    )
+    ) # 'old_price', 'is_discounted'
 
     def get_categories(self, obj):
         return ", ".join([cat.category for cat in obj.assortment_categories.all()])
@@ -111,10 +111,10 @@ class AssortmentAdmin(admin.ModelAdmin):
         return "-"
     preview.short_description = 'Зображення'
 
-    def save_model(self, request, obj, form, change):
-        if not obj.has_variants and obj.old_price:
-            obj.is_discounted = True
-        super().save_model(request, obj, form, change)
+    # def save_model(self, request, obj, form, change):
+    #     if not obj.has_variants and obj.old_price:
+    #         obj.is_discounted = True
+    #     super().save_model(request, obj, form, change)
 
 
 @admin.register(Category)

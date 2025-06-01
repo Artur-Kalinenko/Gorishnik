@@ -58,11 +58,6 @@ function attachQuantityHandlers(productId) {
         addToCartBtn.onclick = (e) => {
             const variantId = addToCartBtn.getAttribute('data-variant-id') || null;
             const grams = addToCartBtn.getAttribute('data-grams') || '';
-            // Не даём добавить в корзину без выбранной граммовки
-            if (!variantId && addToCartBtn.hasAttribute('data-variant-id')) {
-                showCartToast('Оберіть грамовку перед додаванням!');
-                return;
-            }
             addToCart(productId, parseInt(input.value, 10), variantId, grams);
             input.value = 1;
         };
@@ -71,17 +66,9 @@ function attachQuantityHandlers(productId) {
 
 // Главный обработчик
 document.addEventListener('DOMContentLoaded', () => {
-    // Скрыть все cart-controls, показать select-variant-button-block
-    document.querySelectorAll('.cart-switch').forEach(cartSwitch => {
-        const selectVariantBlock = cartSwitch.querySelector('.select-variant-button-block');
-        const cartControls = cartSwitch.querySelector('.cart-controls');
-        if (selectVariantBlock && cartControls) {
-            cartControls.style.display = 'none';
-            selectVariantBlock.style.display = 'block';
-        }
-    });
+    const selectedVariants = {};
 
-    // При выборе граммовки
+    // Обработка граммовки
     document.querySelectorAll('.gram-button').forEach(button => {
         button.addEventListener('click', event => {
             const btn = event.currentTarget;
@@ -90,8 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const price = btn.dataset.price;
             const card = btn.closest('.product-card');
             const cartSwitch = card.querySelector(`#cart-switch-${productId}`);
-            const selectVariantBlock = cartSwitch.querySelector('.select-variant-button-block');
-            const cartControls = cartSwitch.querySelector('.cart-controls');
+
+            selectedVariants[productId] = variantId;
 
             // Обновление цены
             const priceDisplay = document.getElementById(`price-display-${productId}`);
@@ -104,18 +91,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 .forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
 
-            // Показать cart-controls, скрыть select-variant-button-block
-            if (selectVariantBlock && cartControls) {
-                selectVariantBlock.style.display = 'none';
-                cartControls.style.display = 'flex';
-                // Обновить data-variant-id и data-grams у кнопки корзины
-                const addToCartBtn = cartControls.querySelector('.add-to-cart');
-                if (addToCartBtn) {
-                    addToCartBtn.setAttribute('data-variant-id', variantId);
-                    addToCartBtn.setAttribute('data-grams', btn.textContent.trim());
-                }
+            if (cartSwitch) {
+                cartSwitch.innerHTML = `
+                    <div class="cart-controls fade-in" id="controls-${productId}">
+                        <button class="quantity-btn decrease-quantity" data-product-id="${productId}">−</button>
+                        <input type="number" min="1" value="1" id="quantity-input-${productId}" class="quantity-input" readonly>
+                        <button class="quantity-btn increase-quantity" data-product-id="${productId}">+</button>
+                        <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="${productId}" data-variant-id="${variantId}" data-grams="${btn.textContent.trim()}">
+                            <img src="/media/icons/cart_brown.png" data-hover="/media/icons/cart_white.png" data-original="/media/icons/cart_brown.png" alt="В корзину" class="category-icon" style="width: 24px; height: 24px;">
+                        </button>
+                    </div>
+                `;
+                attachQuantityHandlers(productId);
             }
-            attachQuantityHandlers(productId);
         });
     });
 

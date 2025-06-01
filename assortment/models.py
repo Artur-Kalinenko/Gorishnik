@@ -27,10 +27,10 @@ class Assortment(models.Model):
         max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна продукту',
         help_text='Залишити порожнім, якщо товар має варіанти'
     )
-    old_price = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна',
-        help_text='Вкажіть стару ціну, якщо товар акційний'
-    )
+    # old_price = models.DecimalField(
+    #     max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна',
+    #     help_text='Вкажіть стару ціну, якщо товар акційний'
+    # )
     grams = models.IntegerField(
         null=True, blank=True, verbose_name='Грамовка продукту',
         help_text='Вкажіть вагу у грамах, якщо товар без варіантів'
@@ -53,9 +53,9 @@ class Assortment(models.Model):
         default=False, verbose_name='Чи є варіанти продукту',
         help_text='Відмітьте, якщо у товару є різні грамовки'
     )
-    is_discounted = models.BooleanField(
-        default=False, verbose_name='Акційний товар'
-    )
+    # is_discounted = models.BooleanField(
+    #     default=False, verbose_name='Акційний товар'
+    # )
     popularity = models.PositiveIntegerField(
         default=0, verbose_name='Популярність'
     )
@@ -77,11 +77,11 @@ class Assortment(models.Model):
         if not self.has_variants and not self.price:
             raise ValidationError("Необхідно або вказати ціну, або активувати 'є варіанти'.")
 
-        if self.has_variants and self.old_price:
-            raise ValidationError("У товару з варіантами не може бути вказана стара ціна безпосередньо в товарі.")
+        # if self.has_variants and self.old_price:
+        #     raise ValidationError("У товару з варіантами не може бути вказана стара ціна безпосередньо в товарі.")
 
-        if not self.has_variants:
-            self.is_discounted = bool(self.old_price)
+        # if not self.has_variants:
+        #     self.is_discounted = bool(self.old_price)
 
         if self.grams is not None and self.grams <= 0:
             raise ValidationError("Грамовка повинна бути більше 0.")
@@ -107,7 +107,7 @@ class AssortmentVariant(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='variants', verbose_name='Продукт')
     grams = models.IntegerField(verbose_name='Грамовка продукту')
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Ціна за грамовку')
-    old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна')
+    # old_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name='Стара ціна')
 
     def __str__(self):
         return f'{self.grams}г - ₴{self.price}'

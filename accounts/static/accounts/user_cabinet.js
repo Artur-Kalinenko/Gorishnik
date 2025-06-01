@@ -7,45 +7,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Обработка избранного только в кабинете
+    // Добавляем обработчик для избранного
     document.querySelectorAll('.favorite-toggle').forEach(el => {
-        el.addEventListener('click', function (e) {
+        el.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-
-            const productId = this.dataset.productId;
-
-            fetch(`/favorites/toggle/${productId}/`, {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            })
-            .then(response => {
-                if (response.status === 403) {
-                    alert('Для того, щоб додати товар у "Обрані товари", будь ласка, увійдіть або зареєструйтесь.');
-                    return;
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-
-                if (data.status === 'added') {
-                    this.innerHTML = '<i class="fas fa-star text-warning"></i>';
-                    showFavoriteToast('Товар додано в обране', true);
-                } else if (data.status === 'removed') {
-                    this.innerHTML = '<i class="far fa-star"></i>';
-                    showFavoriteToast('Товар видалено з обраного', false);
-
-                    const cardWrapper = this.closest('.col-md-4') || this.closest('.col-sm-12') || this.closest('.col-lg-4');
-                    if (cardWrapper) {
-                        cardWrapper.remove();
-                        rebuildFavoritesCarousel(true);
-                    }
-                }
-            })
-            .catch(() => {
-                alert('Помилка при додаванні в обрані.');
-            });
+            handleFavoriteToggle(this);
         });
     });
 });

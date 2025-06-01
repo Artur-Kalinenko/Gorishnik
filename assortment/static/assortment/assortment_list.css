@@ -2,48 +2,276 @@
 
 /* === Стили ассортимента === */
 
-.btn-group-container {
+:root {
+    --card-bg: #f8f6f3;
+    --choco: #7b4b27;
+}
+
+/* Product Card Styles */
+.product-card {
+    position: relative;
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 12px 12px 18px 12px;
+    min-height: 420px;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    height: 100%;
     display: flex;
-    gap: 5px;
-    justify-content: center;
-}
-
-.quantity-input {
-    width: 50px;
-    text-align: center;
-    border: none;
-    font-weight: bold;
-}
-
-.btn-group-container .btn {
-    flex-grow: 1;
+    flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .product-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.grams-button.selected {
-    background-color: #0d6efd;
-    color: white;
-    border-color: #0d6efd;
+/* Product Image */
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    transition: transform 0.3s ease;
 }
 
-.favorite-toggle {
+.product-card:hover .product-image {
+    transform: scale(1.02);
+}
+
+/* Product Info */
+.product-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.product-name {
+    font-family: 'Comfortaa', cursive;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.product-link {
+    color: var(--accent-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.product-link:hover {
+    color: var(--accent);
+}
+
+/* Category Buttons */
+.category-button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+/* Price Block */
+.price-block {
+    margin: 12px 0;
+    font-family: 'Comfortaa', cursive;
+}
+
+.price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+    margin-right: 8px;
+}
+
+/* Универсальный стиль для маленьких кнопок */
+.btn-choco {
+    background: #f3ede7;
+    color: var(--choco);
+    border: 1.5px solid var(--choco);
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+.btn-choco:hover, .btn-choco:active, .btn-choco.selected {
+    background: var(--choco);
+    color: #fff;
+    border-color: var(--choco);
+}
+
+/* Кнопки граммовок */
+.grams-buttons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+    min-height: 36px;
+    justify-content: center;
+}
+.gram-button {
+    min-width: 38px;
+    max-width: 80px;
+    font-size: 0.85rem;
+    padding: 3px 8px;
+    margin-bottom: 2px;
     cursor: pointer;
-    font-size: 1.4rem;
+    background: #f3ede7;
+    color: var(--choco);
+    border: 1.5px solid var(--choco);
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+.gram-button.btn-primary,
+.gram-button.selected {
+    background: var(--choco);
+    color: #fff;
+    border-color: var(--choco);
+}
+.gram-button:hover {
+    background: var(--choco);
+    color: #fff;
+    border-color: var(--choco);
+}
+
+/* Кнопки управления корзиной */
+.cart-controls, .cart-switch, .cart-controls-placeholder {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+}
+.quantity-btn, .add-to-cart {
+    height: 44px;
+    min-width: 44px;
+    max-width: 100%;
+    font-size: 1.1rem;
+    padding: 0 0.7em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.quantity-btn, .add-to-cart {
+    composes: btn-choco;
+}
+.add-to-cart {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.quantity-btn {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+.quantity-input {
+    height: 44px;
+    min-width: 44px;
+    max-width: 60px;
+    font-size: 1.1rem;
+    margin: 0 2px;
+    border-radius: 8px;
+    border: 1.5px solid var(--choco);
+    color: var(--choco);
+    background: #f3ede7;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Badges */
+.badge {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 6px;
+    top: 12px;
+    left: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+.badge-new {
+    background: #4CAF50;
+    color: white;
+}
+
+.badge-sale {
+    background: #FF5722;
+    color: white;
+}
+
+/* Favorite Toggle */
+.favorite-toggle {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: white;
     border-radius: 50%;
-    z-index: 10;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+    z-index: 2;
+}
+
+.favorite-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .favorite-toggle i {
-    color: #ffcc00;
+    font-size: 1.2rem;
+    color: #FFD700;
+    transition: all 0.2s ease;
+}
+
+.favorite-toggle:hover i {
+    transform: scale(1.1);
+}
+
+/* Select Variant Button */
+.select-variant-button {
+    width: 100%;
+    padding: 8px 16px;
+    background: #f5f5f5;
+    color: #666;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: not-allowed;
+}
+
+.select-variant-button:not([disabled]) {
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+}
+
+.select-variant-button:not([disabled]):hover {
+    background: var(--accent-dark);
 }
 
 /* === Обёртка для кнопок категорий === */
@@ -191,4 +419,35 @@
 .card-price {
     color: var(--highlight);
     font-weight: bold;
+}
+
+/* Сетка карточек — чуть компактнее */
+#product-grid.row {
+    row-gap: 18px;
+    column-gap: 0px;
+}
+
+.product-card {
+    margin-bottom: 0;
+}
+
+@media (max-width: 600px) {
+    .cart-controls, .cart-switch, .cart-controls-placeholder {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+    .add-to-cart, .quantity-btn, .quantity-input {
+        width: 100%;
+        min-width: 0;
+        margin-left: 0 !important;
+    }
+}
+
+.cart-controls-wrapper {
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
 }

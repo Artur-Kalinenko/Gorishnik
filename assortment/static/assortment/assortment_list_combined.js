@@ -3,7 +3,6 @@ function initAssortmentPage() {
     setupGramsButtons();
     setupCartControls();
     setupCardHover();
-    setupFavorites();
     initFilterToggles();
     setupProducerFilterClicks();
 }
@@ -48,14 +47,32 @@ function setupGramsButtons() {
                 container.className = 'd-flex align-items-center justify-content-center btn-group-container';
                 container.id = `controls-${productId}`;
                 container.innerHTML = `
-                    <button class="btn btn-primary decrease-quantity" data-product-id="${productId}">−</button>
+                    <button class="quantity-btn decrease-quantity" data-product-id="${productId}">−</button>
                     <input type="number" min="1" value="1" id="quantity-input-${productId}" class="quantity-input text-center" readonly>
-                    <button class="btn btn-primary increase-quantity" data-product-id="${productId}">+</button>
-                    <button class="btn btn-primary add-to-cart" data-product-id="${productId}" data-variant-id="${variantId}">В корзину</button>
-                `;
+                    <button class="quantity-btn increase-quantity" data-product-id="${productId}">+</button>
+                    <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="${productId}" data-variant-id="${variantId}">
+                        <img src="/media/icons/cart_brown.png" data-hover="/media/icons/cart_white.png" data-original="/media/icons/cart_brown.png" alt="В корзину" class="category-icon" style="width: 24px; height: 24px;">
+                    </button>`;
                 const cardBody = event.target.closest('.card-body');
                 cardBody.appendChild(container);
                 attachQuantityHandlers(productId);
+                
+                // Initialize hover effect for the newly added cart icon
+                const newCartIcon = container.querySelector('img[data-hover]');
+                if (newCartIcon) {
+                    const originalSrc = newCartIcon.getAttribute("src");
+                    const hoverSrc = newCartIcon.dataset.hover;
+                    const container = newCartIcon.closest("button");
+                    
+                    if (hoverSrc && container) {
+                        container.addEventListener("mouseenter", () => {
+                            newCartIcon.setAttribute("src", hoverSrc);
+                        });
+                        container.addEventListener("mouseleave", () => {
+                            newCartIcon.setAttribute("src", originalSrc);
+                        });
+                    }
+                }
             }
         });
     });
@@ -138,43 +155,6 @@ function setupCardHover() {
         });
         card.classList.add('fade-in');
     });
-}
-
-// === Избранное ===
-function setupFavorites() {
-    if (!window.IS_USER_CABINET) {
-        document.querySelectorAll('.favorite-toggle').forEach(el => {
-            el.addEventListener('click', function () {
-                const productId = this.dataset.productId;
-
-                fetch(`/favorites/toggle/${productId}/`, {
-                    method: 'GET',
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                })
-                .then(response => {
-                    if (response.status === 403) {
-                        const toastEl = document.getElementById('loginToast');
-                        if (toastEl) new bootstrap.Toast(toastEl).show();
-                        return;
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (!data) return;
-                    if (data.status === 'added') {
-                        this.innerHTML = '<i class="fas fa-star text-warning"></i>';
-                        showFavoriteToast('Товар додано в обране', true);
-                    } else if (data.status === 'removed') {
-                        this.innerHTML = '<i class="far fa-star"></i>';
-                        showFavoriteToast('Товар видалено з обраного', false);
-                    }
-                })
-                .catch(error => {
-                    console.error('Помилка при додаванні в обрані:', error);
-                });
-            });
-        });
-    }
 }
 
 // === Плюсики фильтров ===

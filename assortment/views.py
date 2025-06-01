@@ -27,7 +27,7 @@ def assortment_list(request):
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
-    discounted_only = request.GET.get('discounted') == '1'
+    # discounted_only = request.GET.get('discounted') == '1'
     new_only = request.GET.get('new') == '1'
     my_favorites_only = request.GET.get('my_favorites') == '1'
 
@@ -42,8 +42,8 @@ def assortment_list(request):
         for filter_id in selected_filter_ids:
             assortments = assortments.filter(filters__id=filter_id)
 
-    if discounted_only:
-        assortments = assortments.filter(is_discounted=True)
+    # if discounted_only:
+    #     assortments = assortments.filter(is_discounted=True)
 
     if new_only:
         assortments = assortments.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
@@ -141,7 +141,7 @@ def assortment_list(request):
         'filter_groups': filter_groups,
         'selected_filter_ids': selected_filter_ids,
         'query': query,
-        'discounted_only': discounted_only,
+        # 'discounted_only': discounted_only,
         'new_only': new_only,
         'favorites_ids': favorites_ids,
         'active_producers': active_producers,
@@ -218,6 +218,12 @@ def assortment_detail(request, pk):
         else:
             form = ReviewForm(instance=edit_review) if edit_mode else (ReviewForm() if not user_review else None)
 
+    # Получаем список избранных товаров
+    if request.user.is_authenticated:
+        favorites_ids = list(request.user.favorites.values_list('product_id', flat=True))
+    else:
+        favorites_ids = []
+
     context = {
         'assortment': assortment,
         'variants': variants,
@@ -227,6 +233,7 @@ def assortment_detail(request, pk):
         'edit_mode': edit_mode,
         'edit_review': edit_review,
         'images': images,
+        'favorites_ids': favorites_ids,  # Добавляем список избранных товаров в контекст
     }
 
     return render(request, 'assortment/assortment_detail.html', context)
