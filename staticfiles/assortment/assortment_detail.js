@@ -222,6 +222,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Интерактивные звёзды рейтинга ---
+    const stars = document.querySelectorAll('#ratingStars > .star');
+    const ratingInput = document.getElementById('ratingInput');
+    let currentRating = 0;
+
+    stars.forEach((star, idx) => {
+        star.addEventListener('mouseenter', () => {
+            // Подсвечиваем только до наведённой включительно
+            stars.forEach((s, i) => {
+                if (i <= idx) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+        });
+        star.addEventListener('mouseleave', () => {
+            // Возвращаем к текущему выбранному рейтингу
+            stars.forEach((s, i) => {
+                if (i < currentRating) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+        });
+        star.addEventListener('click', () => {
+            currentRating = idx + 1;
+            ratingInput.value = currentRating;
+            // Отразить выбранные
+            stars.forEach((s, i) => {
+                if (i < currentRating) s.classList.add('selected');
+                else s.classList.remove('selected');
+            });
+        });
+    });
+
+// Инициализация текущей подсветки при загрузке (если была ошибка валидации и рейтинг вернулся)
+if (ratingInput && ratingInput.value > 0) {
+    currentRating = parseInt(ratingInput.value, 10);
+    stars.forEach((s, i) => {
+        if (i < currentRating) s.classList.add('selected');
+        else s.classList.remove('selected');
+    });
+}
+
     // --- Счетчик символов для textarea отзыва ---
     function bindCounter(textareaId, counterId, max) {
         var textarea = document.getElementById(textareaId);

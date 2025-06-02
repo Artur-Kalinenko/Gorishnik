@@ -1,3 +1,5 @@
+{% load dict_extras %}
+
 <form method="get" id="filter-form">
     {% if selected_category %}
         <input type="hidden" name="category" value="{{ selected_category }}">
@@ -41,13 +43,21 @@
             </h5>
             <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
                 {% for option in group.options.all %}
+                    {% with count=option_counts|get_item:option.id %}
+                    {% with total=option_total_dict|get_item:option.id %}
                     <div class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" name="filters" value="{{ option.id }}"
+                        <input class="form-check-input"
+                               type="checkbox"
+                               name="filters"
+                               value="{{ option.id }}"
                                {% if option.id in selected_filter_ids %}checked{% endif %}>
                         <label class="form-check-label">
-                            {{ option.name }} ({{ option.count_in_category }})
+                            {{ option.name }}
+                            ({% if option.id in selected_filter_ids %}{{ count|default:0 }}{% else %}{{ total|default:0 }}{% endif %})
                         </label>
                     </div>
+                    {% endwith %}
+                    {% endwith %}
                 {% endfor %}
             </div>
         </div>
@@ -58,14 +68,42 @@
             <h5 class="filter-header">Виробники</h5>
             <div class="d-flex flex-wrap gap-2">
                 {% for producer in active_producers %}
-                    <label style="cursor: pointer; opacity: {% if producer.id|stringformat:'s' in selected_producer_ids %}1{% else %}0.4{% endif %};">
-                        <input type="checkbox" name="producer" value="{{ producer.id }}"
-                               class="d-none"
-                               {% if producer.id|stringformat:"s" in selected_producer_ids %}checked{% endif %}>
-                        <img src="{{ producer.producer_img.url }}"
-                             alt="{{ producer.producer_name }}"
-                             style="height: 50px; width: 50px; object-fit: contain;">
-                    </label>
+                    {% if producer.id|stringformat:"s" in selected_producer_ids %}
+                        {% comment %}Выбранный{% endcomment %}
+                        <label style="
+                            cursor: pointer;
+                            opacity: 1;
+                            border: 2px solid #7a4e2d;
+                            border-radius: 8px;
+                            padding: 2px;
+                            margin-bottom: 2px;
+                            transition: border .2s, opacity .2s;
+                        ">
+                            <input type="checkbox" name="producer" value="{{ producer.id }}"
+                                   class="d-none"
+                                   checked>
+                            <img src="{{ producer.producer_img.url }}"
+                                 alt="{{ producer.producer_name }}"
+                                 style="height: 50px; width: 50px; object-fit: contain;">
+                        </label>
+                    {% else %}
+                        {% comment %}Не выбранный{% endcomment %}
+                        <label style="
+                            cursor: pointer;
+                            opacity: 0.4;
+                            border: 2px solid #ccc;
+                            border-radius: 8px;
+                            padding: 2px;
+                            margin-bottom: 2px;
+                            transition: border .2s, opacity .2s;
+                        ">
+                            <input type="checkbox" name="producer" value="{{ producer.id }}"
+                                   class="d-none">
+                            <img src="{{ producer.producer_img.url }}"
+                                 alt="{{ producer.producer_name }}"
+                                 style="height: 50px; width: 50px; object-fit: contain;">
+                        </label>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>

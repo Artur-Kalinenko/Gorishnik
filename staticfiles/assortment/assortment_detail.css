@@ -388,23 +388,38 @@ input.quantity-input:focus, input.quantity-input:hover {
     font-weight: 700;
 }
 .review-form textarea {
-    border-radius: var(--border-radius-md);
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    border-radius: 14px;
     border: 2px solid var(--accent);
-    font-family: inherit;
-    font-size: 1.05rem;
-    padding: 0.7rem 1rem;
-    margin-bottom: 1.2rem;
     background: #fff;
     color: var(--accent-dark);
-    resize: vertical;
+    font-size: 1.13rem;
+    padding: 1.05rem 1.2rem;
+    transition: border-color .22s;
 }
-.review-form textarea:focus {
-    border-color: var(--accent-dark);
-    outline: none;
+
+.review-form textarea:focus,
+.review-form textarea:focus-visible {
+    border-color: var(--accent-dark) !important;
+    outline: none !important;
 }
 .review-form input[type="radio"] {
     accent-color: var(--accent-dark);
     margin-right: 0.3em;
+}
+.textarea-wrapper {
+    position: relative;
+}
+.char-count {
+    position: absolute;
+    right: 1.4rem;
+    bottom: 0.9rem;
+    font-size: 1.01rem;
+    color: #a89b8b;
+    pointer-events: none;
+    background: transparent;
 }
 .review-form .rating label {
     margin-right: 1.2em;
@@ -423,23 +438,35 @@ input.quantity-input:focus, input.quantity-input:hover {
 .review-form button[type="submit"] {
     background: var(--accent-dark);
     color: #fff;
-    border-radius: var(--border-radius-md);
-    border: none;
-    font-family: 'Comfortaa', cursive;
+    border-radius: 14px;
+    padding: 0.95rem 2.8rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    font-size: 1.1rem;
-    padding: 0.7rem 2.2rem;
-    box-shadow: 0 2px 8px rgba(90,70,40,0.07);
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background .2s, color .2s;
+    transition: background .18s, box-shadow .18s;
+    box-shadow: 0 6px 18px rgba(90,70,40,0.13);
 }
 .review-form button[type="submit"]:hover {
     background: var(--accent);
     color: #fff;
+    box-shadow: 0 8px 24px rgba(90,70,40,0.22);
 }
+
+.form-error-message {
+    display: inline-block;
+    margin: 0.5em 0 0.7em 0.3em;
+    padding: 0.3em 0.8em;
+    background: #fde7e7;
+    color: #d63c3c;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    font-weight: 500;
+    box-shadow: 0 1px 6px rgba(214,60,60,0.07);
+    border: 1px solid #f5b3b3;
+    /* Не расширяться на всю ширину! */
+    max-width: 330px;
+    white-space: normal;
+}
+
 
 /* ==== Кнопки "удалить" ==== */
 .review-delete-btn {
@@ -481,6 +508,28 @@ input.quantity-input:focus, input.quantity-input:hover {
 }
 .review-delete-btn.active .review-delete-icon {
     filter: none;
+}
+
+/* === Кастомные звёзды рейтинга === */
+.rating-stars {
+    display: flex;
+    gap: 10px;
+    font-size: 2rem;
+    margin-bottom: 1.2rem;
+    cursor: pointer;
+}
+.rating-stars .star {
+    color: #e0e0e0;
+    transition: color 0.18s, transform 0.18s;
+}
+
+.rating-stars .star.selected {
+    color: #f7b300;
+    transform: scale(1.11);
+}
+.rating-stars .star:hover {
+    color: #f7b300;
+    transform: scale(1.11);
 }
 
 /* ==== Breadcrumb ==== */
@@ -598,3 +647,4 @@ input.quantity-input:focus, input.quantity-input:hover {
     color: var(--accent);
     border-color: var(--accent);
 }
+

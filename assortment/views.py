@@ -39,8 +39,7 @@ def assortment_list(request):
         current_category = all_categories.filter(category=selected_category).first()
 
     if selected_filter_ids:
-        for filter_id in selected_filter_ids:
-            assortments = assortments.filter(filters__id=filter_id)
+        assortments = assortments.filter(filters__id__in=selected_filter_ids)
 
     # if discounted_only:
     #     assortments = assortments.filter(is_discounted=True)
@@ -63,23 +62,27 @@ def assortment_list(request):
             Q(filters__group__name__icontains=query)
         ).distinct()
 
-    variant_qs = AssortmentVariant.objects.filter(assortment=OuterRef('pk'))
+    # ------ Сохраняем состояние ассортимента без учета производителей ------
+    base_assortments = assortments
 
-    if sort == 'price_desc':
-        price_subquery = Subquery(variant_qs.order_by('-price').values('price')[:1])
-    else:
-        price_subquery = Subquery(variant_qs.order_by('price').values('price')[:1])
-
-
+    # ------ Фильтрация по производителям ------
     selected_producer_ids = request.GET.getlist('producer')
     if selected_producer_ids:
         assortments = assortments.filter(producer__id__in=selected_producer_ids)
 
-    active_producers = Producer.objects.filter(
-        assortment__in=assortments
+    # ------ Получаем всех производителей для САЙДБАРА ------
+    sidebar_producers = Producer.objects.filter(
+        assortment__in=base_assortments
     ).distinct().annotate(
-        product_count=Count('assortment', filter=Q(assortment__in=assortments))
+        product_count=Count('assortment', filter=Q(assortment__in=base_assortments))
     )
+
+    # ------ Считаем цены ------
+    variant_qs = AssortmentVariant.objects.filter(assortment=OuterRef('pk'))
+    if sort == 'price_desc':
+        price_subquery = Subquery(variant_qs.order_by('-price').values('price')[:1])
+    else:
+        price_subquery = Subquery(variant_qs.order_by('price').values('price')[:1])
 
     assortments = assortments.annotate(
         effective_price=Case(
@@ -103,22 +106,28 @@ def assortment_list(request):
     elif sort == 'rating':
         assortments = assortments.order_by(OrderBy(F('avg_rating'), descending=True, nulls_last=True))
 
-    filtered_assortment_ids = assortments.values_list('id', flat=True)
+    filtered_assortment_ids = list(assortments.values_list('id', flat=True))
 
-    filtered_options = FilterOption.objects.filter(
-        products__id__in=filtered_assortment_ids
-    ).annotate(
-        count_in_category=Count(
-            'products',
-            filter=Q(products__id__in=filtered_assortment_ids)
+    # Получаем все группы и все опции (НЕ только встречающиеся в выборке)
+    all_filter_groups = FilterGroup.objects.prefetch_related('options')
+    option_counts = (
+        FilterOption.objects
+        .annotate(
+            count_in_category=Count(
+                'products',
+                filter=Q(products__id__in=filtered_assortment_ids)
+            )
         )
-    ).distinct()
-
-    filter_groups = FilterGroup.objects.filter(
-        options__in=filtered_options
-    ).distinct().prefetch_related(
-        Prefetch('options', queryset=filtered_options)
     )
+    option_counts_dict = {o.id: o.count_in_category for o in option_counts}
+
+    option_counts_total = (
+        FilterOption.objects
+        .annotate(
+            total_count=Count('products')
+        )
+    )
+    option_total_dict = {o.id: o.total_count for o in option_counts_total}
 
     if request.user.is_authenticated:
         favorites_ids = list(request.user.favorites.values_list('product_id', flat=True))
@@ -138,16 +147,17 @@ def assortment_list(request):
         'selected_category': selected_category,
         'current_category': current_category,
         'total_products': total_products,
-        'filter_groups': filter_groups,
+        'filter_groups': all_filter_groups,  # всегда все группы и опции
+        'option_counts': option_counts_dict, # словарь с количеством товаров для каждой опции
+        'option_total_dict': option_total_dict,
         'selected_filter_ids': selected_filter_ids,
         'query': query,
         # 'discounted_only': discounted_only,
         'new_only': new_only,
         'favorites_ids': favorites_ids,
-        'active_producers': active_producers,
-        'selected_producer_ids': request.GET.getlist('producer'),
+        'active_producers': sidebar_producers,  # <-- вот этот список теперь всегда правильный!
+        'selected_producer_ids': selected_producer_ids,
     })
-
 
 
 def assortment_detail(request, pk):

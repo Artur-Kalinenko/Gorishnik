@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load assortment_extras %}
+{% load dict_extras %}
 
 {% block title %}
     {% if current_category %}
@@ -119,4 +120,5 @@
 
 <link rel="stylesheet" href="{% static 'assortment/assortment_list.css' %}">
 <script src="{% static 'assortment/product_card.js' %}"></script>
+<script src="{% static 'assortment/assortment_list_filters.js' %}"></script>
 {% endblock %}
