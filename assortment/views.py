@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models.expressions import OrderBy
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.views.decorators.http import require_GET
 from django.db.models import Q, Prefetch, Count, Case, When, F, Subquery, OuterRef, DecimalField, Avg
 from django.contrib.auth.decorators import login_required
@@ -176,47 +176,24 @@ def assortment_detail(request, pk):
         viewed[str(pk)] = timezone.now().isoformat()
         request.session['viewed_products'] = viewed
 
-    # Подготовка формы отзыва
+    # Форма для отзыва
     form = None
     user_review = None
-    edit_mode = False
-    edit_review = None
 
     if request.user.is_authenticated:
         user_review = Review.objects.filter(user=request.user, assortment=assortment).first()
-        edit_id = request.GET.get('edit')
-
-        # Редактирование отзыва
-        if edit_id:
-            edit_review = get_object_or_404(Review, id=edit_id, user=request.user, assortment=assortment)
-            edit_mode = True
-
-        if request.method == 'POST':
-            if 'edit_review_id' in request.POST:
-                # Обновление существующего отзыва
-                edit_review = get_object_or_404(
-                    Review, id=request.POST['edit_review_id'], user=request.user, assortment=assortment
-                )
-                form = ReviewForm(request.POST, instance=edit_review)
-                if form.is_valid():
-                    form.save()
-                    messages.success(request, "Відгук оновлено!")
-                    return redirect('assortment_detail', pk=pk)
-                edit_mode = True
-            elif not user_review:
-                # Добавление нового отзыва
-                form = ReviewForm(request.POST)
-                if form.is_valid():
-                    review = form.save(commit=False)
-                    review.user = request.user
-                    review.assortment = assortment
-                    review.save()
-                    messages.success(request, "Ваш відгук додано!")
-                    return redirect('assortment_detail', pk=pk)
-            else:
-                form = ReviewForm(instance=edit_review) if edit_review else None
+        if request.method == 'POST' and not user_review:
+            # Добавление нового отзыва
+            form = ReviewForm(request.POST)
+            if form.is_valid():
+                review = form.save(commit=False)
+                review.user = request.user
+                review.assortment = assortment
+                review.save()
+                messages.success(request, "Ваш відгук додано!")
+                return redirect('assortment_detail', pk=pk)
         else:
-            form = ReviewForm(instance=edit_review) if edit_mode else (ReviewForm() if not user_review else None)
+            form = ReviewForm() if not user_review else None
 
     # Получаем список избранных товаров
     if request.user.is_authenticated:
@@ -230,30 +207,17 @@ def assortment_detail(request, pk):
         'reviews': reviews,
         'form': form,
         'user_review': user_review,
-        'edit_mode': edit_mode,
-        'edit_review': edit_review,
         'images': images,
-        'favorites_ids': favorites_ids,  # Добавляем список избранных товаров в контекст
+        'favorites_ids': favorites_ids,
     }
 
     return render(request, 'assortment/assortment_detail.html', context)
 
 @login_required
-def edit_review_view(request, review_id):
-    review = get_object_or_404(Review, id=review_id, user=request.user)
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Відгук оновлено.')
-            return redirect('assortment_detail', pk=review.assortment.pk)
-    else:
-        form = ReviewForm(instance=review)
-    return render(request, 'reviews/edit_review.html', {'form': form, 'review': review})
-
-@login_required
 def delete_review_view(request, review_id):
-    review = get_object_or_404(Review, id=review_id, user=request.user)
+    review = get_object_or_404(Review, id=review_id)
+    if review.user != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("Ви не маєте права видаляти цей відгук.")
     assortment_id = review.assortment.pk
     review.delete()
     messages.success(request, 'Відгук видалено.')

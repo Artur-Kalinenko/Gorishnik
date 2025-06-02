@@ -162,19 +162,42 @@
 
 /* === Количество === */
 .quantity-input {
-    text-align: center;
-    width: 44px;
-    min-width: 44px;
-    max-width: 60px;
-    font-size: 1.1rem;
-    border-radius: 8px;
-    border: 2px solid var(--accent);
-    color: var(--accent-dark);
-    background: #f3ede7;
-    font-weight: 600;
-    margin: 0 2px;
-    display: inline-block;
-    box-sizing: border-box;
+    position: unset !important;
+    top: unset !important;
+    width: 48px !important;
+    min-width: 44px !important;
+    max-width: 56px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+    font-size: 1rem !important;
+    font-family: inherit !important;
+    text-align: center !important;
+    border: 2px solid var(--accent) !important;
+    border-radius: 10px !important;
+    background: #f3ede7 !important;
+    color: var(--accent-dark) !important;
+    margin: 0 2px !important;
+    padding: 0 2px !important;
+    box-sizing: border-box !important;
+    vertical-align: middle !important;
+    overflow: visible !important;
+    display: inline-block !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input.quantity-input:focus, input.quantity-input:hover {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--accent) !important;
 }
 
 /* === Цена === */

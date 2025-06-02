@@ -451,3 +451,7 @@
     width: 100%;
     justify-content: center;
 }
+
+.category-btn:hover img.category-icon {
+    filter: brightness(0) invert(1);
+}
