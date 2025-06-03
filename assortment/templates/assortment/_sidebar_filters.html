@@ -8,6 +8,36 @@
         <input type="hidden" name="q" value="{{ query }}">
     {% endif %}
 
+    {% if active_producers %}
+        <div class="filter-group mb-3">
+            <h5 class="filter-header">Виробники</h5>
+            <div class="d-flex flex-wrap gap-2">
+                {% for producer in active_producers %}
+                    {% if producer.id|stringformat:"s" in selected_producer_ids %}
+                        {% comment %}Выбранный{% endcomment %}
+                        <label class="producer-label producer-label--selected">
+                            <input type="checkbox" name="producer" value="{{ producer.id }}"
+                                   class="d-none"
+                                   checked>
+                            <img src="{{ producer.producer_img.url }}"
+                                 alt="{{ producer.producer_name }}"
+                                 class="producer-img">
+                        </label>
+                    {% else %}
+                        {% comment %}Не выбранный{% endcomment %}
+                        <label class="producer-label">
+                            <input type="checkbox" name="producer" value="{{ producer.id }}"
+                                   class="d-none">
+                            <img src="{{ producer.producer_img.url }}"
+                                 alt="{{ producer.producer_name }}"
+                                 class="producer-img">
+                        </label>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
     <!-- 🔽 Специальные фильтры -->
     <div class="filter-group mb-3">
         <h5 class="filter-header">Додатково</h5>
@@ -17,17 +47,17 @@
 <!--                       {% if request.GET.discounted %}checked{% endif %}>-->
 <!--                <label class="form-check-label">Акційні пропозиції</label>-->
 <!--            </div>-->
-            <div class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" name="new" value="1"
-                       {% if request.GET.new %}checked{% endif %}>
-                <label class="form-check-label">Новинки</label>
-            </div>
+            <label class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
+                <span class="custom-checkbox"></span>
+                <span class="form-check-label">Новинки</span>
+            </label>
             {% if user.is_authenticated %}
-            <div class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" name="my_favorites" value="1"
-                       {% if request.GET.my_favorites == "1" %}checked{% endif %}>
-                <label class="form-check-label">Мої обрані товари</label>
-            </div>
+            <label class="form-check mb-1">
+                <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
+                <span class="custom-checkbox"></span>
+                <span class="form-check-label">Мої обрані товари</span>
+            </label>
         {% endif %}
 
         </div>
@@ -45,69 +75,24 @@
                 {% for option in group.options.all %}
                     {% with count=option_counts|get_item:option.id %}
                     {% with total=option_total_dict|get_item:option.id %}
-                    <div class="form-check mb-1">
+                    <label class="form-check mb-1">
                         <input class="form-check-input"
                                type="checkbox"
                                name="filters"
                                value="{{ option.id }}"
                                {% if option.id in selected_filter_ids %}checked{% endif %}>
-                        <label class="form-check-label">
+                        <span class="custom-checkbox"></span>
+                        <span class="form-check-label">
                             {{ option.name }}
                             ({% if option.id in selected_filter_ids %}{{ count|default:0 }}{% else %}{{ total|default:0 }}{% endif %})
-                        </label>
-                    </div>
+                        </span>
+                    </label>
                     {% endwith %}
                     {% endwith %}
                 {% endfor %}
             </div>
         </div>
     {% endfor %}
-
-    {% if active_producers %}
-        <div class="filter-group mb-3">
-            <h5 class="filter-header">Виробники</h5>
-            <div class="d-flex flex-wrap gap-2">
-                {% for producer in active_producers %}
-                    {% if producer.id|stringformat:"s" in selected_producer_ids %}
-                        {% comment %}Выбранный{% endcomment %}
-                        <label style="
-                            cursor: pointer;
-                            opacity: 1;
-                            border: 2px solid #7a4e2d;
-                            border-radius: 8px;
-                            padding: 2px;
-                            margin-bottom: 2px;
-                            transition: border .2s, opacity .2s;
-                        ">
-                            <input type="checkbox" name="producer" value="{{ producer.id }}"
-                                   class="d-none"
-                                   checked>
-                            <img src="{{ producer.producer_img.url }}"
-                                 alt="{{ producer.producer_name }}"
-                                 style="height: 50px; width: 50px; object-fit: contain;">
-                        </label>
-                    {% else %}
-                        {% comment %}Не выбранный{% endcomment %}
-                        <label style="
-                            cursor: pointer;
-                            opacity: 0.4;
-                            border: 2px solid #ccc;
-                            border-radius: 8px;
-                            padding: 2px;
-                            margin-bottom: 2px;
-                            transition: border .2s, opacity .2s;
-                        ">
-                            <input type="checkbox" name="producer" value="{{ producer.id }}"
-                                   class="d-none">
-                            <img src="{{ producer.producer_img.url }}"
-                                 alt="{{ producer.producer_name }}"
-                                 style="height: 50px; width: 50px; object-fit: contain;">
-                        </label>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
 
 
     <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">

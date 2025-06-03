@@ -62,8 +62,8 @@
 }
 
 .favorite-toggle.active, .favorite-toggle:hover, .favorite-toggle:focus {
-    background: var(--accent-dark);
-    border-color: var(--accent-dark);
+    background: var(--accent);
+    border-color: var(--accent);
 }
 
 .favorite-toggle.active .fa-star,

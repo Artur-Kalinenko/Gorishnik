@@ -1,0 +1,198 @@
+.sidebar {
+    background: var(--white);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(60, 35, 20, 0.04);
+    padding: 30px 18px 24px 18px;
+    margin: 0 0 32px 0;
+    transition: box-shadow 0.3s ease;
+}
+
+.sidebar:hover {
+    box-shadow: 0 6px 24px rgba(60, 35, 20, 0.08);
+}
+
+.filter-header {
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+    position: relative;
+    padding-bottom: 8px;
+}
+
+.filter-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-dark);
+    transition: width 0.3s ease;
+}
+
+.filter-header:hover::after {
+    width: 100%;
+}
+
+.filter-group {
+    margin-bottom: 28px;
+    transition: all 0.3s ease;
+}
+
+.filter-group:hover {
+    transform: translateX(4px);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.form-check-input {
+    display: none;
+}
+
+.custom-checkbox {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--accent-dark);
+    border-radius: 7px;
+    background: var(--bg-main);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+}
+
+.form-check-input:checked + .custom-checkbox {
+    border-color: var(--accent);
+    background: var(--bg-main);
+}
+
+.custom-checkbox::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 3px;
+    background: none;
+    border: none;
+    box-sizing: border-box;
+    transition: all 0.15s;
+    position: absolute;
+    left: 4px;
+    top: 2px;
+}
+
+.form-check-input:checked + .custom-checkbox::after {
+    content: '\2714';
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: bold;
+    width: auto;
+    height: auto;
+    left: 2px;
+    top: 0px;
+}
+
+.form-check-label {
+    font-size: 1.1rem;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+    position: relative;
+    top: 2px;
+}
+
+.form-check:hover .form-check-label {
+    color: var(--accent);
+}
+
+.producer-label {
+    display: inline-block;
+    background: var(--bg-main);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(60, 35, 20, 0.08);
+    transition: all 0.3s ease;
+    padding: 2px;
+    margin-bottom: 2px;
+    margin-right: 5px;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    opacity: 0.4;
+    overflow: hidden;
+}
+
+.producer-label--selected {
+    border: 2px solid #7a4e2d;
+    opacity: 1;
+    background: var(--bg-main);
+}
+
+.producer-label:hover,
+.producer-label--selected:hover {
+    border: 2px solid var(--accent);
+    box-shadow: 0 6px 24px rgba(122, 78, 45, 0.18);
+    opacity: 1;
+    transform: scale(1.07) translateY(-2px);
+    background: #fff8f0;
+}
+
+.producer-img {
+    height: 50px;
+    width: 50px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+    display: block;
+}
+
+.producer-label:hover .producer-img,
+.producer-label--selected:hover .producer-img {
+    transform: scale(1.12);
+}
+
+#clear-filters {
+    padding: 16px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 14px;
+    border-width: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 4px rgba(228, 155, 46, 0.08);
+    width: 100%;
+    background: var(--bg-main);
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+#clear-filters:hover {
+    background: var(--accent);
+    color: var(--white);
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(122, 78, 45, 0.15);
+}
+
+.toggle-icon {
+    font-size: 1.2rem;
+    color: var(--accent);
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.filter-header:hover .toggle-icon {
+    transform: translateX(4px);
+}
