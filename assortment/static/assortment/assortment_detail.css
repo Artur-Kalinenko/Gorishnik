@@ -212,6 +212,10 @@ body {
     font-size: 1.1rem;
 }
 
+.select-variant-button {
+    cursor: not-allowed;
+}
+
 /* Избранное: квадратная кнопка с выровненной иконкой */
 .favorite-toggle-detail {
     width: 44px !important;

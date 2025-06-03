@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils import timezone
 from datetime import timedelta
+from collections import defaultdict
 
 def chunked(iterable, size):
     for i in range(0, len(iterable), size):
@@ -21,39 +22,28 @@ def chunked(iterable, size):
 
 
 def assortment_list(request):
+    # 1. Базовые параметры
     all_categories = Category.objects.all().order_by('created_at')
-
     selected_category = request.GET.get('category')
-    selected_filter_ids = list(map(int, request.GET.getlist('filters')))
+    selected_filter_ids = list(map(int, request.GET.getlist('filters')))  # список выбранных option.id
+    selected_producer_ids = request.GET.getlist('producer')
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
-    # discounted_only = request.GET.get('discounted') == '1'
     new_only = request.GET.get('new') == '1'
     my_favorites_only = request.GET.get('my_favorites') == '1'
 
-    assortments = Assortment.objects.all()
-    current_category = None
+    # 2. Базовая выборка (до фильтров)
+    base_assortments = Assortment.objects.all()
 
+    current_category = None
     if selected_category:
-        assortments = assortments.filter(assortment_categories__category=selected_category)
+        base_assortments = base_assortments.filter(
+            assortment_categories__category=selected_category
+        )
         current_category = all_categories.filter(category=selected_category).first()
 
-    if selected_filter_ids:
-        assortments = assortments.filter(filters__id__in=selected_filter_ids)
-
-    # if discounted_only:
-    #     assortments = assortments.filter(is_discounted=True)
-
-    if new_only:
-        assortments = assortments.filter(created_at__gte=timezone.now() - timezone.timedelta(days=30))
-
-    if my_favorites_only and request.user.is_authenticated:
-        from favorites.models import Favorite
-        favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
-        assortments = assortments.filter(id__in=favorite_ids)
-
     if query:
-        assortments = assortments.filter(
+        base_assortments = base_assortments.filter(
             Q(assortment_name__icontains=query) |
             Q(assortment_description__icontains=query) |
             Q(assortment_categories__category__icontains=query) |
@@ -62,22 +52,93 @@ def assortment_list(request):
             Q(filters__group__name__icontains=query)
         ).distinct()
 
-    # ------ Сохраняем состояние ассортимента без учета производителей ------
-    base_assortments = assortments
+    if new_only:
+        base_assortments = base_assortments.filter(
+            created_at__gte=timezone.now() - timezone.timedelta(days=30)
+        )
 
-    # ------ Фильтрация по производителям ------
-    selected_producer_ids = request.GET.getlist('producer')
+    if my_favorites_only and request.user.is_authenticated:
+        from favorites.models import Favorite
+        favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
+        base_assortments = base_assortments.filter(id__in=favorite_ids)
+
+    # 3. Фильтруем по производителям (но еще не по фильтрам)
+    assortment_for_facet = base_assortments
     if selected_producer_ids:
-        assortments = assortments.filter(producer__id__in=selected_producer_ids)
+        assortment_for_facet = assortment_for_facet.filter(producer__id__in=selected_producer_ids)
 
-    # ------ Получаем всех производителей для САЙДБАРА ------
+    # 4. Применяем выбранные фильтры к товарам (итоговый список) с учётом группировки
+    assortments = assortment_for_facet
+
+    if selected_filter_ids:
+        # Сначала сгруппируем выбранные filter_id по group_id
+        all_options = FilterOption.objects.select_related('group').all()
+        option_group_map = {opt.id: opt.group_id for opt in all_options}
+
+        group_to_option_ids = defaultdict(list)
+        for opt_id in selected_filter_ids:
+            grp_id = option_group_map.get(opt_id)
+            if grp_id is not None:
+                group_to_option_ids[grp_id].append(opt_id)
+
+        # Теперь для каждой группы из выбранных делаем фильтрацию "filters__id__in [...]"
+        for grp_id, opts_list in group_to_option_ids.items():
+            # ИЛИ внутри этой группы
+            assortments = assortments.filter(filters__id__in=opts_list)
+
+    # После этого данные для итогу:
+    filtered_assortment_ids = list(assortments.values_list('id', flat=True))
+
+    # 5. Производители для сайдбара (до применения фильтров)
     sidebar_producers = Producer.objects.filter(
         assortment__in=base_assortments
     ).distinct().annotate(
         product_count=Count('assortment', filter=Q(assortment__in=base_assortments))
     )
 
-    # ------ Считаем цены ------
+    # === 6. Считаем фасетные счетчики для всех опций ===
+    all_filter_groups = FilterGroup.objects.prefetch_related('options')
+    # all_options мы уже получили выше, но можно ещё раз:
+    all_options = FilterOption.objects.select_related('group').all()
+
+    # Сгруппируем реальные выбранные фильтры по группам:
+    group_selected_options = defaultdict(list)
+    for opt_id in selected_filter_ids:
+        grp_id = option_group_map.get(opt_id)
+        if grp_id:
+            group_selected_options[grp_id].append(opt_id)
+
+    option_counts_dict = {}
+
+    for option in all_options:
+        current_group_id = option.group_id
+
+        # Начинаем с полного набора ассортиментов без фильтров (от объектов без фильтров мы уже сохранили в assortment_for_facet)
+        qs_for_count = assortment_for_facet
+
+        # Для каждой группы строим условие:
+        for grp in all_filter_groups:
+            if grp.id == current_group_id:
+                # внутри «своей» группы подставляем только эту единственную опцию
+                opts_in_this_grp = [option.id]
+            else:
+                # для остальных групп берём реальные выбранные пользователем (если они есть)
+                opts_in_this_grp = group_selected_options.get(grp.id, [])
+
+            if opts_in_this_grp:
+                qs_for_count = qs_for_count.filter(filters__id__in=opts_in_this_grp)
+
+        count = qs_for_count.distinct().count()
+        option_counts_dict[option.id] = count
+
+    # 7. Считаем общее число товаров для каждого фильтра (без учёта выбранных фильтров):
+    option_counts_total = (
+        FilterOption.objects
+        .annotate(total_count=Count('products'))
+    )
+    option_total_dict = {o.id: o.total_count for o in option_counts_total}
+
+    # 8. Считаем цены и рейтинг для ассортиментов
     variant_qs = AssortmentVariant.objects.filter(assortment=OuterRef('pk'))
     if sort == 'price_desc':
         price_subquery = Subquery(variant_qs.order_by('-price').values('price')[:1])
@@ -95,6 +156,7 @@ def assortment_list(request):
         avg_rating=Avg('reviews__rating'),
     ).prefetch_related('variants').distinct()
 
+    # 9. Сортировка
     if sort == 'price_asc':
         assortments = assortments.order_by('effective_price')
     elif sort == 'price_desc':
@@ -104,31 +166,9 @@ def assortment_list(request):
     elif sort == 'popular':
         assortments = assortments.order_by('-popularity')
     elif sort == 'rating':
-        assortments = assortments.order_by(OrderBy(F('avg_rating'), descending=True, nulls_last=True))
+        assortments = assortments.order_by(Avg('reviews__rating').desc(nulls_last=True))
 
-    filtered_assortment_ids = list(assortments.values_list('id', flat=True))
-
-    # Получаем все группы и все опции (НЕ только встречающиеся в выборке)
-    all_filter_groups = FilterGroup.objects.prefetch_related('options')
-    option_counts = (
-        FilterOption.objects
-        .annotate(
-            count_in_category=Count(
-                'products',
-                filter=Q(products__id__in=filtered_assortment_ids)
-            )
-        )
-    )
-    option_counts_dict = {o.id: o.count_in_category for o in option_counts}
-
-    option_counts_total = (
-        FilterOption.objects
-        .annotate(
-            total_count=Count('products')
-        )
-    )
-    option_total_dict = {o.id: o.total_count for o in option_counts_total}
-
+    # 10. Избранные товары пользователя
     if request.user.is_authenticated:
         favorites_ids = list(request.user.favorites.values_list('product_id', flat=True))
     else:
@@ -147,17 +187,17 @@ def assortment_list(request):
         'selected_category': selected_category,
         'current_category': current_category,
         'total_products': total_products,
-        'filter_groups': all_filter_groups,  # всегда все группы и опции
-        'option_counts': option_counts_dict, # словарь с количеством товаров для каждой опции
+        'filter_groups': all_filter_groups,
+        'option_counts': option_counts_dict,     # фасетные счётчики (после правки)
         'option_total_dict': option_total_dict,
         'selected_filter_ids': selected_filter_ids,
         'query': query,
-        # 'discounted_only': discounted_only,
         'new_only': new_only,
         'favorites_ids': favorites_ids,
-        'active_producers': sidebar_producers,  # <-- вот этот список теперь всегда правильный!
+        'active_producers': sidebar_producers,
         'selected_producer_ids': selected_producer_ids,
     })
+
 
 
 def assortment_detail(request, pk):

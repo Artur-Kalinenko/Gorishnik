@@ -14,7 +14,6 @@
             <div class="d-flex flex-wrap gap-2">
                 {% for producer in active_producers %}
                     {% if producer.id|stringformat:"s" in selected_producer_ids %}
-                        {% comment %}Выбранный{% endcomment %}
                         <label class="producer-label producer-label--selected">
                             <input type="checkbox" name="producer" value="{{ producer.id }}"
                                    class="d-none"
@@ -24,7 +23,6 @@
                                  class="producer-img">
                         </label>
                     {% else %}
-                        {% comment %}Не выбранный{% endcomment %}
                         <label class="producer-label">
                             <input type="checkbox" name="producer" value="{{ producer.id }}"
                                    class="d-none">
@@ -42,28 +40,22 @@
     <div class="filter-group mb-3">
         <h5 class="filter-header">Додатково</h5>
         <div class="filter-options">
-<!--            <div class="form-check mb-1">-->
-<!--                <input class="form-check-input" type="checkbox" name="discounted" value="1"-->
-<!--                       {% if request.GET.discounted %}checked{% endif %}>-->
-<!--                <label class="form-check-label">Акційні пропозиції</label>-->
-<!--            </div>-->
             <label class="form-check mb-1">
                 <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
                 <span class="custom-checkbox"></span>
                 <span class="form-check-label">Новинки</span>
             </label>
             {% if user.is_authenticated %}
-            <label class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
-                <span class="custom-checkbox"></span>
-                <span class="form-check-label">Мої обрані товари</span>
-            </label>
-        {% endif %}
-
+                <label class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
+                    <span class="custom-checkbox"></span>
+                    <span class="form-check-label">Мої обрані товари</span>
+                </label>
+            {% endif %}
         </div>
     </div>
 
-    <!-- 🔽 Основные фильтры -->
+    <!-- 🔽 Основные фильтры по группам -->
     {% for group in filter_groups %}
         <div class="filter-group mb-3">
             <h5 class="filter-header d-flex justify-content-between align-items-center"
@@ -71,31 +63,54 @@
                 {{ group.name }}
                 <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
             </h5>
+
+            {# Скрываем блок с опциями группы, пока он «свернут» #}
             <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
+                {# Первоначально показываем только «доступные» опции #}
                 {% for option in group.options.all %}
                     {% with count=option_counts|get_item:option.id %}
-                    {% with total=option_total_dict|get_item:option.id %}
-                    <label class="form-check mb-1">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               name="filters"
-                               value="{{ option.id }}"
-                               {% if option.id in selected_filter_ids %}checked{% endif %}>
-                        <span class="custom-checkbox"></span>
-                        <span class="form-check-label">
-                            {{ option.name }}
-                            ({% if option.id in selected_filter_ids %}{{ count|default:0 }}{% else %}{{ total|default:0 }}{% endif %})
-                        </span>
-                    </label>
-                    {% endwith %}
+                        {% if count == 0 and not option.id in selected_filter_ids %}
+                            {# «Недоступная» опция: прячем её с помощью классов unavailable + hidden #}
+                            <label class="form-check mb-1 unavailable hidden">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="filters"
+                                       value="{{ option.id }}"
+                                       disabled>
+                                <span class="custom-checkbox"></span>
+                                <span class="form-check-label">
+                                    {{ option.name }} ({{ count|default:0 }})
+                                </span>
+                            </label>
+                        {% else %}
+                            {# «Доступная» или уже выбранная опция: показываем как обычно #}
+                            <label class="form-check mb-1">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="filters"
+                                       value="{{ option.id }}"
+                                       {% if option.id in selected_filter_ids %}checked{% endif %}>
+                                <span class="custom-checkbox"></span>
+                                <span class="form-check-label">
+                                    {{ option.name }} ({{ count|default:0 }})
+                                </span>
+                            </label>
+                        {% endif %}
                     {% endwith %}
                 {% endfor %}
+
+                {# Кнопка показать «недоступные» опции, если такие вообще присутствуют #}
+                <button type="button"
+                        class="btn btn-link btn-sm show-unavailable"
+                        data-group-id="{{ group.id }}">
+                    Показати недоступні фільтри
+                </button>
             </div>
         </div>
     {% endfor %}
-
 
     <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
         Очистити фільтри
     </button>
 </form>
+
