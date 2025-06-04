@@ -1,0 +1,117 @@
+/* Payment pages styling */
+
+.checkout-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.checkout-container h2 {
+    color: var(--accent-dark);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.checkout-container p {
+    color: var(--text-main);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* LiqPay payment form styling */
+form[action*="liqpay.ua"] {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+form[action*="liqpay.ua"] input[type="image"] {
+    transition: transform 0.2s ease;
+}
+
+form[action*="liqpay.ua"] input[type="image"]:hover {
+    transform: scale(1.05);
+}
+
+/* Order details styling */
+.order-details {
+    background-color: var(--bg-subnav);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 1.5rem 0;
+}
+
+.order-details p {
+    margin-bottom: 0.8rem;
+    text-align: left;
+}
+
+.order-details strong {
+    color: var(--accent-dark);
+}
+
+/* Payment status messages */
+.payment-status {
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+.payment-status.success {
+    background-color: var(--soft-yellow);
+    border: 2px solid var(--green);
+}
+
+.payment-status.error {
+    background-color: #ffebee;
+    border: 2px solid #c0392b;
+}
+
+/* Return to home button */
+.return-home-btn {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    margin: 2rem auto 0 auto;
+    background-color: var(--accent-dark);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    font-size: 1.15rem;
+    height: 48px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    cursor: pointer;
+    line-height: 48px;
+}
+.return-home-btn:hover, .return-home-btn:focus {
+    background-color: var(--accent);
+    color: var(--white);
+    text-decoration: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .checkout-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .checkout-container h2 {
+        font-size: 1.5rem;
+    }
+    
+    .checkout-container p {
+        font-size: 1rem;
+    }
+}

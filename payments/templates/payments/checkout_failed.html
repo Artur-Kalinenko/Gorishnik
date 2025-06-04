@@ -1,8 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block content %}
-<div class="container text-center mt-5">
+<div class="checkout-container">
     <h2>Оплата не вдалася</h2>
     <p>Щось пішло не так під час обробки платежу. Спробуйте ще раз.</p>
-    <a href="{% url 'cart' %}" class="btn btn-primary mt-3">Повернутись до кошика</a>
+    <a href="{% url 'cart' %}" class="return-home-btn">Повернутись до кошика</a>
 </div>
+<link rel="stylesheet" href="{% static 'payments/payment.css' %}">
 {% endblock %}

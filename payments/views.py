@@ -70,3 +70,9 @@ def checkout_done_view(request):
 # Отображается после неудачной оплаты
 def checkout_failed_view(request):
     return render(request, 'payments/checkout_failed.html')
+
+def order_success_view(request, order_id):
+    return render(request, 'payments/order_success.html', {'order_id': order_id})
+
+def order_invoice_view(request, order_id):
+    return render(request, 'payments/order_invoice.html', {'order_id': order_id})

@@ -20,6 +20,7 @@ def checkout_view(request):
         if form.is_valid():
             cd = form.cleaned_data
             delivery_method = cd['delivery_method']
+            payment_method = cd['payment_method']
 
             address = ''
             city_ref = None
@@ -51,6 +52,8 @@ def checkout_view(request):
 
             elif delivery_method == 'pickup':
                 address = 'Самовивіз'
+
+            additional_notes = cd.get('additional_notes', '')
 
             order = Order.objects.create(
                 user=request.user if request.user.is_authenticated else None,
@@ -91,6 +94,10 @@ Email: {cd['email']}
 Місто (НП): {city_name}
 Відділення (НП): {warehouse_name}
 
+Спосіб оплати: {dict(form.fields['payment_method'].choices).get(payment_method, '')}
+
+Додаткові побажання: {additional_notes}
+
 Замовлені товари:
 {items_text}
 Загальна сума: {order.total_price()} грн
@@ -105,7 +112,12 @@ Email: {cd['email']}
             )
 
             cart.items.all().delete()
-            return redirect('order_payment', order_id=order.id)
+            if payment_method == 'cod':
+                return redirect('order_success', order_id=order.id)
+            elif payment_method == 'online':
+                return redirect('order_payment', order_id=order.id)
+            elif payment_method == 'invoice':
+                return redirect('order_invoice', order_id=order.id)
 
     else:
         form = OrderForm()

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="checkout-container">
+    <h2>Ваше замовлення оформлено!</h2>
+    <p>Дякуємо за замовлення. Ми вже працюємо над його відправкою.</p>
+    <a href="/" class="return-home-btn">Повернутись на головну</a>
+</div>
+<link rel="stylesheet" href="{% static 'payments/payment.css' %}">
+{% endblock %}
