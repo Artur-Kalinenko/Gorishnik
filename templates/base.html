@@ -225,42 +225,59 @@
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <div class="modal-header">
-          <h5 class="modal-title">Увійти</h5>
+          <h5 class="modal-title">Вхід до акаунту</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
         </div>
         <div class="modal-body">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-            {{ login_form.non_field_errors }}
-            <div class="mb-3">
-                {{ login_form.identifier.label_tag }}
-                {{ login_form.identifier }}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+          {{ login_form.non_field_errors }}
+          <div class="mb-3">
+            <label for="id_identifier" class="form-label">Email або телефон</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-person"></i></span>
+              {{ login_form.identifier }}
             </div>
-            <div class="mb-3">
-                {{ login_form.password.label_tag }}
-                {{ login_form.password }}
+          </div>
+          <div class="mb-3">
+            <label for="id_password" class="form-label">Пароль</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-lock"></i></span>
+              {{ login_form.password }}
             </div>
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="{% url 'password_reset_request' %}" class="btn btn-link p-0">Забули пароль?</a>
-            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{% url 'password_reset_request' %}" class="btn btn-link p-0">Забули пароль?</a>
+          </div>
         </div>
+
+        <!-- Вот тут modal-footer: три кнопки одна за другой -->
         <div class="modal-footer flex-column">
           <button type="submit" class="btn btn-primary w-100 mb-2">Увійти</button>
-          <a href="{% url 'register' %}" class="btn btn-outline-success w-100">Реєстрація</a>
+          
+          <div class="divider">
+            <span>Ще немає акаунту?</span>
+          </div>
+          
+          <a href="{% url 'register' %}" class="btn btn-outline-success w-100 mb-2">Реєстрація</a>
+          
+          <div class="divider">
+            <span>або</span>
+          </div>
+          
+          <!-- Кнопка Google сразу после них, без лишних отступов -->
+          <button type="button" class="btn btn-danger w-100" onclick="saveSessionAndRedirect()">
+            <i class="bi bi-google"></i> Увійти через Google
+          </button>
         </div>
       </form>
-
-      <div class="px-4 pb-4">
-        <button type="button" class="btn btn-danger w-100" onclick="saveSessionAndRedirect()">
-            <i class="bi bi-google"></i> Увійти через Google
-        </button>
-      </div>
     </div>
   </div>
 </div>
+
 
 <!-- Футер -->
 <footer class="footer mt-5 text-center py-3 border-top">

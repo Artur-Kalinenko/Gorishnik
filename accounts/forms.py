@@ -48,8 +48,24 @@ class RegistrationForm(forms.Form):
         return cleaned_data
 
 class LoginForm(forms.Form):
-    identifier = forms.CharField(label='Email або телефон')
-    password = forms.CharField(label='Пароль', widget=forms.PasswordInput)
+    identifier = forms.CharField(
+        label='Email або телефон',
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Введіть email або телефон'
+            }
+        )
+    )
+    password = forms.CharField(
+        label='Пароль',
+        widget=forms.PasswordInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Введіть пароль'
+            }
+        )
+    )
 
 # --- Сброс пароля ---
 class PasswordResetRequestForm(forms.Form):

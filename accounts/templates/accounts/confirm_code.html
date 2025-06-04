@@ -4,8 +4,8 @@
 {% block title %}{{ title|default:"Підтвердження коду" }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="mb-4">{{ title|default:"Підтвердження коду" }}</h2>
+<div class="confirm-container">
+    <h2>{{ title|default:"Підтвердження коду" }}</h2>
     <p>{{ description|default:"Введіть 6-значний код, надісланий вам на пошту." }}</p>
 
     {% if messages %}
@@ -19,9 +19,12 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
 
-        <div class="mb-3">
-            {{ form.code.label_tag }}
-            {{ form.code }}
+        <div class="form-group">
+            <label for="id_code">Код підтвердження</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                <input type="text" name="code" id="id_code" class="form-control" maxlength="6" pattern="[0-9]{6}" placeholder="Введіть код" required value="{{ form.code.value|default:'' }}">
+            </div>
             {% if form.code.errors %}
                 <div class="text-danger small">{{ form.code.errors.0 }}</div>
             {% endif %}
@@ -31,20 +34,24 @@
     </form>
 
     <!-- Форма повторної відправки коду -->
-    <form method="post" class="mt-2 d-inline-block" id="resend-form">
-        {% csrf_token %}
-        <input type="hidden" name="resend" value="1">
-        <button type="submit"
-                id="resend-code-btn"
-                class="btn btn-link p-0"
-                data-code-resend
-                data-sent-at="{{ sent_at|default:'' }}"
-                data-is-first="{{ is_first|yesno:'true,false' }}">
-            Надіслати код повторно
-        </button>
-        <span id="timer-placeholder" class="ms-2 text-muted"></span>
-    </form>
+    <div class="resend-center">
+        <form method="post" class="mt-2 d-flex flex-column align-items-center" id="resend-form" style="gap: 0.2rem;">
+            {% csrf_token %}
+            <input type="hidden" name="resend" value="1">
+            <button type="submit"
+                    id="resend-code-btn"
+                    class="btn btn-link p-0"
+                    data-code-resend
+                    data-sent-at="{{ sent_at|default:'' }}"
+                    data-is-first="{{ is_first|yesno:'true,false' }}">
+                Надіслати код повторно
+            </button>
+            <span id="timer-placeholder" class="text-muted" style="margin-top: 0.2em;"></span>
+        </form>
+    </div>
 </div>
 
+<link rel="stylesheet" href="{% static 'accounts/confirm_code.css' %}">
 <script src="{% static 'accounts/confirm_code.js' %}"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 {% endblock %}

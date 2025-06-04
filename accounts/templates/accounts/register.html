@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 {% load form_tags %}
+{% load static %}
 
 {% block content %}
-<!-- Страница регистрации -->
-<div class="container mt-5">
+<div class="register-container">
     <h2>Реєстрація</h2>
 
     <form method="post" novalidate>
@@ -17,54 +17,87 @@
         {% endif %}
 
         <!-- Поле: Имя -->
-        <div class="mb-3">
-            {{ form.first_name.label_tag }}
-            {{ form.first_name|add_class:"form-control" }}
+        <div class="form-group">
+            <label for="id_first_name">Ім'я</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value|default:'' }}" placeholder="Ваше імʼя" required>
+            </div>
             {% for error in form.first_name.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Email -->
-        <div class="mb-3">
-            {{ form.email.label_tag }}
-            {{ form.email|add_class:"form-control" }}
+        <div class="form-group">
+            <label for="id_email">Email</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}" placeholder="Адреса вашої пошти" required>
+            </div>
             {% for error in form.email.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Телефон -->
-        <div class="mb-3">
-            {{ form.phone.label_tag }}
-            {{ form.phone|add_class:"form-control" }}
+        <div class="form-group">
+            <label for="id_phone">Телефон</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="tel" name="phone" id="phone-input" class="form-control" value="{{ form.phone.value|default:'' }}" placeholder="Ваш номер телефону" required>
+            </div>
             {% for error in form.phone.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Пароль -->
-        <div class="mb-3">
-            {{ form.password1.label_tag }}
-            {{ form.password1|add_class:"form-control" }}
+        <div class="form-group">
+            <label for="id_password1">Пароль</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Введіть пароль" required>
+            </div>
             {% for error in form.password1.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Подтверждение пароля -->
-        <div class="mb-3">
-            {{ form.password2.label_tag }}
-            {{ form.password2|add_class:"form-control" }}
+        <div class="form-group">
+            <label for="id_password2">Підтвердження паролю</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Введіть той саме пароль, що і вище" required>
+            </div>
             {% for error in form.password2.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
-        <!-- Кнопка отправки формы -->
+        <!-- Кнопка регистрации -->
         <button type="submit" class="btn btn-primary">Зареєструватися</button>
     </form>
+
+    <div class="divider">
+        <span>Вже є акаунт?</span>
+    </div>
+
+    <!-- Кнопка входа -->
+    <a href="{% url 'login' %}" class="btn btn-outline-success">Увійти</a>
+
+    <div class="divider">
+        <span>або</span>
+    </div>
+
+    <!-- Кнопка входа через Google -->
+    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger">
+        <i class="bi bi-google"></i> Увійти через Google
+    </a>
 </div>
+
+<link rel="stylesheet" href="{% static 'accounts/register.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
 
 <script>
