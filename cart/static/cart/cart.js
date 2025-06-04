@@ -34,6 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Помилка:', error));
     };
 
+    // Функция для показа тоста удаления
+    const showRemoveToast = () => {
+        const removeToast = document.getElementById('removeCartToast');
+        const toast = new bootstrap.Toast(removeToast);
+        toast.show();
+    };
+
     // Удаление товара
     const removeItem = (itemId) => {
         fetch(`/cart/remove/${itemId}/`, {
@@ -48,13 +55,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById(`cart-item-${itemId}`).remove();
                     document.getElementById('cart-total-price').textContent = data.cart_total_price;
 
-                    const cartItems = document.querySelectorAll('tbody tr');
+                    // Показываем тост об удалении
+                    showRemoveToast();
+
+                    // Корректно обновляем иконку корзины в шапке
+                    updateCartItemCount(data.cart_total_quantity);
+
+                    // Проверяем, остались ли товары
+                    const cartTable = document.querySelector('.cart-table');
+                    const cartItems = document.querySelectorAll('.cart-table tbody tr');
                     if (cartItems.length === 0) {
-                        document.querySelector('tbody').innerHTML = `
-                            <tr>
-                                <td colspan="6" class="text-center">Ваша корзина пуста.</td>
-                            </tr>
-                        `;
+                        if (cartTable) cartTable.style.display = 'none';
+                        // Скрываем или удаляем блок с общей суммой
+                        let cartTotalBlock = document.querySelector('.cart-total');
+                        if (cartTotalBlock) cartTotalBlock.style.display = 'none';
+                        let emptyBlock = document.querySelector('.empty-cart');
+                        if (emptyBlock) {
+                            emptyBlock.style.display = 'block';
+                        } else {
+                            // Если блока нет, создаём его
+                            const cartContainer = document.querySelector('.cart-container');
+                            if (cartContainer) {
+                                cartContainer.insertAdjacentHTML('beforeend', `
+                                    <div class="empty-cart">
+                                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                                        <p class="empty-cart-text">Ваша корзина пуста</p>
+                                        <a href="/assortment/" class="checkout-btn">
+                                            <i class="fas fa-arrow-left"></i>
+                                            Перейти к покупкам
+                                        </a>
+                                    </div>
+                                `);
+                            }
+                        }
                     }
                 } else {
                     console.error(data.message || 'Не вдалося видалити товар');

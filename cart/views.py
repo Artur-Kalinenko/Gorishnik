@@ -114,12 +114,14 @@ def remove_from_cart(request, item_id):
         cart_item = get_object_or_404(CartItem, id=item_id, cart=cart)
         cart_item.delete()
 
-        cart = cart_item.cart
+        # Пересчитываем корзину уже после удаления
         cart_total_price = sum(item.total_price() for item in cart.items.all())
+        cart_total_quantity = cart.items.aggregate(total=Sum('quantity'))['total'] or 0
 
         return JsonResponse({
             'success': True,
             'cart_total_price': cart_total_price,
+            'cart_total_quantity': cart_total_quantity,
         })
 
     return JsonResponse({'success': False, 'message': 'Неверный запрос'})
