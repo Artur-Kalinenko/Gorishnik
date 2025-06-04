@@ -1,0 +1,179 @@
+.confirm-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--bg-main);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(122, 78, 45, 0.18);
+    border: 2px solid var(--accent);
+}
+
+.confirm-container h2 {
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-family: 'Comfortaa', cursive;
+}
+
+.confirm-container p {
+    color: var(--accent-dark);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.05rem;
+    font-family: 'Comfortaa', cursive;
+}
+
+.confirm-container .form-group {
+    margin-bottom: 1.2rem;
+}
+
+.confirm-container label {
+    color: var(--accent-dark);
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: block;
+    font-family: 'Comfortaa', cursive;
+}
+
+.confirm-container .input-group {
+    box-shadow: none;
+}
+
+.confirm-container .input-group .input-group-text {
+    background-color: var(--white) !important;
+    border: 2px solid var(--accent) !important;
+    border-right: none !important;
+    border-radius: 10px 0 0 10px !important;
+    color: var(--accent-dark);
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 42px !important;
+    line-height: normal !important;
+}
+
+.confirm-container .form-control {
+    border: 2px solid var(--accent);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    background: var(--white);
+    color: var(--accent-dark);
+    font-family: 'Comfortaa', cursive;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-shadow: none;
+    height: 42px !important;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 0;
+    padding-bottom: 0;
+    line-height: normal !important;
+}
+
+.confirm-container .form-control:focus {
+    outline: none !important;
+    border-color: var(--accent-dark) !important;
+}
+
+.confirm-container .btn-primary {
+    height: 42px !important;
+    font-weight: 700 !important;
+    font-size: 1.1rem !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
+    padding: 0 12px !important;
+    line-height: 1 !important;
+    width: 100% !important;
+    background: var(--accent);
+    border: none;
+    color: var(--white);
+    font-family: 'Comfortaa', cursive;
+    margin-top: 0.5rem;
+}
+
+.confirm-container .btn-primary:hover {
+    background: var(--accent-dark);
+    color: var(--white);
+}
+
+.confirm-container .btn-link {
+    color: var(--accent-dark);
+    font-weight: 600;
+    text-decoration: underline;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+    padding: 0;
+    margin-top: 0.5rem;
+    font-family: 'Comfortaa', cursive;
+}
+
+.confirm-container .btn-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.confirm-container .alert {
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.confirm-container .text-danger {
+    color: #c0392b !important;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.resend-center {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.resend-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    font-family: 'Comfortaa', cursive;
+    font-size: 1.08rem;
+    color: var(--accent-dark);
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+}
+
+.resend-btn {
+    background: none;
+    border: none;
+    color: var(--accent-dark);
+    font-family: 'Comfortaa', cursive;
+    font-size: 1.08rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0 0.2em;
+    transition: color 0.2s;
+    outline: none;
+    box-shadow: none;
+    text-decoration: none;
+    border-radius: 6px;
+}
+
+.resend-btn:hover:not(:disabled) {
+    color: var(--accent);
+    background: rgba(122, 78, 45, 0.07);
+}
+
+#timer-placeholder {
+    color: var(--accent-dark);
+    font-size: 1.08rem;
+    font-family: 'Comfortaa', cursive;
+    opacity: 0.8;
+    margin-left: 0.2em;
+}

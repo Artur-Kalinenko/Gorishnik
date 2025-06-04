@@ -1,41 +1,83 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
-<!-- Форма редактирования профиля -->
 <div class="container mt-5">
-    <h2>Редагування профілю</h2>
+    <div style="max-width: 500px; margin: 2rem auto; padding: 2rem; background: var(--bg-main); border-radius: 18px; box-shadow: 0 8px 32px rgba(122, 78, 45, 0.18); border: 2px solid var(--accent);">
+        <h2 style="color: var(--accent); text-align: center; margin-bottom: 1.5rem; font-weight: 700;">Редагування профілю</h2>
 
-    <form method="post">
-        {% csrf_token %}
+        <form method="post">
+            {% csrf_token %}
 
-        <!-- Сообщения (успех/ошибки) -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            <!-- Сообщения (успех/ошибки) -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" style="border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem;">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Поля формы -->
+            {% for field in form %}
+                <div style="margin-bottom: 1.2rem;">
+                    <label for="{{ field.id_for_label }}" style="color: var(--accent-dark); font-weight: 600; margin-bottom: 0.3rem; display: block;">{{ field.label }}</label>
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <span class="input-group-text" style="background-color: var(--white) !important; border: 2px solid var(--accent) !important; border-right: none !important; border-radius: 10px 0 0 10px !important; color: var(--accent-dark); padding-left: 0.75rem !important; padding-right: 0.75rem !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 42px !important; line-height: normal !important; font-size: 1.2em;">
+                            {% if field.name == 'first_name' or field.name == 'last_name' %}
+                                <i class="bi bi-person"></i>
+                            {% elif field.name == 'email' %}
+                                <i class="bi bi-envelope"></i>
+                            {% elif field.name == 'phone' %}
+                                <i class="bi bi-telephone"></i>
+                            {% else %}
+                                <i class="bi bi-pencil"></i>
+                            {% endif %}
+                        </span>
+                        <input
+                            type="{{ field.field.widget.input_type }}"
+                            name="{{ field.html_name }}"
+                            id="{{ field.id_for_label }}"
+                            class="form-control"
+                            value="{{ field.value|default_if_none:'' }}"
+                            placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}"
+                            {% if field.field.required %}required{% endif %}
+                            style="flex:1; border: 2px solid var(--accent); border-left: none; border-radius: 0 10px 10px 0; background: var(--white); color: var(--accent-dark); font-family: 'Comfortaa', cursive; font-size: 1rem; transition: border-color 0.2s; box-shadow: none; height: 42px; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0; padding-bottom: 0; line-height: normal;"
+                        >
+                    </div>
+                    {% for error in field.errors %}
+                        <div style="color: #c0392b !important; font-size: 0.9rem; margin-top: 0.3rem;">{{ error }}</div>
+                    {% endfor %}
+                </div>
             {% endfor %}
-        {% endif %}
 
-        <!-- Поля формы -->
-        {% for field in form %}
-            <div class="mb-3">
-                {{ field.label_tag }}
-                {{ field }}
-                {% if field.errors %}
-                    <div class="text-danger">{{ field.errors|striptags }}</div>
-                {% endif %}
+            <!-- Кнопки -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--accent); border: none; color: var(--white);">Зберегти</button>
+                <a href="{% url 'user_cabinet' %}" class="btn btn-secondary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--white); border: 2px solid var(--accent); color: var(--accent);">Скасувати</a>
             </div>
-        {% endfor %}
-
-        <!-- Кнопки -->
-        <button type="submit" class="btn btn-primary">Зберегти</button>
-        <a href="{% url 'user_cabinet' %}" class="btn btn-secondary ms-2">Скасувати</a>
-    </form>
+        </form>
+    </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    .form-control:focus {
+        outline: none !important;
+        border-color: var(--accent-dark) !important;
+        box-shadow: none !important;
+    }
+    .btn-primary:hover {
+        background: var(--accent-dark) !important;
+        color: var(--white) !important;
+    }
+    .btn-secondary:hover {
+        background: var(--accent) !important;
+        color: var(--white) !important;
+    }
+</style>
 <script src="https://cdn.jsdelivr.net/npm/inputmask@5.0.8/dist/inputmask.min.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const input = document.getElementById("edit-phone-input");
+    const input = document.getElementById("edit-phone-input") || document.getElementById("id_phone");
     if (input) {
         Inputmask({
             mask: "+380 (99) 999-99-99",
@@ -47,5 +89,4 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
-
 {% endblock %}

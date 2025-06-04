@@ -6,30 +6,38 @@ document.addEventListener('DOMContentLoaded', function () {
             attachQuantityHandlers(productId);
         }
     });
-
-    // Добавляем обработчик для избранного
-    document.querySelectorAll('.favorite-toggle').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            handleFavoriteToggle(this);
-        });
-    });
 });
 
+// Функция для перестроения карусели
 function rebuildFavoritesCarousel(shouldFixActiveSlide = false) {
     const container = document.querySelector('.favorites-container');
     if (!container) return;
 
-    const cardWrappers = Array.from(container.querySelectorAll('.product-card'))
-        .map(card => card.closest('.col-md-4') || card.closest('.col-sm-12') || card.closest('.col-lg-4'))
+    // Remove any cards that are in the process of being removed
+    const removingCards = container.querySelectorAll('.product-card.removing');
+    removingCards.forEach(card => {
+        if (card.style.opacity === '0') {
+            card.remove();
+        }
+    });
+
+    const cardWrappers = Array.from(container.querySelectorAll('.product-card:not(.removing)'))
+        .map(card => card.closest('.col-auto') || card)
         .filter(Boolean);
 
     if (!cardWrappers.length) {
         const carousel = document.getElementById('favoritesCarousel');
-        if (carousel) carousel.remove();
+        if (carousel) {
+            carousel.style.display = 'none';
+        }
 
         const parent = container.closest('.card-body');
+        // Remove any existing empty message
+        const existingMessage = parent.querySelector('.text-muted');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+
         const emptyMessage = document.createElement('p');
         emptyMessage.className = 'text-center text-muted mt-3';
         emptyMessage.textContent = 'У вас ще немає обраних товарів.';
@@ -52,24 +60,22 @@ function rebuildFavoritesCarousel(shouldFixActiveSlide = false) {
     chunks.forEach((group, index) => {
         const item = document.createElement('div');
         item.className = 'carousel-item';
+        if (index === 0) {
+            item.classList.add('active');
+        }
 
         const row = document.createElement('div');
         row.className = 'row justify-content-center';
 
         group.forEach(col => {
-            row.appendChild(col);
+            if (col) {
+                row.appendChild(col);
+            }
         });
 
         item.appendChild(row);
         carouselInner.appendChild(item);
     });
-
-    // Назначение активного слайда
-    const allSlides = carouselInner.querySelectorAll('.carousel-item');
-    const newActiveIndex = Math.min(oldActiveIndex, allSlides.length - 1);
-    if (allSlides[newActiveIndex]) {
-        allSlides[newActiveIndex].classList.add('active');
-    }
 
     // Управление видимостью стрелок
     const carouselControls = document.querySelectorAll('#favoritesCarousel .carousel-control-prev, #favoritesCarousel .carousel-control-next');
@@ -88,8 +94,9 @@ function rebuildFavoritesCarousel(shouldFixActiveSlide = false) {
                 const activeSlide = carouselElement.querySelector('.carousel-item.active');
 
                 if (activeSlide) {
-                    const cardsInActiveSlide = activeSlide.querySelectorAll('.product-card');
+                    const cardsInActiveSlide = activeSlide.querySelectorAll('.product-card:not(.removing)');
                     if (cardsInActiveSlide.length === 0) {
+                        const allSlides = carouselElement.querySelectorAll('.carousel-item');
                         const currentIndex = Array.from(allSlides).indexOf(activeSlide);
                         const newIndex = Math.max(0, currentIndex - 1);
                         if (newIndex !== currentIndex) {

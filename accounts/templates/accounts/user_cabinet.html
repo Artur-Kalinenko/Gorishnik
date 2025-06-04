@@ -9,12 +9,14 @@
     <div class="card mb-4">
         <div class="card-header">Особисті дані</div>
         <div class="card-body">
-            <p><strong>Ім’я:</strong> {{ user.first_name }}</p>
+            <p><strong>Ім'я:</strong> {{ user.first_name }}</p>
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Телефон:</strong> {{ user.phone|default:"(не вказано)" }}</p>
-            <a href="{% url 'edit_profile' %}" class="btn btn-outline-primary mt-2">Редагувати профіль</a>
-            <a href="{% url 'change_email' %}" class="btn btn-outline-warning mt-2">Змінити email</a>
-            <a href="{% url 'change_password' %}" class="btn btn-outline-warning mt-2">Змінити пароль</a>
+            <div style="display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.2rem;">
+                <a href="{% url 'edit_profile' %}" class="btn profile-btn">Редагувати профіль</a>
+                <a href="{% url 'change_email' %}" class="btn profile-btn">Змінити email</a>
+                <a href="{% url 'change_password' %}" class="btn profile-btn">Змінити пароль</a>
+            </div>
         </div>
     </div>
 
@@ -27,7 +29,7 @@
                     <div class="row justify-content-center favorites-container">
                         {% for fav in favorites %}
                             {% with item=fav.product %}
-                                <div class="col-sm-12 col-md-6 col-lg-4 mb-4 d-flex justify-content-center">
+                                <div class="col-auto mb-4">
                                     {% include 'assortment/partials/product_card.html' %}
                                 </div>
                             {% endwith %}
@@ -42,7 +44,7 @@
                                         {% for fav in group %}
                                             {% if fav %}
                                                 {% with item=fav.product %}
-                                                    <div class="col-md-4 d-flex justify-content-center mb-3">
+                                                    <div class="col-auto">
                                                         {% include 'assortment/partials/product_card.html' %}
                                                     </div>
                                                 {% endwith %}
@@ -106,8 +108,9 @@
 <script>
     window.IS_USER_CABINET = true;
 </script>
-<script src="{% static 'assortment/assortment_list.js' %}"></script>
+<script src="{% static 'js/favorites.js' %}"></script>
 <script src="{% static 'accounts/user_cabinet.js' %}"></script>
+<script src="{% static 'assortment/assortment_list.js' %}"></script>
 
 <!-- CSS -->
 <link rel="stylesheet" href="{% static 'assortment/assortment_list.css' %}">

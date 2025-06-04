@@ -1,17 +1,291 @@
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    background-color: red; /* красный фон */
-    background-size: 50% 50%;
-    border-radius: 50%;
+/* === User Cabinet Styles === */
+
+/* Card Styles */
+.card {
+    border: 2px solid var(--accent);
+    border-radius: 15px;
+    background-color: var(--bg-main);
+    box-shadow: 0 4px 15px rgba(122, 78, 45, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(122, 78, 45, 0.12);
+}
+
+.card-header {
+    background-color: var(--accent);
+    color: var(--white);
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Personal Info Section */
+.card-body p {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.card-body strong {
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
+/* Profile Cabinet Buttons */
+.btn.profile-btn {
+    background: var(--bg-main);
+    color: var(--accent);
+    font-family: 'Comfortaa', cursive;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    border: 2px solid var(--accent);
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.btn.profile-btn:last-child {
+    margin-bottom: 0;
+}
+.btn.profile-btn:hover, .btn.profile-btn:focus, .btn.profile-btn:active {
+    background: var(--accent) !important;
+    color: var(--white) !important;
+    border-color: var(--accent) !important;
+    outline: none !important;
+}
+
+/* Buttons */
+.btn {
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--accent);
+    color: var(--white);
+}
+
+.btn-outline-warning {
+    border-color: var(--highlight);
+    color: var(--highlight);
+}
+
+.btn-outline-warning:hover {
+    background-color: var(--highlight);
+    color: var(--white);
+}
+
+/* Favorites Section */
+.favorites-container {
+    padding: 1rem 0;
+    min-height: 460px;
+}
+
+/* Carousel Styles */
+#favoritesCarousel .carousel-inner {
+    min-height: 460px;
+    display: flex;
+    align-items: center;
+}
+
+/* Product Card Styles */
+.favorites-container .product-card {
+    width: 280px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    transition: all 0.5s ease;
+    opacity: 1;
+    transform: scale(1);
+}
+
+.favorites-container .product-card.removing {
+    opacity: 0 !important;
+    transform: scale(0.8) !important;
+    pointer-events: none;
+}
+
+.favorites-container .product-card .card {
+    height: 100%;
+    margin: 0;
+    width: 100%;
+    min-height: 450px;
+    transition: all 0.3s ease;
+}
+
+.favorites-container .product-card .card-img-top {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    background-color: var(--white);
+    padding: 1rem;
+}
+
+.favorites-container .product-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.favorites-container .product-card .card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+    height: 2.4em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.favorites-container .product-card .price {
+    margin-top: auto;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+/* Carousel Controls */
+.carousel-control-prev,
+.carousel-control-next {
     width: 40px;
     height: 40px;
+    background-color: var(--accent);
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    z-index: 2;
 }
 
-/* Дополнительно — убрать серый SVG и вставить кастомную иконку */
-.carousel-control-prev-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 8 8'%3E%3Cpath d='M5.5 0L4.09 1.41 6.67 4l-2.58 2.59L5.5 8l4-4z'/%3E%3C/svg%3E");
+.carousel-control-prev {
+    left: -20px;
 }
 
+.carousel-control-next {
+    right: -20px;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background-color: var(--accent-dark);
+    opacity: 1;
+}
+
+.carousel-control-prev-icon,
 .carousel-control-next-icon {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 8 8'%3E%3Cpath d='M2.5 0L1.09 1.41 3.67 4l-2.58 2.59L2.5 8l4-4z'/%3E%3C/svg%3E");
+    background-color: transparent;
+    background-size: 50% 50%;
+    width: 20px;
+    height: 20px;
+}
+
+/* Orders History */
+.list-group-item {
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    background-color: var(--white);
+    transition: transform 0.3s ease;
+}
+
+.list-group-item:hover {
+    transform: translateX(5px);
+}
+
+.list-group-item strong {
+    color: var(--accent-dark);
+    font-size: 1.1rem;
+}
+
+.list-group-item ul {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.list-group-item ul li {
+    color: var(--text-main);
+    margin-bottom: 0.3rem;
+}
+
+/* Empty States */
+.text-muted {
+    color: var(--accent-dark) !important;
+    font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-right: 0;
+    }
+    
+    .carousel-control-prev {
+        left: 0;
+    }
+    
+    .carousel-control-next {
+        right: 0;
+    }
+
+    .favorites-container .product-card {
+        width: 240px;
+    }
+
+    .favorites-container .product-card .card-img-top {
+        height: 180px;
+    }
+
+    .btn.profile-btn {
+        width: 100%;
+        margin-right: 0;
+    }
+}
+
+.cabinet-btn {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+    padding-left: 18px;
+    padding-right: 18px;
+}
+
+.btn:focus, .btn:active, .btn:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
