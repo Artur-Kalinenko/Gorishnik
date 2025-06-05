@@ -16,6 +16,11 @@ function showFavoriteToast(message, isAdded) {
 // Function to handle favorite toggle
 function handleFavoriteToggle(element) {
     const productId = element.dataset.productId;
+    const isCurrentlyFavorite = element.querySelector('.fas.fa-star') !== null;
+
+    // Prevent double clicks
+    if (element.dataset.processing === 'true') return;
+    element.dataset.processing = 'true';
 
     fetch(`/favorites/toggle/${productId}/`, {
         method: 'GET',
@@ -39,18 +44,27 @@ function handleFavoriteToggle(element) {
             element.innerHTML = '<i class="far fa-star"></i>';
             showFavoriteToast('Товар видалено з обраного', false);
             
-            // If in user cabinet, remove the card
+            // If in user cabinet, remove the card with animation
             if (window.IS_USER_CABINET) {
-                const cardWrapper = element.closest('.col-md-4') || element.closest('.col-sm-12') || element.closest('.col-lg-4');
-                if (cardWrapper) {
-                    cardWrapper.remove();
-                    rebuildFavoritesCarousel(true);
+                const productCard = element.closest('.product-card');
+                if (productCard) {
+                    productCard.classList.add('removing');
+                    setTimeout(() => {
+                        rebuildFavoritesCarousel(true);
+                    }, 500);
                 }
             }
         }
     })
     .catch(error => {
         console.error('Помилка при додаванні в обрані:', error);
+        showFavoriteToast('Помилка при оновленні обраного', false);
+    })
+    .finally(() => {
+        // Remove processing flag after a short delay
+        setTimeout(() => {
+            element.dataset.processing = 'false';
+        }, 500);
     });
 }
 

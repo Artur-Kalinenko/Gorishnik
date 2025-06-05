@@ -1,29 +1,42 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Producers{% endblock %}
+{% block title %}Наші виробники{% endblock %}
 
 {% block content %}
-<!-- Страница с производителями -->
 <div class="container mt-5">
-    <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Наші виробники</h1>
-    <div class="row">
+    <h1 class="montserrat-category-title text-center mb-4">Наші виробники</h1>
+    <div class="row producers-grid">
         {% for producer in producers %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    {% if producer.producer_img %}
-                        <img src="{{ producer.producer_img.url }}" class="card-img-top" alt="{{ producer.producer_name }}" style="height: 200px; object-fit: cover;">
-                    {% else %}
-                        <img src="{% static 'images/default_producer.jpg' %}" class="card-img-top" alt="No image available" style="height: 200px; object-fit: cover;">
-                    {% endif %}
-                    <div class="card-body">
-                        <h5 class="card-title">{{ producer.producer_name }}</h5>
-                        <p class="card-text"><strong>Країна виробника:</strong> {{ producer.producer_country }}</p>
-                        <p class="card-text">{{ producer.producer_description }}</p>
+            <div class="col-md producer-card-wrapper">
+                <a href="{% url 'assortment_items' %}?producer={{ producer.id }}" class="producer-card">
+                    <div class="producer-logo">
+                        {% if producer.producer_img %}
+                            <img src="{{ producer.producer_img.url }}"
+                                 alt="{{ producer.producer_name }}"
+                                 class="producer-img">
+                        {% else %}
+                            <img src="{% static 'images/default_producer.jpg' %}"
+                                 alt="No image"
+                                 class="producer-img">
+                        {% endif %}
                     </div>
-                </div>
+                    <div class="producer-info">
+                        <h3 class="producer-name">{{ producer.producer_name }}</h3>
+                        <div class="producer-btn">
+<!--                            <img src="{% static 'icons/assortment_brown.png' %}"-->
+<!--                                 data-hover="{% static 'icons/assortment_white.png' %}"-->
+<!--                                 data-original="{% static 'icons/assortment_brown.png' %}"-->
+<!--                                 alt="Переглянути товари"-->
+<!--                                 class="category-icon">-->
+                            <span>Переглянути товари</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         {% endfor %}
     </div>
 </div>
+
+<link rel="stylesheet" href="{% static 'producer/producer_list.css' %}">
 {% endblock %}

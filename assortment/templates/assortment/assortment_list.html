@@ -20,6 +20,14 @@
     <h1 class="montserrat-category-title d-flex align-items-center justify-content-center mb-4">
         {% if query %}
             Результати пошуку для: "{{ query }}"
+        {% elif selected_producers %}
+            {% if selected_producers|length == 1 %}
+                {{ selected_producers.0.producer_name }}
+            {% else %}
+                {% for producer in selected_producers %}
+                    {{ producer.producer_name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            {% endif %}
         {% elif current_category and current_category.display_icon %}
             <img src="{{ current_category.display_icon.url }}" alt="{{ current_category.category }}"
                  style="height: 60px; width: 60px; margin-right: 15px;">
@@ -39,7 +47,7 @@
 
             <!-- Кнопка "Всі товари" -->
             <div class="text-center mx-2 my-1">
-                <a href="{% url 'assortment_list' %}"
+                <a href="{% url 'assortment_items' %}"
                    class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if not current_category %}btn-primary{% endif %}"
                    style="min-width: 150px; gap: 8px;">
                     {% if not current_category %}
@@ -64,7 +72,7 @@
             <!-- Остальные категории -->
             {% for category in categories %}
                 <div class="text-center mx-2 my-1">
-                    <a href="{% url 'assortment_list' %}?category={{ category.category }}"
+                    <a href="{% url 'assortment_items' %}?category={{ category.category }}"
                        class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% endif %}"
                        style="min-width: 150px; gap: 8px;">
                         {% if category.button_icon_brown %}

@@ -137,6 +137,8 @@ class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
     button_icon_white = models.ImageField(upload_to='assortment/category_icons_white/', null=True, blank=True)
     button_icon_brown = models.ImageField(upload_to='assortment/category_icons_brown/', blank=True, null=True)
+    cover_image = models.ImageField(upload_to='assortment/category_covers/', null=True, blank=True,
+                                    verbose_name='Обкладинка категорії')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -148,7 +150,7 @@ class Category(models.Model):
         return self.category
 
     def get_absolute_url(self):
-        return reverse('assortment_list') + f'?category={self.category}'
+        return reverse('assortment_items') + f'?category={self.category}'
 
     def delete(self, *args, **kwargs):
         if self.assortments.exists():  # ← Используем related_name

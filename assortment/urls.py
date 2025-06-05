@@ -1,11 +1,10 @@
 from django.urls import path
 from . import views
-from .views import search_suggest, delete_review_view
 
 urlpatterns = [
-    path('', views.assortment_list, name='assortment_list'), # Список товаров
-    path('<int:pk>/', views.assortment_detail, name='assortment_detail'), # Детальная страница товара
-    path('search_suggest/', search_suggest, name='search_suggest'), # AJAX
-
-    path('review/<int:review_id>/delete/', delete_review_view, name='delete_review'),
+    path('assortment/', views.category_list_view, name='assortment_list'),  # список категорий
+    path('assortment/items/', views.assortment_list, name='assortment_items'),  # список товаров
+    path('assortment/<int:pk>/', views.assortment_detail, name='assortment_detail'),  # детальная карточка
+    path('assortment/search_suggest/', views.search_suggest, name='search_suggest'),
+    path('assortment/review/<int:review_id>/delete/', views.delete_review_view, name='delete_review'),
 ]

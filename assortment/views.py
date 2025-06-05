@@ -16,6 +16,10 @@ from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
 
+def category_list_view(request):
+    categories = Category.objects.all()
+    return render(request, 'assortment/category_list.html', {'categories': categories})
+
 def chunked(iterable, size):
     for i in range(0, len(iterable), size):
         yield iterable[i:i + size]
@@ -27,6 +31,9 @@ def assortment_list(request):
     selected_category = request.GET.get('category')
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))  # список выбранных option.id
     selected_producer_ids = request.GET.getlist('producer')
+    selected_producers = []
+    if selected_producer_ids:
+        selected_producers = list(Producer.objects.filter(id__in=selected_producer_ids))
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     new_only = request.GET.get('new') == '1'
@@ -196,6 +203,7 @@ def assortment_list(request):
         'favorites_ids': favorites_ids,
         'active_producers': sidebar_producers,
         'selected_producer_ids': selected_producer_ids,
+        'selected_producers': selected_producers,
     })
 
 
