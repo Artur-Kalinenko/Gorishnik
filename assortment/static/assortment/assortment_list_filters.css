@@ -1,5 +1,5 @@
 .sidebar {
-    background: var(--white);
+    background: #F8F6F3;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(60, 35, 20, 0.04);
     padding: 30px 18px 24px 18px;
@@ -50,15 +50,24 @@
 
 .form-check {
     display: flex;
-    align-items: center;
+    align-items: flex-start;   /* было center, стало flex-start */
+    justify-content: flex-start;  /* добавь обязательно! */
     gap: 10px;
     cursor: pointer;
     margin-bottom: 8px;
     position: relative;
+    width: 100%;               /* чтобы занимали всю ширину контейнера */
 }
 
 .form-check-input {
     display: none;
+}
+
+.filter-options {
+    margin-left: -24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 }
 
 .custom-checkbox {
@@ -115,6 +124,8 @@
     vertical-align: middle;
     position: relative;
     top: 2px;
+    text-align: left;
+    width: 100%;
 }
 
 .form-check:hover .form-check-label {
@@ -198,9 +209,11 @@
 }
 
 .show-unavailable {
-  display: inline-block;
+  display: block;
+  width: 100%;
   padding: 0.3rem 0.75rem;
   margin-top: 0.5rem;
+  margin-left: 12px;
   font-family: 'Comfortaa', cursive;
   font-size: 0.95rem;
   text-align: center;
@@ -210,6 +223,7 @@
   border: 2px solid var(--accent);
   border-radius: var(--border-radius-md);
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  white-space: normal;
 }
 .show-unavailable:hover,
 .show-unavailable:focus {
@@ -223,6 +237,13 @@
   color: var(--white);
   box-shadow: none;
 }
+
+.show-unavailable:focus,
+.show-unavailable:active {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(122, 78, 45, 0.15) !important;
+}
+
 .show-unavailable[disabled],
 .show-unavailable.disabled {
   opacity: 0.5;
@@ -238,3 +259,17 @@ display: none !important;
 opacity: 0.5;
 cursor: not-allowed;
 }
+
+button.show-unavailable:focus,
+button.show-unavailable:active,
+button.show-unavailable:focus-visible,
+.btn.show-unavailable:focus,
+.btn.show-unavailable:active,
+.btn.show-unavailable:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--white); /* или другой цвет если надо */
+    background: var(--accent-dark); /* или другой фон */
+    border-color: var(--accent-dark);
+}
+

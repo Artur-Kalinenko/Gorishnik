@@ -1,314 +1,276 @@
+/* === Общие переменные === */
+:root {
+    --accent: #7a4e2d;
+    --accent-dark: #5c3a21;
+    --bg-main: #f3eee7;
+    --highlight: #d9534f;
+    --green: #5cb85c;
+    --text-main: #3b2f2f;
+    --white: #fff;
+    --border-radius-sm: 4px;
+    --border-radius-md: 10px;
+    --border-radius-lg: 14px;
+    --transition: 0.3s; /* длительность роста карточки */
+}
+
+/* === Grid-контейнер для карточек === */
+#product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* карточки выравниваются по верху */
+    gap: 20px;
+    overflow: visible;       /* чтобы при ховере карточка «выросла» поверх соседей */
+    position: relative;
+}
+
 /* === Карточка товара === */
 .product-card {
     background-color: var(--bg-main);
     border: 2px solid var(--accent);
-    border-radius: 14px;
+    border-radius: var(--border-radius-lg);
     padding: 15px;
-    text-align: center;
     font-family: 'Comfortaa', cursive;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    min-height: unset !important;
-    height: auto !important;
+    height: 420px; /* обычная высота */
     position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: visible;
+    margin-bottom: 40px;
+    z-index: 1;
+    /* Анимация роста до 500px за 0.3с */
+    transition:
+        height var(--transition) ease,
+        transform var(--transition) ease,
+        box-shadow var(--transition) ease;
 }
 
-.product-card:hover {
+/* === Расширение карточки при ховере (для товаров с вариантами) === */
+.product-card.has-variants:hover {
+    z-index: 10;
     transform: scale(1.03);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    height: 500px;          /* выросшая высота */
+    margin-bottom: -180px;  /* компенсируем разницу (500 − 420 = 80, но чтобы карточка всплыла сверху, мы всё равно делаем -180px) */
 }
 
-/* === Плашки === */
-.badge-new, .badge-sale {
+/* === Плашки «Новинка» / «Акція» === */
+.badge-new,
+.badge-sale {
     position: absolute;
     top: 8px;
     font-size: 0.75rem;
     padding: 4px 8px;
-    border-radius: 10px;
+    border-radius: var(--border-radius-md);
     color: var(--white);
+    z-index: 2;
 }
-
 .badge-new {
     left: 8px;
     background-color: var(--green);
 }
-
 .badge-sale {
     right: 8px;
     background-color: var(--highlight);
 }
 
-/* === Избранное === */
+/* === Иконка «Избранное» === */
 .favorite-toggle {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     background-color: rgba(255, 255, 255, 0.85);
     border-radius: 50%;
     padding: 6px;
     cursor: pointer;
-    z-index: 10;
-    transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
+    z-index: 3;
+    transition: box-shadow var(--transition),
+                background var(--transition),
+                border-color var(--transition);
     border: 2px solid var(--accent);
 }
-
-.favorite-toggle .fa-star, .favorite-toggle .far.fa-star {
+.favorite-toggle .fa-star,
+.favorite-toggle .far.fa-star {
     font-size: 1.3rem;
-    color: var(--accent-dark); /* Шоколадный цвет */
+    color: var(--accent-dark);
     transition: color 0.2s;
 }
-
-.favorite-toggle.active, .favorite-toggle:hover, .favorite-toggle:focus {
+.favorite-toggle:hover,
+.favorite-toggle:focus,
+.favorite-toggle.active {
     background: var(--accent);
     border-color: var(--accent);
 }
-
-.favorite-toggle.active .fa-star,
-.favorite-toggle.active .far.fa-star,
 .favorite-toggle:hover .fa-star,
 .favorite-toggle:hover .far.fa-star,
 .favorite-toggle:focus .fa-star,
-.favorite-toggle:focus .far.fa-star {
-    color: #fff !important; /* Белая звезда на шоколадном фоне */
+.favorite-toggle:focus .far.fa-star,
+.favorite-toggle.active .fa-star,
+.favorite-toggle.active .far.fa-star {
+    color: var(--white) !important;
 }
 
-/* === Изображение товара === */
+/* === Обёртка изображения товара === */
+.product-image-wrapper {
+    overflow: hidden;
+    border-radius: var(--border-radius-md);
+    margin-bottom: 12px;
+}
 .product-image {
-    height: 150px;
     width: 100%;
+    height: 200px;
     object-fit: cover;
-    border-radius: 10px;
 }
 
-/* === Инфо внутри карточки === */
+/* === Обёртка названия, цены и кнопки === */
 .product-info {
-    flex-grow: 0 !important;
-    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
 }
 
-/* === Название === */
+/* === Название товара === */
 .product-name {
     color: var(--accent-dark);
     font-weight: bold;
     font-size: 1.1rem;
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 10px;
+    height: 48px; /* ограничиваем двумя строками */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 8px;
+    text-align: center;
 }
-
 .product-link {
     color: var(--accent-dark);
     text-decoration: none;
     transition: color 0.2s ease;
 }
-
 .product-link:hover {
     color: var(--accent);
 }
 
-/* === Категории === */
-.category-button, .select-variant-button {
-    border: 2px solid var(--accent) !important;
-    background-color: var(--bg-main) !important;
-    color: var(--accent-dark) !important;
-    border-radius: 10px !important;
-    font-family: 'Comfortaa', cursive;
-    font-weight: 600;
-    height: 48px !important;
+/* === ОБЁРТКА ДЛЯ ЦЕНЫ И HOVER-ДЕТАЛЕЙ === */
+.price-wrapper {
+    position: relative;  /* базис для абсолютного позиционирования .hover-details */
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    text-decoration: none !important;
-    padding: 6px 12px !important;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-    text-transform: none;
-    box-sizing: border-box;
+    margin-bottom: 12px; /* чтобы кнопка “Купити товар” не цеплялась */
 }
 
-.category-button img.category-icon {
-    height: 20px;
-    width: 20px;
-    transition: filter 0.3s ease;
-}
-
-.category-button:hover, .select-variant-button:hover {
-    background-color: var(--accent) !important;
-    color: var(--white) !important;
-    border-color: var(--accent) !important;
-}
-
-.category-button.btn-primary, .gram-button.selected, .gram-button.btn-primary {
-    background-color: var(--accent-dark) !important;
-    color: var(--white) !important;
-    border-color: var(--accent-dark) !important;
-}
-
-.category-button {
-    margin-bottom: 6px !important;
-}
-
-.grams-buttons {
+/* === 1) Статичная «мин. цена + граммовка» (в потоке) === */
+.main-price-grams {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    pointer-events: none; /* чтобы не мешал кликам */
+    opacity: 1;
+    /* Для плавного скрытия с задержкой — базовый transition (0.15s без delay) */
+    transition: opacity 0.15s ease 0s;
+}
+.main-price-grams .price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+.main-price-grams .grams-text {
+    font-size: 0.9rem;
+    color: var(--text-main);
+    margin: 0;
+}
+
+/* === 2) Hover-блок «мин–макс цена + кнопки граммовок» (абсолют внутри price-wrapper) === */
+/* 2.1 Базовый (скрытый) стиль, без задержки при скрытии */
+.hover-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    position: absolute;
+    top: 0;               /* совпадает с .price-wrapper */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    visibility: hidden;
+    z-index: 2;
+    transition:
+        opacity 0.15s ease 0s,
+        visibility 0s linear 0s;
+}
+/* Hover-цена внутри hover-details */
+.hover-details .hover-price {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+.hover-grams-buttons {
+    display: flex;
+    gap: 8px;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 6px;
 }
-
-/* === Количество === */
-.quantity-input {
-    position: unset !important;
-    top: unset !important;
-    width: 48px !important;
-    min-width: 44px !important;
-    max-width: 56px !important;
-    height: 44px !important;
-    line-height: 44px !important;
-    font-size: 1rem !important;
-    font-family: inherit !important;
-    text-align: center !important;
-    border: 2px solid var(--accent) !important;
-    border-radius: 10px !important;
-    background: #f3ede7 !important;
-    color: var(--accent-dark) !important;
-    margin: 0 2px !important;
-    padding: 0 2px !important;
-    box-sizing: border-box !important;
-    vertical-align: middle !important;
-    overflow: visible !important;
-    display: inline-block !important;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-input.quantity-input:focus, input.quantity-input:hover {
-    outline: none !important;
-    box-shadow: none !important;
-    border-color: var(--accent) !important;
-}
-
-/* === Цена === */
-.price-block {
-    margin-bottom: 6px;
-    min-height: 36px;
-}
-
-.price {
-    color: var(--text-main);
-    font-size: 1.05rem;
-    font-weight: bold;
-    display: inline-block;
-}
-
-/* === Переключатель между выбором и корзиной === */
-.cart-switch {
-    min-height: 56px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px;
-    position: relative;
-}
-
-.select-variant-button-block {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.select-variant-button:hover {
-    background-color: var(--accent);
-    color: var(--white);
-}
-
-.select-variant-button-block.fade-out {
-    opacity: 0;
-    height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transform: scale(0.95);
-}
-
-/* === Корзина === */
-.cart-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-}
-
-.cart-controls.fade-in {
-    animation: fadeInSlide 0.35s ease-out forwards;
-}
-
-@keyframes fadeInSlide {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.quantity-btn,
-.add-to-cart {
+.hover-grams-buttons .gram-button {
     border: 2px solid var(--accent);
-    background-color: transparent;
-    color: var(--text-main);
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.25s ease;
+    background-color: var(--bg-main);
+    color: var(--accent-dark);
+    border-radius: var(--border-radius-md);
+    padding: 4px 8px;
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color var(--transition),
+                color var(--transition),
+                transform 0.2s;
 }
-
-.quantity-btn:hover,
-.add-to-cart:hover {
+.hover-grams-buttons .gram-button:hover {
     background-color: var(--accent);
     color: var(--white);
+    transform: scale(1.05);
 }
 
-.cart-controls-wrapper {
-    margin-bottom: 0 !important;
-    flex-grow: 0 !important;
+/* 2.2 Показ hover-details при ховере (delay = 0.3s, чтобы карточка успела вырасти) */
+.product-card.has-variants:hover .hover-details {
+    opacity: 1;
+    visibility: visible;
+    transition:
+        opacity 0.15s ease 0.3s,
+        visibility 0s linear 0.3s;
 }
 
-.cart-controls-placeholder {
-    min-height: 0 !important;
-    height: auto !important;
+/* 2.3 Скрываем main-price-grams не сразу, а с delay = 0.3s, чтобы не образовывалась «белая дыра» */
+.product-card.has-variants:hover .main-price-grams {
+    opacity: 0;
+    transition: opacity 0.15s ease 0.3s;
 }
 
-/* Диагностика и устранение лишнего белого пространства */
-.row, .col {
-    height: auto !important;
+/* === Кнопка «Купити товар» (в потоке, снизу price-wrapper) === */
+.buy-button {
+    margin-top: auto; /* прижать к низу .product-info */
+    width: 100%;
+    height: 48px;
+    background-color: var(--accent) !important;
+    color: var(--white) !important;
+    border: none !important;
+    border-radius: var(--border-radius-md) !important;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    z-index: 1; /* под hover-блоком, но над обычным текстом */
 }
-
-.favorite-toggle .fa-star,
-.favorite-toggle .far.fa-star {
-    color: var(--accent-dark) !important;
+.buy-button:hover {
+    background-color: var(--accent-dark) !important;
+    transform: scale(1.02);
 }
-
-.favorite-toggle.active .fa-star,
-.favorite-toggle.active .far.fa-star,
-.favorite-toggle:hover .fa-star,
-.favorite-toggle:hover .far.fa-star,
-.favorite-toggle:focus .fa-star,
-.favorite-toggle:focus .far.fa-star {
-    color: #fff !important;
+.buy-button img {
+    filter: brightness(0) invert(1);
+    margin-right: 8px;
 }

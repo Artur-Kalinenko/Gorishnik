@@ -7,6 +7,59 @@
     --choco: #7b4b27;
 }
 
+/* Pagination Styles */
+.pagination-wrapper {
+    margin: 2rem 0;
+}
+
+.pagination {
+    --bs-pagination-color: var(--accent-dark);
+    --bs-pagination-bg: var(--bg-main);
+    --bs-pagination-border-color: var(--accent);
+    --bs-pagination-hover-color: var(--white);
+    --bs-pagination-hover-bg: var(--accent);
+    --bs-pagination-hover-border-color: var(--accent);
+    --bs-pagination-active-bg: var(--accent-dark);
+    --bs-pagination-active-border-color: var(--accent-dark);
+    --bs-pagination-disabled-color: var(--accent-dark);
+    --bs-pagination-disabled-bg: var(--bg-main);
+    --bs-pagination-disabled-border-color: var(--accent);
+    gap: 4px;
+}
+
+.page-link {
+    font-family: 'Comfortaa', cursive;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 8px !important;
+    border: 2px solid var(--accent) !important;
+    transition: all 0.3s ease;
+}
+
+.page-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(122, 78, 45, 0.15);
+}
+
+.page-item.active .page-link {
+    background-color: var(--accent-dark);
+    border-color: var(--accent-dark);
+    color: var(--white);
+}
+
+.page-item.disabled .page-link {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.page-link:focus, .page-link:active {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(122, 78, 45, 0.2) !important; /* Тонкая подсветка под стиль */
+    color: var(--white);
+    background: var(--accent-dark);
+    border-color: var(--accent-dark);
+}
+
 /* Product Card Styles */
 .product-card {
     position: relative;

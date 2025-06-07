@@ -1,5 +1,8 @@
 {% load dict_extras %}
 
+<!-- Корневой контейнер фильтров -->
+<div class="sidebar" id="filters-sidebar" data-view="{% if current_category %}category{% else %}all{% endif %}">
+
 <form method="get" id="filter-form">
     {% if selected_category %}
         <input type="hidden" name="category" value="{{ selected_category }}">
@@ -8,10 +11,14 @@
         <input type="hidden" name="q" value="{{ query }}">
     {% endif %}
 
+    {# === Блок производителей — ВСЕГДА открыт на главной === #}
     {% if active_producers %}
         <div class="filter-group mb-3">
-            <h5 class="filter-header">Виробники</h5>
-            <div class="d-flex flex-wrap gap-2">
+            <h5 class="filter-header">
+                Виробники
+            </h5>
+            <div class="filter-options" id="group-producers" style="display: block;">
+                <div class="d-flex flex-wrap gap-2">
                 {% for producer in active_producers %}
                     {% if producer.id|stringformat:"s" in selected_producer_ids %}
                         <label class="producer-label producer-label--selected">
@@ -32,14 +39,17 @@
                         </label>
                     {% endif %}
                 {% endfor %}
+                </div>
             </div>
         </div>
     {% endif %}
 
-    <!-- 🔽 Специальные фильтры -->
+    {# === Блок "Додатково" — ВСЕГДА открыт на главной === #}
     <div class="filter-group mb-3">
-        <h5 class="filter-header">Додатково</h5>
-        <div class="filter-options">
+        <h5 class="filter-header">
+            Додатково
+        </h5>
+        <div class="filter-options" id="group-additional" style="display: block;">
             <label class="form-check mb-1">
                 <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
                 <span class="custom-checkbox"></span>
@@ -55,22 +65,20 @@
         </div>
     </div>
 
-    <!-- 🔽 Основные фильтры по группам -->
+    {# === Основные фильтры по группам === #}
     {% for group in filter_groups %}
         <div class="filter-group mb-3">
-            <h5 class="filter-header d-flex justify-content-between align-items-center"
+            <h5 class="filter-header d-flex justify-content-between align-items-center
+                {% if current_category and group.category.id == current_category.id %}category-group{% endif %}"
                 data-group-id="{{ group.id }}" style="cursor: pointer;">
                 {{ group.name }}
                 <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
             </h5>
 
-            {# Скрываем блок с опциями группы, пока он «свернут» #}
             <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
-                {# Первоначально показываем только «доступные» опции #}
                 {% for option in group.options.all %}
                     {% with count=option_counts|get_item:option.id %}
                         {% if count == 0 and not option.id in selected_filter_ids %}
-                            {# «Недоступная» опция: прячем её с помощью классов unavailable + hidden #}
                             <label class="form-check mb-1 unavailable hidden">
                                 <input class="form-check-input"
                                        type="checkbox"
@@ -83,7 +91,6 @@
                                 </span>
                             </label>
                         {% else %}
-                            {# «Доступная» или уже выбранная опция: показываем как обычно #}
                             <label class="form-check mb-1">
                                 <input class="form-check-input"
                                        type="checkbox"
@@ -99,11 +106,10 @@
                     {% endwith %}
                 {% endfor %}
 
-                {# Кнопка показать «недоступные» опции, если такие вообще присутствуют #}
                 <button type="button"
                         class="btn btn-link btn-sm show-unavailable"
                         data-group-id="{{ group.id }}">
-                    Показати недоступні фільтри
+                    Показати всі фільтри
                 </button>
             </div>
         </div>
@@ -113,4 +119,4 @@
         Очистити фільтри
     </button>
 </form>
-
+</div>

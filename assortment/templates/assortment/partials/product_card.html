@@ -1,6 +1,8 @@
 {% load static %}
 
-<div class="product-card" data-product-id="{{ item.id }}">
+<div
+    class="product-card {% if item.variants.count > 1 %}has-variants{% endif %}"
+    data-product-id="{{ item.id }}">
     <!-- Плашки -->
     {% if item.is_new %}
         <span class="badge badge-new">Новинка</span>
@@ -29,134 +31,58 @@
 
     <div class="product-info">
         <h5 class="product-name">
-            <a href="{% url 'assortment_detail' item.pk %}" class="product-link">{{ item.assortment_name }}</a>
+            <a href="{% url 'assortment_detail' item.pk %}" class="product-link">
+                {{ item.assortment_name }}
+            </a>
         </h5>
 
-        {% for cat in item.assortment_categories.all %}
-            <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="category-btn category-button d-inline-flex align-items-center mb-2">
-                {% if cat.button_icon_brown and cat.button_icon_white %}
-                    <img src="{{ cat.button_icon_brown.url }}"
-                         data-hover="{{ cat.button_icon_white.url }}"
-                         data-original="{{ cat.button_icon_brown.url }}"
-                         class="category-icon me-1"
-                         style="width: 18px; height: 18px;">
-                {% elif cat.button_icon %}
-                    <img src="{{ cat.button_icon.url }}" class="category-icon me-1" style="width: 18px; height: 18px;">
-                {% endif %}
-                {{ cat.category }}
-            </a>
-        {% endfor %}
-
-        <!-- Цены -->
-        <p class="price-block" id="price-display-{{ item.pk }}">
-            {% if item.variants.exists %}
-                {% with sorted_variants=item.variants.all|dictsort:"price" %}
-                    {% with min=sorted_variants|first max=sorted_variants|last %}
-                        <span class="price">
-                            {{ min.price }} ₴
-                            {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}
-                        </span>
+        <!-- Обёртка для цены и hover-деталей -->
+        <div class="price-wrapper">
+            <!-- 1) Статичное состояние: мин. цена + граммовка -->
+            <div class="main-price-grams">
+                {% if item.variants.exists %}
+                    {% with min_variant=item.variants.all|dictsort:"price"|first %}
+                        <span class="price">{{ min_variant.price }} ₴</span>
+                        <p class="grams-text">{{ min_variant.grams }} г</p>
                     {% endwith %}
-                {% endwith %}
-            {% else %}
-                <span class="price">{{ item.price }} ₴</span>
-            {% endif %}
-        </p>
-            <!--Функционал скидок-->
-<!--        <p class="price-block" id="price-display-{{ item.pk }}">-->
-<!--            {% if item.variants.exists %}-->
-<!--                {% with sorted_variants=item.variants.all|dictsort:"price" %}-->
-<!--                    {% with min=sorted_variants|first max=sorted_variants|last %}-->
-<!--                        {% if min.old_price or max.old_price %}-->
-<!--                            <span class="old-price">-->
-<!--                                {% if min.old_price %}{{ min.old_price }} ₴{% endif %}-->
-<!--                                {% if max.old_price and max.old_price != min.old_price %} – {{ max.old_price }} ₴{% endif %}-->
-<!--                            </span><br>-->
-<!--                        {% endif %}-->
-<!--                        <span class="price">-->
-<!--                            {% if min.price %}-->
-<!--                                {{ min.price }} ₴-->
-<!--                                {% if max.price and max.price != min.price %} – {{ max.price }} ₴{% endif %}-->
-<!--                            {% else %}-->
-<!--                                {{ max.price }} ₴-->
-<!--                            {% endif %}-->
-<!--                        </span>-->
-<!--                    {% endwith %}-->
-<!--                {% endwith %}-->
-<!--            {% else %}-->
-<!--                {% if item.old_price and item.old_price > item.price %}-->
-<!--                    <span class="old-price">{{ item.old_price }} ₴</span><br>-->
-<!--                {% endif %}-->
-<!--                <span class="price">{{ item.price }} ₴</span>-->
-<!--            {% endif %}-->
-<!--        </p>-->
+                {% else %}
+                    <span class="price">{{ item.price }} ₴</span>
+                    <p class="grams-text">{{ item.grams }} г</p>
+                {% endif %}
+            </div>
 
-        <!-- Граммовки -->
-        {% if item.variants.count > 1 %}
-            <div class="grams-buttons">
-                {% for variant in item.variants.all %}
-                    <button class="gram-button category-btn d-inline-flex align-items-center justify-content-center"
-                            data-product-id="{{ item.pk }}"
-                            data-variant-id="{{ variant.id }}"
-                            data-price="{{ variant.price }}">
-                        {{ variant.grams }}г
-                    </button>
-                {% endfor %}
-            </div>
-            <div class="cart-switch" id="cart-switch-{{ item.pk }}">
-                <div class="select-variant-button-block" id="select-variant-{{ item.pk }}" style="display: block;">
-                    <button class="select-variant-button category-btn w-100" disabled>Оберіть грамовку</button>
-                </div>
-                <div class="cart-controls fade-in" id="controls-{{ item.pk }}" style="display: none;">
-                    <button class="quantity-btn decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input" readonly>
-                    <button class="quantity-btn increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                    <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="{{ item.pk }}">
-                        <img src="{{ MEDIA_URL }}icons/cart_brown.png"
-                             data-hover="{{ MEDIA_URL }}icons/cart_white.png"
-                             data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                             alt="В корзину"
-                             class="category-icon"
-                             style="width: 24px; height: 24px;">
-                    </button>
-                </div>
-            </div>
-        {% elif item.variants.count == 1 %}
-            {% with variant=item.variants.first %}
-                <p class="grams-text">{{ variant.grams }} г</p>
-                <div class="cart-controls-wrapper" style="min-height: 56px; display: flex; align-items: center;">
-                    <div class="cart-controls" id="controls-{{ item.pk }}">
-                        <button class="quantity-btn decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                        <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center mx-1" readonly>
-                        <button class="quantity-btn increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                        <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="{{ item.pk }}" data-variant-id="{{ variant.id }}">
-                            <img src="{{ MEDIA_URL }}icons/cart_brown.png"
-                                 data-hover="{{ MEDIA_URL }}icons/cart_white.png"
-                                 data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                                 alt="В корзину"
-                                 class="category-icon"
-                                 style="width: 24px; height: 24px;">
-                        </button>
+            <!-- 2) Hover-детали: абсолютный блок с диапазоном цен и кнопками граммовки -->
+            {% if item.variants.count > 1 %}
+                <div class="hover-details">
+                    {% with sorted_variants=item.variants.all|dictsort:"price" %}
+                        {% with min=sorted_variants|first max=sorted_variants|last %}
+                            <span class="hover-price">
+                                {{ min.price }} – {{ max.price }} ₴
+                            </span>
+                        {% endwith %}
+                    {% endwith %}
+                    <div class="hover-grams-buttons">
+                        {% for variant in item.variants.all %}
+                            <a href="{% url 'assortment_detail' item.pk %}"
+                               class="gram-button category-btn d-inline-flex align-items-center justify-content-center">
+                                {{ variant.grams }}г
+                            </a>
+                        {% endfor %}
                     </div>
                 </div>
-            {% endwith %}
-        {% else %}
-            <p class="grams-text">{{ item.grams }} г</p>
-            <div class="cart-controls-wrapper" style="min-height: 56px; display: flex; align-items: center;">
-                <div class="cart-controls" id="controls-{{ item.pk }}">
-                    <button class="quantity-btn decrease-quantity" data-product-id="{{ item.pk }}">−</button>
-                    <input type="number" min="1" value="1" id="quantity-input-{{ item.pk }}" class="quantity-input text-center mx-1" readonly>
-                    <button class="quantity-btn increase-quantity" data-product-id="{{ item.pk }}">+</button>
-                    <button class="category-btn add-to-cart d-flex align-items-center justify-content-center" data-product-id="{{ item.pk }}">
-                        <img src="{{ MEDIA_URL }}icons/cart_brown.png"
-                             data-hover="{{ MEDIA_URL }}icons/cart_white.png"
-                             data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                             alt="В корзину"
-                             class="category-icon"
-                             style="width: 24px; height: 24px;">
-                    </button>
-                </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- 3) Кнопка «Купити товар» (в потоке product-info, прижата к низу) -->
+        <a href="{% url 'assortment_detail' item.pk %}"
+           class="buy-button category-btn d-flex align-items-center justify-content-center">
+            <img src="{{ MEDIA_URL }}icons/cart_brown.png"
+                 data-hover="{{ MEDIA_URL }}icons/cart_white.png"
+                 data-original="{{ MEDIA_URL }}icons/cart_brown.png"
+                 alt="Купити"
+                 class="category-icon me-2"
+                 style="width: 24px; height: 24px;">
+            Купити товар
+        </a>
     </div>
 </div>

@@ -10,32 +10,47 @@
         Категорії товарів
     </h1>
 
-    <!-- Категории как на assortment_list -->
-    <div class="container">
-        <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">
-            {% get_media_prefix as MEDIA_URL %}
-            {% for category in categories %}
-                <div class="text-center mx-2 my-1">
-                    <a href="{{ category.get_absolute_url }}"
-                       class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase"
-                       style="min-width: 150px; gap: 8px;">
-                        {% if category.button_icon_brown %}
-                            <img src="{{ category.button_icon_brown.url }}"
-                                 data-hover="{{ category.button_icon_white.url }}"
-                                 data-original="{{ category.button_icon_brown.url }}"
-                                 class="category-icon"
-                                 alt="{{ category.category }}"
-                                 style="height: 24px; width: 24px;">
-                        {% endif %}
-                        <span style="font-size: 0.85rem;">{{ category.category }}</span>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
+<!--    &lt;!&ndash; Категории как на assortment_list &ndash;&gt;-->
+<!--    <div class="container">-->
+<!--        <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">-->
+<!--            {% get_media_prefix as MEDIA_URL %}-->
+<!--            {% for category in categories %}-->
+<!--                <div class="text-center mx-2 my-1">-->
+<!--                    <a href="{{ category.get_absolute_url }}"-->
+<!--                       class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase"-->
+<!--                       style="min-width: 150px; gap: 8px;">-->
+<!--                        {% if category.button_icon_brown %}-->
+<!--                            <img src="{{ category.button_icon_brown.url }}"-->
+<!--                                 data-hover="{{ category.button_icon_white.url }}"-->
+<!--                                 data-original="{{ category.button_icon_brown.url }}"-->
+<!--                                 class="category-icon"-->
+<!--                                 alt="{{ category.category }}"-->
+<!--                                 style="height: 24px; width: 24px;">-->
+<!--                        {% endif %}-->
+<!--                        <span style="font-size: 0.85rem;">{{ category.category }}</span>-->
+<!--                    </a>-->
+<!--                </div>-->
+<!--            {% endfor %}-->
+<!--        </div>-->
+<!--    </div>-->
 
     <!-- Карточки категорий -->
     <div class="row">
+        <!-- Карточка "Всі товари" -->
+        <div class="col-md-3 mb-4">
+            <a href="{% url 'assortment_items' %}" class="category-card">
+                <div class="card text-center shadow h-100">
+                    <img src="{{ MEDIA_URL }}assortment/category_covers/all_goods.png" class="card-img-top" alt="Всі товари">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title mb-3">Всі товари</h5>
+                        <div class="category-view-btn">
+                            <span>Переглянути товари</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <!-- Остальные категории -->
         {% for category in categories %}
             <div class="col-md-3 mb-4">
                 <a href="{{ category.get_absolute_url }}" class="category-card">

@@ -15,6 +15,7 @@ from django.shortcuts import redirect
 from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
+from django.core.paginator import Paginator
 
 def category_list_view(request):
     categories = Category.objects.all()
@@ -38,6 +39,7 @@ def assortment_list(request):
     sort = request.GET.get('sort')
     new_only = request.GET.get('new') == '1'
     my_favorites_only = request.GET.get('my_favorites') == '1'
+    page = request.GET.get('page', 1)
 
     # 2. Базовая выборка (до фильтров)
     base_assortments = Assortment.objects.all()
@@ -187,6 +189,13 @@ def assortment_list(request):
             'favorites_ids': favorites_ids,
         })
 
+    # Add pagination
+    paginator = Paginator(assortments, 12)  # Show 24 items per page
+    try:
+        assortments = paginator.page(page)
+    except:
+        assortments = paginator.page(1)
+
     total_products = Assortment.objects.count()
 
     return render(request, 'assortment/assortment_list.html', {
@@ -198,12 +207,15 @@ def assortment_list(request):
         'option_counts': option_counts_dict,     # фасетные счётчики (после правки)
         'option_total_dict': option_total_dict,
         'selected_filter_ids': selected_filter_ids,
-        'query': query,
-        'new_only': new_only,
-        'favorites_ids': favorites_ids,
+        'selected_producers': selected_producers,
         'active_producers': sidebar_producers,
         'selected_producer_ids': selected_producer_ids,
-        'selected_producers': selected_producers,
+        'query': query,
+        'sort': sort,
+        'new_only': new_only,
+        'my_favorites_only': my_favorites_only,
+        'favorites_ids': favorites_ids,
+        'categories': all_categories,
     })
 
 
