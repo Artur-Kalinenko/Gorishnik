@@ -1,11 +1,17 @@
 // === Плюсики фильтров ===
 function initFilterToggles() {
+    const sidebar = document.getElementById('filters-sidebar');
+    if (!sidebar) return;
+    const viewType = sidebar.getAttribute('data-view'); // 'all' или 'category'
     const OPENED_FILTERS_KEY = 'opened_filter_groups';
+
+    if (viewType === "all" && !document.querySelector('#filter-form input[type="checkbox"]:checked')) {
+        localStorage.removeItem(OPENED_FILTERS_KEY);
+    }
 
     function saveOpenedGroups(openedIds) {
         localStorage.setItem(OPENED_FILTERS_KEY, JSON.stringify(openedIds));
     }
-
     function getOpenedGroups() {
         try {
             return JSON.parse(localStorage.getItem(OPENED_FILTERS_KEY)) || [];
@@ -16,16 +22,38 @@ function initFilterToggles() {
 
     let openedGroups = getOpenedGroups();
 
-    document.querySelectorAll('.filter-header').forEach(header => {
-        const groupId = header.dataset.groupId;
-        const options = document.getElementById(`group-${groupId}`);
-        const icon = document.getElementById(`icon-${groupId}`);
+    document.querySelectorAll('.filter-header[data-group-id]').forEach(header => {
+    const groupId = header.dataset.groupId;
+    const options = document.getElementById(`group-${groupId}`);
+    const icon = document.getElementById(`icon-${groupId}`);
+    if (!options || !icon) return; // <-- вот это!
 
+        // === Управление начальным состоянием ===
+        let open = false;
         if (openedGroups.includes(groupId)) {
-            options.style.display = 'block';
-            icon.textContent = '−';
+            open = true;
+        } else if (viewType === 'all') {
+            // На главной: только производители и "додатково" раскрыты
+            if (header.textContent.trim().toLowerCase() === 'виробники' ||
+                header.textContent.trim().toLowerCase() === 'додатково') {
+                open = true;
+            }
+        } else if (viewType === 'category') {
+            // На странице категории: раскрыта только группа категории (если у нее, например, есть спец data-атрибут)
+            if (header.classList.contains('category-group')) {
+                open = true;
+            }
         }
 
+        if (open) {
+            options.style.display = 'block';
+            icon.textContent = '−';
+        } else {
+            options.style.display = 'none';
+            icon.textContent = '+';
+        }
+
+        // === Тоггл по клику ===
         header.addEventListener('click', () => {
             const isOpen = options.style.display === 'block';
             options.style.display = isOpen ? 'none' : 'block';
@@ -39,6 +67,7 @@ function initFilterToggles() {
         });
     });
 }
+
 
 // === Картинки-производители ===
 function setupProducerFilterClicks() {

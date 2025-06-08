@@ -1,10 +1,98 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Welcome{% endblock %}
 
 {% block content %}
-<!-- Стартовая страница -->
-<div class="text-center mt-5">
-    <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Стартова сторінка</h1>
+<!-- Hero Section -->
+<div class="welcome-hero-full">
+    <div class="welcome-hero-content hero-title-block">
+        <h1 class="welcome-title hero-title">Ласкаво просимо до GORISHNIK_UA</h1>
+    </div>
+    <img src="/media/pictures/welcome_page/main_pic.png" alt="Welcome" class="welcome-hero-image-full hero-image-rounded">
+    <div class="welcome-hero-content" style="padding-top: 0;">
+        <div class="welcome-subtitle hero-subtitle">Ваш надійний партнер у світі якісних товарів</div>
+        <a href="{% url 'assortment_list' %}" class="btn btn-primary btn-lg welcome-main-btn" style="width: 100%; max-width: 100%;">Переглянути товари</a>
+    </div>
 </div>
+
+<!-- Featured Categories -->
+<div class="featured-categories">
+    <div class="container">
+        <h2 class="section-title">Популярні категорії</h2>
+        <div class="row featured-row">
+            <div class="category-card">
+                <div class="category-image-wrapper">
+                    <img src="/media/pictures/welcome_page/oreh.png" alt="Горіхи" class="category-image">
+                </div>
+                <div class="category-card-content">
+                    <h3>Горіхи</h3>
+                    <p>Великий вибір свіжих та смачних горіхів</p>
+                </div>
+                <a href="/assortment/items/?category=Горіхи" class="category-view-btn"><span>Детальніше</span></a>
+            </div>
+            <div class="category-card">
+                <div class="category-image-wrapper">
+                    <img src="/media/pictures/welcome_page/suhofrukt.png" alt="Сухофрукти" class="category-image">
+                </div>
+                <div class="category-card-content">
+                    <h3>Сухофрукти</h3>
+                    <p>Натуральні сухофрукти для здорового харчування</p>
+                </div>
+                <a href="/assortment/items/?category=Cухофрукти" class="category-view-btn"><span>Детальніше</span></a>
+            </div>
+            <div class="category-card">
+                <div class="category-image-wrapper">
+                    <img src="/media/pictures/welcome_page/eurotov.png" alt="Євротовари та Бакалія" class="category-image">
+                </div>
+                <div class="category-card-content">
+                    <h3>Євротовари та Бакалія</h3>
+                    <p>Європейські товари та бакалія для вашого столу</p>
+                </div>
+                <a href="/assortment/items/?category=Євротовари%20та%20Бакалія" class="category-view-btn"><span>Детальніше</span></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Why Choose Us -->
+<div class="why-choose-us">
+    <div class="container">
+        <h2 class="section-title">Чому обирають нас</h2>
+        <div class="row why-row">
+            <div class="feature-card">
+                <i class="bi bi-truck"></i>
+                <h3>Швидка доставка</h3>
+                <p>Доставляємо по всій Україні</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-shield-check"></i>
+                <h3>Якість товарів</h3>
+                <p>Перевіряємо кожен товар</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-headset"></i>
+                <h3>Підтримка 24/7</h3>
+                <p>Завжди на зв'язку</p>
+            </div>
+            <div class="feature-card">
+                <i class="bi bi-currency-dollar"></i>
+                <h3>Доступні ціни</h3>
+                <p>Найкращі пропозиції</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="cta-section cta-rounded">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Готові почати покупки?</h2>
+            <p>Перегляньте наш каталог та знайдіть ідеальні товари для себе</p>
+            <a href="{% url 'assortment_list' %}" class="btn btn-primary">Перейти до каталогу</a>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="{% static 'pages/welcome.css' %}">
 {% endblock %}
