@@ -75,10 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 if (data.success) {
                     // Удаляем элемент из DOM
-                    const itemElement = document.getElementById(`cart-item-${itemId}`);
-                    const mobileItemElement = document.getElementById(`cart-item-mobile-${itemId}`);
+                    const itemElement = document.getElementById(`cart-mobile-item-${itemId}`);
                     if (itemElement) itemElement.remove();
-                    if (mobileItemElement) mobileItemElement.remove();
 
                     // Обновляем общую сумму
                     document.getElementById('cart-total-price').textContent = data.cart_total_price;

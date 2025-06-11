@@ -6,6 +6,17 @@
     {{ assortment.assortment_name }}
 {% endblock %}
 
+{% block breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'category_list' %}">{% trans "Categories" %}</a>
+    </li>
+    {% for cat in assortment.assortment_categories.all %}
+        <li class="breadcrumb-item">
+            <a href="{% url 'assortment_list' %}?category={{ cat.category }}">{{ cat.category }}</a>
+        </li>
+    {% endfor %}
+    <li class="breadcrumb-item active">{{ assortment.assortment_name }}</li>
+{% endblock %}
 
 {% block content %}
 <div id="customConfirmModal" class="custom-modal">
@@ -24,19 +35,6 @@
   </div>
 </div>
 <div class="container mt-5">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'welcome' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'category_list' %}" class="text-decoration-none">{% trans "Catalog" %}</a></li>
-            {% for cat in assortment.assortment_categories.all %}
-                <li class="breadcrumb-item">
-                    <a href="{% url 'category_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a>
-                </li>
-            {% endfor %}
-            <li class="breadcrumb-item active" aria-current="page">{{ assortment.assortment_name }}</li>
-        </ol>
-    </nav>
-
     <div class="row align-items-stretch">
         <!-- Картинка -->
         <div class="col-md-6 d-flex align-items-center justify-content-center">

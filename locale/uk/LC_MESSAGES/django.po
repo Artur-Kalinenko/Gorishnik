@@ -719,3 +719,7 @@ msgstr "Ваше замовлення оформлено!"
 #: payments/templates/payments/order_success.html:7
 msgid "Дякуємо за замовлення. Ми вже працюємо над його відправкою."
 msgstr "Дякуємо за замовлення. Ми вже працюємо над його відправкою."
+
+#: assortment/templates/assortment/assortment_list.html:25
+msgid "All products"
+msgstr "Всі товари"

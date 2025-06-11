@@ -29,3 +29,6 @@ staticfiles/  # сюда попадают файлы из collectstatic
 
 # Docker
 *.pid
+
+#DB
+backups/

@@ -536,19 +536,6 @@ input.quantity-input:focus, input.quantity-input:hover {
     transform: scale(1.11);
 }
 
-/* ==== Breadcrumb ==== */
-.breadcrumb {
-    background: transparent;
-    padding: 0;
-    margin-bottom: 2rem;
-}
-.breadcrumb-item a {
-    color: var(--accent-dark);
-    transition: color var(--transition);
-}
-.breadcrumb-item a:hover { color: var(--accent); }
-.breadcrumb-item.active { color: var(--accent-dark); }
-
 /* ==== Медиа-запросы ==== */
 @media (max-width: 991px) {
     .product-gallery, .product-info { max-width: 100%; min-width: 0; }
