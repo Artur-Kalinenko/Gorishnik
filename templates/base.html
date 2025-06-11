@@ -48,7 +48,7 @@
 
             <!-- Центр: Поиск (только для десктопа) -->
             <div class="d-flex justify-content-center flex-grow-1 desktop-only">
-                <form class="position-relative d-flex align-items-stretch" method="get" action="{% url 'assortment_items' %}" style="max-width: 500px; width: 100%;">
+                <form class="position-relative d-flex align-items-stretch" method="get" action="{% url 'assortment_list' %}" style="max-width: 500px; width: 100%;">
                     {% csrf_token %}
                     <input class="form-control w-100 ps-4 pe-5" type="search" name="q" id="search-input"
                            placeholder="{% trans 'What are we looking for?' %}" autocomplete="off" value="{{ query|default:'' }}">
@@ -165,7 +165,7 @@
 
             <!-- Центральная часть -->
             <div class="nav-center">
-                <a class="category-btn d-flex align-items-center {% if request.path == '/assortment/' %}btn-primary{% endif %}" href="{% url 'assortment_list' %}" style="padding: 0 12px;">
+                <a class="category-btn d-flex align-items-center {% if request.path == '/assortment/' %}btn-primary{% endif %}" href="{% url 'category_list' %}" style="padding: 0 12px;">
                     <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
                          data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
@@ -226,6 +226,22 @@
             </div>
         </div>
     </nav>
+
+    <!-- Хлебные крошки -->
+    <div class="breadcrumbs py-2 bg-light">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <a href="/" class="text-decoration-none">
+                            <i class="bi bi-house-door"></i> {% trans "Home" %}
+                        </a>
+                    </li>
+                    {% block breadcrumbs %}{% endblock %}
+                </ol>
+            </nav>
+        </div>
+    </div>
 </header>
 
 <!-- Мобильное меню -->
@@ -236,7 +252,7 @@
     </div>
     
     <div class="mobile-menu-search">
-        <form method="get" action="{% url 'assortment_items' %}">
+        <form method="get" action="{% url 'assortment_list' %}">
             {% csrf_token %}
             <input class="form-control" type="search" name="q" placeholder="{% trans 'What are we looking for?' %}" autocomplete="off">
         </form>
@@ -268,7 +284,7 @@
 
         <!-- Секция навигации -->
         <div class="mobile-menu-section" id="navigation-section">
-            <a href="{% url 'assortment_list' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+            <a href="{% url 'category_list' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
                 <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
                      data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
                      data-original="{{ MEDIA_URL }}icons/assortment_brown.png"

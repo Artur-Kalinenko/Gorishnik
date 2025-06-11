@@ -150,7 +150,7 @@ class Category(models.Model):
         return self.category
 
     def get_absolute_url(self):
-        return reverse('assortment_items') + f'?category={self.category}'
+        return reverse('assortment_list') + f'?category={self.category}'
 
     def delete(self, *args, **kwargs):
         if self.assortments.exists():  # ← Используем related_name

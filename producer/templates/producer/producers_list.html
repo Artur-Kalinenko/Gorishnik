@@ -10,7 +10,7 @@
     <div class="row producers-grid">
         {% for producer in producers %}
             <div class="col-md producer-card-wrapper">
-                <a href="{% url 'assortment_items' %}?producer={{ producer.id }}" class="producer-card">
+                <a href="{% url 'assortment_list' %}?producer={{ producer.id }}" class="producer-card">
                     <div class="producer-logo">
                         {% if producer.producer_img %}
                             <img src="{{ producer.producer_img.url }}"

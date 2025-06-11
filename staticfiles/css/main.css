@@ -572,14 +572,57 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: var(--bg-main);
+    background-color: var(--bg-main);
+}
+
+/* Стили для хлебных крошек */
+.breadcrumbs {
+    background-color: var(--bg-subnav) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumb {
+    margin: 0;
+    padding: 0;
+}
+
+.breadcrumb-item {
+    font-size: 0.9rem;
+    color: var(--accent-dark);
+}
+
+.breadcrumb-item a {
+    color: var(--accent);
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--accent-dark);
+}
+
+.breadcrumb-item.active {
+    color: var(--accent-dark);
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--accent);
 }
 
 /* === Search Suggestions Above All === */
 #suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
     z-index: 2000 !important;
+    max-height: 320px;
+    overflow-y: auto;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    background: #fff;
+    border: 1px solid #ece2d6;
 }
-
 
 /* Вертикальное выравнивание поиска и кнопок */
 .top-bar .container, .top-bar .d-flex.justify-content-center.flex-grow-1, .top-bar .d-flex.align-items-center {
@@ -591,8 +634,6 @@ header {
     display: flex;
     align-items: center;
 }
-
-
 
 /* Media Queries */
 /* Large screens (992px and up) */

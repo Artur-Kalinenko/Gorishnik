@@ -686,3 +686,13 @@ msgstr "Ваш заказ оформлен!"
 #: payments/templates/payments/order_success.html:7
 msgid "Дякуємо за замовлення. Ми вже працюємо над його відправкою."
 msgstr "Спасибо за заказ. Мы уже работаем над его отправкой."
+
+# Django password validation errors
+msgid "This password is too short. It must contain at least 8 characters."
+msgstr "Пароль должен содержать не менее 8 символов."
+
+msgid "This password is too common."
+msgstr "Пароль слишком распространён."
+
+msgid "This password is entirely numeric."
+msgstr "Пароль не может состоять только из цифр."

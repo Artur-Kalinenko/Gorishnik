@@ -27,10 +27,10 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'welcome' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'assortment_list' %}" class="text-decoration-none">{% trans "Catalog" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'category_list' %}" class="text-decoration-none">{% trans "Catalog" %}</a></li>
             {% for cat in assortment.assortment_categories.all %}
                 <li class="breadcrumb-item">
-                    <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a>
+                    <a href="{% url 'category_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a>
                 </li>
             {% endfor %}
             <li class="breadcrumb-item active" aria-current="page">{{ assortment.assortment_name }}</li>
@@ -81,7 +81,7 @@
                 <h1 class="montserrat-category-title mb-3">{{ assortment.assortment_name }}</h1>
                 <div class="mb-3">
                     {% for cat in assortment.assortment_categories.all %}
-                        <a href="{% url 'assortment_list' %}?category={{ cat.category }}"
+                        <a href="{% url 'category_list' %}?category={{ cat.category }}"
                            class="category-btn category-button d-inline-flex align-items-center me-2 mb-2">
                             {% if cat.button_icon_brown and cat.button_icon_white %}
                                 <img src="{{ cat.button_icon_brown.url }}"

@@ -44,10 +44,15 @@ document.addEventListener("DOMContentLoaded", function () {
                         const link = document.createElement("a");
                         link.href = item.url;
                         link.className = "list-group-item list-group-item-action";
-                        link.innerHTML = `<strong>${item.name}</strong>`;
-                        if (item.category) {
-                            link.innerHTML += `<br><small class="text-muted">${item.category}</small>`;
-                        }
+                        link.innerHTML = `
+                          <div style="display: flex; align-items: center;">
+                            ${item.image ? `<img src="${item.image}" alt="" style="width:32px;height:32px;object-fit:cover;border-radius:4px;margin-right:10px;">` : ''}
+                            <div>
+                              <strong>${item.name}</strong>
+                              ${item.category ? `<br><small class="text-muted">${item.category}</small>` : ''}
+                            </div>
+                          </div>
+                        `;
                         suggestions.appendChild(link);
                     });
                 });

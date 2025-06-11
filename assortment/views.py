@@ -300,7 +300,19 @@ def search_suggest(request):
     results = []
 
     if q:
-        matches = (
+        # First try exact matches
+        exact_matches = (
+            Assortment.objects
+            .filter(
+                Q(assortment_name__iexact=q) |
+                Q(assortment_categories__category__iexact=q)
+            )
+            .prefetch_related('assortment_categories')
+            .distinct()[:3]
+        )
+
+        # Then try partial matches
+        partial_matches = (
             Assortment.objects
             .filter(
                 Q(assortment_name__icontains=q) |
@@ -311,15 +323,51 @@ def search_suggest(request):
                 Q(filters__group__name__icontains=q)
             )
             .prefetch_related('assortment_categories')
-            .distinct()[:6]
+            .exclude(id__in=exact_matches.values_list('id', flat=True))
+            .distinct()[:3]
         )
 
-        for item in matches:
-            first_category = item.assortment_categories.first()
+        # Process exact matches first
+        for item in exact_matches:
+            categories = [cat.category for cat in item.assortment_categories.all()]
+            image_url = item.poster.url if item.poster else ''
             results.append({
                 'name': item.assortment_name,
                 'url': f"/assortment/{item.pk}/",
-                'category': first_category.category if first_category else '',
+                'categories': categories,
+                'image': image_url,
+                'type': 'exact_match',
+                'price': str(item.price) if item.price else '',
             })
+
+        # Then process partial matches
+        for item in partial_matches:
+            categories = [cat.category for cat in item.assortment_categories.all()]
+            image_url = item.poster.url if item.poster else ''
+            results.append({
+                'name': item.assortment_name,
+                'url': f"/assortment/{item.pk}/",
+                'categories': categories,
+                'image': image_url,
+                'type': 'partial_match',
+                'price': str(item.price) if item.price else '',
+            })
+
+        # Add category suggestions if we have less than 6 results
+        if len(results) < 6:
+            category_matches = (
+                Category.objects
+                .filter(category__icontains=q)
+                .exclude(category__in=[cat for result in results for cat in result['categories']])
+                .distinct()[:6 - len(results)]
+            )
+            
+            for category in category_matches:
+                results.append({
+                    'name': category.category,
+                    'url': f"/assortment/?category={category.category}",
+                    'type': 'category',
+                    'image': '',
+                })
 
     return JsonResponse({'results': results})
