@@ -18,7 +18,7 @@ from collections import defaultdict
 from django.core.paginator import Paginator
 
 def category_list_view(request):
-    categories = Category.objects.all()
+    categories = Category.objects.all().order_by('created_at')
     return render(request, 'assortment/category_list.html', {'categories': categories})
 
 def chunked(iterable, size):

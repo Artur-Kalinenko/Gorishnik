@@ -1,21 +1,22 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="login-container">
-    <h2>Вхід до акаунту</h2>
+    <h2>{% trans "Login to Account" %}</h2>
 
     <!-- Уведомление о том, что вход через Google был отменен -->
     {% if request.GET.cancel %}
         <div class="alert alert-warning">
-            Ви скасували вхід через Google.
+            {% trans "You cancelled Google login." %}
         </div>
     {% endif %}
 
     <!-- Системные сообщения -->
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            <div class="alert alert-{{ message.tags }}">{% trans message.message %}</div>
         {% endfor %}
     {% endif %}
 
@@ -24,41 +25,41 @@
         {% csrf_token %}
         {{ form.non_field_errors }}
         <div class="form-group">
-            <label for="id_identifier">Email або телефон</label>
+            <label for="id_identifier">{% trans "Email or phone" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-person"></i></span>
                 {{ form.identifier }}
             </div>
         </div>
         <div class="form-group">
-            <label for="id_password">Пароль</label>
+            <label for="id_password">{% trans "Password" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
                 {{ form.password }}
             </div>
         </div>
         <div class="d-flex justify-content-between align-items-center">
-            <a href="{% url 'password_reset_request' %}" class="btn-link p-0 login-forgot-link">Забули пароль?</a>
+            <a href="{% url 'password_reset_request' %}" class="btn-link p-0 login-forgot-link">{% trans "Forgot password?" %}</a>
         </div>
 
         <!-- Кнопка входа -->
-        <button type="submit" class="btn btn-primary">Увійти</button>
+        <button type="submit" class="btn btn-primary">{% trans "Login" %}</button>
     </form>
 
     <div class="divider">
-        <span>Ще немає акаунту?</span>
+        <span>{% trans "Don't have an account yet?" %}</span>
     </div>
 
     <!-- Кнопка регистрации -->
-    <a href="{% url 'register' %}" class="btn btn-outline-success">Реєстрація</a>
+    <a href="{% url 'register' %}" class="btn btn-outline-success">{% trans "Registration" %}</a>
 
     <div class="divider">
-        <span>або</span>
+        <span>{% trans "or" %}</span>
     </div>
 
     <!-- Кнопка входа через Google -->
     <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger">
-        <i class="bi bi-google"></i> Увійти через Google
+        <i class="bi bi-google"></i> {% trans "Login with Google" %}
     </a>
 </div>
 

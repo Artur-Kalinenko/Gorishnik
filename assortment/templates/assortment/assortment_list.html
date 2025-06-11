@@ -2,14 +2,15 @@
 {% load static %}
 {% load assortment_extras %}
 {% load dict_extras %}
+{% load i18n %}
 
 {% block title %}
     {% if current_category %}
         {{ current_category.category }}
     {% elif query %}
-        Результати пошуку для: {{ query }}
+        {% trans "Search results for" %}: {{ query }}
     {% else %}
-        Асортимент
+        {% trans "Assortment" %}
     {% endif %}
 {% endblock %}
 
@@ -19,7 +20,7 @@
     <!-- Заголовок -->
     <h1 class="montserrat-category-title d-flex align-items-center justify-content-center mb-4">
         {% if query %}
-            Результати пошуку для: "{{ query }}"
+            {% trans "Search results for" %}: "{{ query }}"
         {% elif selected_producers %}
             {% if selected_producers|length == 1 %}
                 {{ selected_producers.0.producer_name }}
@@ -35,68 +36,9 @@
         {% elif current_category %}
             {{ current_category.category }}
         {% else %}
-            Асортимент
+            {% trans "Assortment" %}
         {% endif %}
     </h1>
-
-<!--    &lt;!&ndash; Категорії &ndash;&gt;-->
-<!--    {% if not query %}-->
-<!--    <div class="container">-->
-<!--        <div class="d-flex justify-content-center mb-4 flex-wrap category-buttons-wrapper">-->
-<!--            {% get_media_prefix as MEDIA_URL %}-->
-
-<!--            &lt;!&ndash; Кнопка "Всі товари" &ndash;&gt;-->
-<!--            <div class="text-center mx-2 my-1">-->
-<!--                <a href="{% url 'assortment_items' %}"-->
-<!--                   class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if not current_category %}btn-primary{% endif %}"-->
-<!--                   style="min-width: 150px; gap: 8px;">-->
-<!--                    {% if not current_category %}-->
-<!--                        <img src="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"-->
-<!--                             data-hover="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"-->
-<!--                             data-original="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"-->
-<!--                             class="category-icon"-->
-<!--                             alt="Всі товари"-->
-<!--                             style="height: 24px; width: 24px;">-->
-<!--                    {% else %}-->
-<!--                        <img src="{{ MEDIA_URL }}assortment/category_icons_brown/shop_brown.png"-->
-<!--                             data-hover="{{ MEDIA_URL }}assortment/category_icons_white/shop_white.png"-->
-<!--                             data-original="{{ MEDIA_URL }}assortment/category_icons_brown/shop_brown.png"-->
-<!--                             class="category-icon"-->
-<!--                             alt="Всі товари"-->
-<!--                             style="height: 24px; width: 24px;">-->
-<!--                    {% endif %}-->
-<!--                    <span style="font-size: 0.85rem;">ВСІ ТОВАРИ</span>-->
-<!--                </a>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Остальные категории &ndash;&gt;-->
-<!--            {% for category in categories %}-->
-<!--                <div class="text-center mx-2 my-1">-->
-<!--                    <a href="{% url 'assortment_items' %}?category={{ category.category }}"-->
-<!--                       class="btn d-flex align-items-center justify-content-center py-2 px-3 text-uppercase {% if current_category and current_category.category == category.category %}btn-primary{% endif %}"-->
-<!--                       style="min-width: 150px; gap: 8px;">-->
-<!--                        {% if category.button_icon_brown %}-->
-<!--                            {% if current_category and current_category.category == category.category %}-->
-<!--                                <img src="{{ category.button_icon_white.url }}"-->
-<!--                                     data-hover="{{ category.button_icon_white.url }}"-->
-<!--                                     class="category-icon"-->
-<!--                                     alt="{{ category.category }}"-->
-<!--                                     style="height: 24px; width: 24px;">-->
-<!--                            {% else %}-->
-<!--                                <img src="{{ category.button_icon_brown.url }}"-->
-<!--                                     data-hover="{{ category.button_icon_white.url }}"-->
-<!--                                     class="category-icon"-->
-<!--                                     alt="{{ category.category }}"-->
-<!--                                     style="height: 24px; width: 24px;">-->
-<!--                            {% endif %}-->
-<!--                        {% endif %}-->
-<!--                        <span style="font-size: 0.85rem;">{{ category.category }}</span>-->
-<!--                    </a>-->
-<!--                </div>-->
-<!--            {% endfor %}-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    {% endif %}-->
 
     <div class="row">
         <div class="col-md-3">
@@ -112,12 +54,12 @@
                     {% endif %}
                 {% endfor %}
                 <select name="sort" onchange="this.form.submit()" class="form-select w-auto">
-                    <option value="">Сортувати...</option>
-                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>За популярністю</option>
-                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Новинки</option>
-                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>За ціною ↑</option>
-                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>За ціною ↓</option>
-                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>За рейтингом</option>
+                    <option value="">{% trans "Sort by..." %}</option>
+                    <option value="popular" {% if request.GET.sort == 'popular' %}selected{% endif %}>{% trans "By popularity" %}</option>
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>{% trans "Newest" %}</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>{% trans "By price ↑" %}</option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>{% trans "By price ↓" %}</option>
+                    <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>{% trans "By rating" %}</option>
                 </select>
             </form>
 

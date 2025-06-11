@@ -1,4 +1,5 @@
 {% load dict_extras %}
+{% load i18n %}
 
 <!-- Корневой контейнер фильтров -->
 <div class="sidebar" id="filters-sidebar" data-view="{% if current_category %}category{% else %}all{% endif %}">
@@ -15,7 +16,7 @@
     {% if active_producers %}
         <div class="filter-group mb-3">
             <h5 class="filter-header">
-                Виробники
+                {% trans "Producers" %}
             </h5>
             <div class="filter-options" id="group-producers" style="display: block;">
                 <div class="d-flex flex-wrap gap-2">
@@ -47,19 +48,19 @@
     {# === Блок "Додатково" — ВСЕГДА открыт на главной === #}
     <div class="filter-group mb-3">
         <h5 class="filter-header">
-            Додатково
+            {% trans "Additional" %}
         </h5>
         <div class="filter-options" id="group-additional" style="display: block;">
             <label class="form-check mb-1">
                 <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
                 <span class="custom-checkbox"></span>
-                <span class="form-check-label">Новинки</span>
+                <span class="form-check-label">{% trans "New items" %}</span>
             </label>
             {% if user.is_authenticated %}
                 <label class="form-check mb-1">
                     <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
                     <span class="custom-checkbox"></span>
-                    <span class="form-check-label">Мої обрані товари</span>
+                    <span class="form-check-label">{% trans "My favorite items" %}</span>
                 </label>
             {% endif %}
         </div>
@@ -109,14 +110,14 @@
                 <button type="button"
                         class="btn btn-link btn-sm show-unavailable"
                         data-group-id="{{ group.id }}">
-                    Показати всі фільтри
+                    {% trans "Show all filters" %}
                 </button>
             </div>
         </div>
     {% endfor %}
 
     <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
-        Очистити фільтри
+        {% trans "Clear filters" %}
     </button>
 </form>
 </div>

@@ -6,36 +6,716 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: Gorishnik_ua\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-16 09:59+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2024-03-19 12:00+0000\n"
+"PO-Revision-Date: 2024-03-19 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Ukrainian\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
-"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
-"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
-"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
-#: accounts/admin.py:14
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: accounts/admin.py:16
 msgid "Permissions"
 msgstr ""
 
-#: accounts/admin.py:15
+#: accounts/admin.py:17
 msgid "Important dates"
 msgstr ""
 
-#: django/contrib/auth/password_validation.py:29
-msgid "This password is too short. It must contain at least 8 characters."
-msgstr "Цей пароль надто короткий. Він має містити щонайменше 8 символів."
+#: accounts/forms.py:10 accounts/forms.py:119
+msgid "Ім'я"
+msgstr ""
 
-#: django/contrib/auth/password_validation.py:37
-msgid "This password is too common."
-msgstr "Пароль надто відомий."
+#: accounts/forms.py:11
+msgid "Email"
+msgstr ""
 
-#: django/contrib/auth/password_validation.py:45
-msgid "This password is entirely numeric."
-msgstr "Цей пароль повністю складається із цифр."
+#: accounts/forms.py:13 accounts/forms.py:120
+msgid "Телефон"
+msgstr ""
+
+#: accounts/forms.py:19 accounts/forms.py:62
+msgid "Пароль"
+msgstr ""
+
+#: accounts/forms.py:20
+msgid "Підтвердіть пароль"
+msgstr ""
+
+#: accounts/forms.py:26 accounts/forms.py:104
+msgid "Користувач з таким email вже існує."
+msgstr ""
+
+#: accounts/forms.py:35
+msgid "Користувач з таким телефоном вже існує."
+msgstr ""
+
+#: accounts/forms.py:44
+msgid "Паролі не співпадають."
+msgstr ""
+
+#: accounts/forms.py:53
+msgid "Email або телефон"
+msgstr ""
+
+#: accounts/forms.py:57
+msgid "Введіть email або телефон"
+msgstr ""
+
+#: accounts/forms.py:66
+msgid "Введіть пароль"
+msgstr ""
+
+#: accounts/forms.py:73
+msgid "Ваша електронна адреса"
+msgstr ""
+
+#: accounts/forms.py:78
+msgid "Користувача з таким email не існує."
+msgstr ""
+
+#: accounts/forms.py:82
+msgid "Код підтвердження"
+msgstr ""
+
+#: accounts/forms.py:85
+msgid "Новий пароль"
+msgstr ""
+
+#: accounts/forms.py:86
+msgid "Підтвердіть новий пароль"
+msgstr ""
+
+#: accounts/forms.py:99
+msgid "Новий email"
+msgstr ""
+
+#: gorishnik/settings.py:111
+msgid "Українська"
+msgstr ""
+
+#: gorishnik/settings.py:112
+msgid "Русский"
+msgstr ""
+
+#: templates/base.html:8
+msgid "Gorishnik"
+msgstr "Gorishnik"
+
+#: templates/base.html:54 templates/base.html:241
+msgid "What are we looking for?"
+msgstr "Що будемо шукати?"
+
+#: templates/base.html:61
+msgid "Search"
+msgstr "Пошук"
+
+#: templates/base.html:74
+msgid "Cart"
+msgstr "Кошик"
+
+#: templates/base.html:99 templates/base.html:102 templates/base.html:323 templates/base.html:324
+msgid "Logout"
+msgstr "Вийти"
+
+#: templates/base.html:109 templates/base.html:112 templates/base.html:331 templates/base.html:332 templates/base.html:382
+msgid "Login"
+msgstr "Увійти"
+
+#: templates/base.html:119 templates/base.html:234
+msgid "Menu"
+msgstr "Меню"
+
+#: templates/base.html:136 templates/base.html:139 templates/base.html:246
+msgid "Categories"
+msgstr "Категорії товарів"
+
+#: templates/base.html:172 templates/base.html:175 templates/base.html:275 templates/base.html:276
+msgid "Assortment"
+msgstr "Асортимент"
+
+#: templates/base.html:181 templates/base.html:184 templates/base.html:282 templates/base.html:283
+msgid "Producers"
+msgstr "Виробники"
+
+#: templates/base.html:190 templates/base.html:193 templates/base.html:289 templates/base.html:290
+msgid "Delivery"
+msgstr "Доставка"
+
+#: templates/base.html:199 templates/base.html:202 templates/base.html:296 templates/base.html:297
+msgid "Reviews"
+msgstr "Відгуки"
+
+#: templates/base.html:209 templates/base.html:212 templates/base.html:304 templates/base.html:305
+msgid "My Cabinet"
+msgstr "Мій кабінет"
+
+#: templates/base.html:220 templates/base.html:223 templates/base.html:313 templates/base.html:314
+msgid "Admin"
+msgstr "Адмін"
+
+#: templates/base.html:247
+msgid "Navigation"
+msgstr "Навігація"
+
+#: templates/base.html:351
+msgid "Login to Account"
+msgstr "Вхід в обліковий запис"
+
+#: templates/base.html:352 templates/base.html:415 templates/base.html:424 templates/base.html:432 templates/base.html:440
+msgid "Close"
+msgstr "Закрити"
+
+#: templates/base.html:362
+msgid "Email or phone"
+msgstr "Email або телефон"
+
+#: templates/base.html:369
+msgid "Password"
+msgstr "Пароль"
+
+#: templates/base.html:376
+msgid "Forgot password?"
+msgstr "Забули пароль?"
+
+#: templates/base.html:385
+msgid "Don't have an account yet?"
+msgstr "Ще немає облікового запису?"
+
+#: templates/base.html:388
+msgid "Registration"
+msgstr "Реєстрація"
+
+#: templates/base.html:391
+msgid "or"
+msgstr "або"
+
+#: templates/base.html:396
+msgid "Login with Google"
+msgstr "Увійти через Google"
+
+#: templates/base.html:407
+msgid "All rights reserved"
+msgstr "Всі права захищені"
+
+#: templates/base.html:421
+msgid "To add an item to"
+msgstr "Щоб додати товар в"
+
+#: templates/base.html:422
+msgid "login or register"
+msgstr "увійдіть або зареєструйтесь"
+
+#: templates/base.html:430
+msgid "Item added to"
+msgstr "Товар додано у"
+
+#: templates/base.html:430
+msgid "cart"
+msgstr "кошик"
+
+#: templates/base.html:438
+msgid "Item removed from cart"
+msgstr "Товар видалено з кошика"
+
+msgid "Favorites"
+msgstr "Обрані товари"
+
+msgid "please"
+msgstr "будь ласка"
+
+msgid "Change Email Address"
+msgstr "Зміна адреси електронної пошти"
+
+msgid "New email address"
+msgstr "Нова адреса email"
+
+msgid "Enter new email address"
+msgstr "Введіть нову адресу email"
+
+msgid "Send verification code"
+msgstr "Надіслати код підтвердження"
+
+msgid "Change Password"
+msgstr "Зміна пароля"
+
+msgid "Save"
+msgstr "Зберегти"
+
+msgid "Code Confirmation"
+msgstr "Підтвердження коду"
+
+msgid "Enter the 6-digit code sent to your email."
+msgstr "Введіть 6-значний код, надісланий вам на пошту."
+
+msgid "Confirmation code"
+msgstr "Код підтвердження"
+
+msgid "Enter code"
+msgstr "Введіть код"
+
+msgid "Confirm"
+msgstr "Підтвердити"
+
+msgid "Resend code"
+msgstr "Надіслати код повторно"
+
+msgid "Edit Profile"
+msgstr "Редагувати профіль"
+
+msgid "Cancel"
+msgstr "Скасувати"
+
+msgid "You cancelled Google login."
+msgstr "Ви скасували вхід через Google."
+
+msgid "New Password"
+msgstr "Новий пароль"
+
+msgid "Enter new password"
+msgstr "Введіть новий пароль"
+
+msgid "Confirm password"
+msgstr "Підтвердження паролю"
+
+msgid "Repeat new password"
+msgstr "Повторіть новий пароль"
+
+msgid "Password Recovery"
+msgstr "Відновлення паролю"
+
+msgid "Enter your email"
+msgstr "Введіть ваш email"
+
+msgid "Send Code"
+msgstr "Надіслати код"
+
+msgid "Name"
+msgstr "Ім'я"
+
+msgid "Your name"
+msgstr "Ваше ім'я"
+
+msgid "Your email address"
+msgstr "Ваша адреса email"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Your phone number"
+msgstr "Ваш номер телефону"
+
+msgid "Enter password"
+msgstr "Введіть пароль"
+
+msgid "Enter the same password as above"
+msgstr "Введіть той самий пароль ще раз"
+
+msgid "Register"
+msgstr "Зареєструватися"
+
+msgid "Already have an account?"
+msgstr "Вже маєте обліковий запис?"
+
+msgid "My Account"
+msgstr "Мій обліковий запис"
+
+msgid "Personal Information"
+msgstr "Особиста інформація"
+
+msgid "(not specified)"
+msgstr "(не вказано)"
+
+msgid "Favorite Products"
+msgstr "Обрані товари"
+
+msgid "You don't have any favorite products yet."
+msgstr "У вас ще немає обраних товарів."
+
+msgid "Previous"
+msgstr "Попередній"
+
+msgid "Next"
+msgstr "Наступний"
+
+msgid "Order History"
+msgstr "Історія замовлень"
+
+msgid "Order"
+msgstr "Замовлення"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Delivery Method"
+msgstr "Спосіб доставки"
+
+msgid "Products"
+msgstr "Товари"
+
+msgid "pcs"
+msgstr "шт"
+
+msgid "Total"
+msgstr "Всього"
+
+msgid "UAH"
+msgstr "грн"
+
+msgid "You don't have any orders yet."
+msgstr "У вас ще немає замовлень."
+
+msgid "Оцінка"
+msgstr "Оцінка"
+
+msgid "Відгук"
+msgstr "Відгук"
+
+msgid "Відгук не повинен перевищувати 500 символів."
+msgstr "Відгук не повинен перевищувати 500 символів."
+
+msgid "Категорії товарів"
+msgstr "Категорії товарів"
+
+msgid "Всі товари"
+msgstr "Всі товари"
+
+msgid "Переглянути товари"
+msgstr "Переглянути товари"
+
+msgid "Search results for"
+msgstr "Результати пошуку для"
+
+msgid "Sort by..."
+msgstr "Сортувати..."
+
+msgid "By popularity"
+msgstr "За популярністю"
+
+msgid "Newest"
+msgstr "Новинки"
+
+msgid "By price ↑"
+msgstr "За ціною ↑"
+
+msgid "By price ↓"
+msgstr "За ціною ↓"
+
+msgid "By rating"
+msgstr "За рейтингом"
+
+msgid "Confirmation"
+msgstr "Підтвердження"
+
+msgid "Are you sure you want to delete the review?"
+msgstr "Ви впевнені, що хочете видалити відгук?"
+
+msgid "Delete"
+msgstr "Видалити"
+
+msgid "Home"
+msgstr "Головна"
+
+msgid "Catalog"
+msgstr "Каталог"
+
+msgid "No image available"
+msgstr "Зображення відсутнє"
+
+msgid "Producer"
+msgstr "Виробник"
+
+msgid "In stock,Out of stock"
+msgstr "У наявності,Нема у наявності"
+
+msgid "Select weight"
+msgstr "Оберіть грамовку"
+
+msgid "Add to cart"
+msgstr "В корзину"
+
+msgid "Product description"
+msgstr "Опис продукту"
+
+msgid "No reviews yet."
+msgstr "Немає відгуків."
+
+msgid "Leave a review"
+msgstr "Залишити відгук"
+
+msgid "Submit"
+msgstr "Надіслати"
+
+msgid "You have already left a review."
+msgstr "Ви вже залишали відгук."
+
+msgid "Please log in to leave a review."
+msgstr "Щоб залишити відгук, увійдіть до акаунту."
+
+msgid "Additional"
+msgstr "Додатково"
+
+msgid "New items"
+msgstr "Новинки"
+
+msgid "My favorite items"
+msgstr "Мої обрані товари"
+
+msgid "Show all filters"
+msgstr "Показати всі фільтри"
+
+msgid "Clear filters"
+msgstr "Очистити фільтри"
+
+msgid "New"
+msgstr "Новинка"
+
+msgid "Sale"
+msgstr "Акція"
+
+msgid "g"
+msgstr "г"
+
+msgid "Buy"
+msgstr "Купити"
+
+msgid "Buy product"
+msgstr "Купити товар"
+
+msgid "No search results found."
+msgstr "Результати пошуку відсутні."
+
+msgid "Remove"
+msgstr "Видалити"
+
+msgid "No image"
+msgstr "Немає зображення"
+
+msgid "Total amount"
+msgstr "Загальна сума"
+
+msgid "Place order"
+msgstr "Зробити замовлення"
+
+msgid "Your cart is empty"
+msgstr "Ваш кошик порожній"
+
+msgid "Go to shopping"
+msgstr "Перейти до покупок"
+
+msgid "Order checkout"
+msgstr "Оформлення замовлення"
+
+msgid "Full name"
+msgstr "ПІБ"
+
+msgid "Recipient full name"
+msgstr "ПІБ отримувача"
+
+msgid "Recipient contact number"
+msgstr "Контактний номер отримувача"
+
+msgid "Delivery method"
+msgstr "Спосіб доставки"
+
+msgid "Nova Poshta"
+msgstr "Нова Пошта"
+
+msgid "Ukrposhta"
+msgstr "Укрпошта"
+
+msgid "Self-pickup"
+msgstr "Самовивіз"
+
+msgid "Additional notes"
+msgstr "Додаткові побажання"
+
+msgid "Your order preferences. If you are ordering delivery as a gift, please provide your phone number and name for contact!"
+msgstr "Ваші побажання до замовлення. Якщо ви замовляєте доставку у якості подарунка, будь ласка, вкажіть ваш номер телефону та імʼя для звʼязку з вами!"
+
+msgid "Payment method"
+msgstr "Спосіб оплати"
+
+msgid "Cash on delivery"
+msgstr "Оплата при отриманні"
+
+msgid "Online payment"
+msgstr "Оплата на сайті"
+
+msgid "Payment by invoice"
+msgstr "Оплата за реквізитами"
+
+msgid "City (Nova Poshta)"
+msgstr "Місто (Нова Пошта)"
+
+msgid "Warehouse (Nova Poshta)"
+msgstr "Відділення (Нова Пошта)"
+
+msgid "City"
+msgstr "Місто"
+
+msgid "Enter city"
+msgstr "Введіть місто"
+
+msgid "Warehouse address"
+msgstr "Адреса відділення"
+
+msgid "Enter warehouse address"
+msgstr "Введіть адресу відділення"
+
+msgid "Submit order"
+msgstr "Відправити замовлення"
+
+msgid "Welcome"
+msgstr "Ласкаво просимо"
+
+msgid "Welcome to GORISHNIK_UA"
+msgstr "Ласкаво просимо до GORISHNIK_UA"
+
+msgid "Your reliable partner in the world of quality products"
+msgstr "Ваш надійний партнер у світі якісних товарів"
+
+msgid "View products"
+msgstr "Переглянути товари"
+
+msgid "Popular categories"
+msgstr "Популярні категорії"
+
+msgid "Nuts"
+msgstr "Горіхи"
+
+msgid "Wide selection of fresh and delicious nuts"
+msgstr "Великий вибір свіжих та смачних горіхів"
+
+msgid "Learn more"
+msgstr "Детальніше"
+
+msgid "Dried fruits"
+msgstr "Сухофрукти"
+
+msgid "Natural dried fruits for healthy eating"
+msgstr "Натуральні сухофрукти для здорового харчування"
+
+msgid "European goods and Groceries"
+msgstr "Євротовари та Бакалія"
+
+msgid "European goods and groceries for your table"
+msgstr "Європейські товари та бакалія для вашого столу"
+
+msgid "Why choose us"
+msgstr "Чому обирають нас"
+
+msgid "Fast delivery"
+msgstr "Швидка доставка"
+
+msgid "We deliver throughout Ukraine"
+msgstr "Доставляємо по всій Україні"
+
+msgid "Product quality"
+msgstr "Якість товарів"
+
+msgid "We check every product"
+msgstr "Перевіряємо кожен товар"
+
+msgid "24/7 Support"
+msgstr "Підтримка 24/7"
+
+msgid "Always in touch"
+msgstr "Завжди на зв'язку"
+
+msgid "Affordable prices"
+msgstr "Доступні ціни"
+
+msgid "Best offers"
+msgstr "Найкращі пропозиції"
+
+msgid "Ready to start shopping?"
+msgstr "Готові почати покупки?"
+
+msgid "Browse our catalog and find the perfect products for yourself"
+msgstr "Перегляньте наш каталог та знайдіть ідеальні товари для себе"
+
+msgid "Go to catalog"
+msgstr "Перейти до каталогу"
+
+msgid "Delivery options"
+msgstr "Варіанти доставки"
+
+msgid "Orders are shipped twice a day"
+msgstr "Відправлення замовлень двічі на день"
+
+msgid "Required information"
+msgstr "Обов'язкові дані"
+
+msgid "Прізвище та ім'я"
+msgstr "Прізвище та ім'я"
+
+msgid "Населений пункт"
+msgstr "Населений пункт"
+
+msgid "Номер відділення Нової Пошти"
+msgstr "Номер відділення Нової Пошти"
+
+msgid "Номер телефону"
+msgstr "Номер телефону"
+
+msgid "Payment methods"
+msgstr "Способи оплати"
+
+msgid "Cash on delivery (from 200 UAH)"
+msgstr "Накладений платіж (від 200 грн)"
+
+msgid "Card payment"
+msgstr "Оплата на карту"
+
+msgid "Postal code"
+msgstr "Індекс"
+
+msgid "Our warehouse"
+msgstr "Наш склад"
+
+msgid "Kharkiv, Vernadsky St. 22"
+msgstr "м. Харків, вул. Вернадського 22"
+
+msgid "Our producers"
+msgstr "Наші виробники"
+
+#: payments/templates/payments/checkout_done.html:7
+msgid "Ваше замовлення прийнято і буде опрацьовано найближчим часом."
+msgstr "Ваше замовлення прийнято і буде опрацьовано найближчим часом."
+
+#: payments/templates/payments/checkout_done.html:8
+msgid "Повернутись на головну"
+msgstr "Повернутись на головну"
+
+#: payments/templates/payments/checkout_failed.html:6
+msgid "Оплата не вдалася"
+msgstr "Оплата не вдалася"
+
+#: payments/templates/payments/checkout_failed.html:7
+msgid "Щось пішло не так під час обробки платежу. Спробуйте ще раз."
+msgstr "Щось пішло не так під час обробки платежу. Спробуйте ще раз."
+
+#: payments/templates/payments/checkout_failed.html:8
+msgid "Повернутись до кошика"
+msgstr "Повернутись до кошика"
+
+#: payments/templates/payments/order_invoice.html:6
+msgid "Дякуємо за замовлення!"
+msgstr "Дякуємо за замовлення!"
+
+#: payments/templates/payments/order_invoice.html:7
+msgid "Ми звʼяжемося з вами для виставлення рахунку і надішлемо реквізити для оплати найближчим часом."
+msgstr "Ми звʼяжемося з вами для виставлення рахунку і надішлемо реквізити для оплати найближчим часом."
+
+#: payments/templates/payments/order_success.html:6
+msgid "Ваше замовлення оформлено!"
+msgstr "Ваше замовлення оформлено!"
+
+#: payments/templates/payments/order_success.html:7
+msgid "Дякуємо за замовлення. Ми вже працюємо над його відправкою."
+msgstr "Дякуємо за замовлення. Ми вже працюємо над його відправкою."

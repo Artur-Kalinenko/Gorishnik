@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Наші виробники{% endblock %}
+{% block title %}{% trans "Our producers" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="montserrat-category-title text-center mb-4">Наші виробники</h1>
+    <h1 class="montserrat-category-title text-center mb-4">{% trans "Our producers" %}</h1>
     <div class="row producers-grid">
         {% for producer in producers %}
             <div class="col-md producer-card-wrapper">
@@ -17,7 +18,7 @@
                                  class="producer-img">
                         {% else %}
                             <img src="{% static 'images/default_producer.jpg' %}"
-                                 alt="No image"
+                                 alt="{% trans 'No image' %}"
                                  class="producer-img">
                         {% endif %}
                     </div>
@@ -29,7 +30,7 @@
 <!--                                 data-original="{% static 'icons/assortment_brown.png' %}"-->
 <!--                                 alt="Переглянути товари"-->
 <!--                                 class="category-icon">-->
-                            <span>Переглянути товари</span>
+                            <span>{% trans "View products" %}</span>
                         </div>
                     </div>
                 </a>

@@ -86,8 +86,9 @@ class AssortmentAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Основна інформація', {
             'fields': (
-                'assortment_name', 'poster', 'assortment_description',
-                'assortment_categories', 'filters', 'tags', 'producer'
+                'assortment_name', 'assortment_name_uk',
+                'assortment_name_ru', 'poster', 'assortment_description', 'assortment_description_uk',
+                'assortment_description_ru', 'assortment_categories', 'filters', 'tags', 'producer'
             )
         }),
         ('Ціни та доступність', {

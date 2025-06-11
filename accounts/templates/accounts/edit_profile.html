@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-5">
     <div style="max-width: 500px; margin: 2rem auto; padding: 2rem; background: var(--bg-main); border-radius: 18px; box-shadow: 0 8px 32px rgba(122, 78, 45, 0.18); border: 2px solid var(--accent);">
-        <h2 style="color: var(--accent); text-align: center; margin-bottom: 1.5rem; font-weight: 700;">Редагування профілю</h2>
+        <h2 style="color: var(--accent); text-align: center; margin-bottom: 1.5rem; font-weight: 700;">{% trans "Edit Profile" %}</h2>
 
         <form method="post">
             {% csrf_token %}
@@ -12,14 +13,14 @@
             <!-- Сообщения (успех/ошибки) -->
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}" style="border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem;">{{ message }}</div>
+                    <div class="alert alert-{{ message.tags }}" style="border-radius: 8px; font-size: 0.95rem; margin-bottom: 1rem;">{% trans message %}</div>
                 {% endfor %}
             {% endif %}
 
             <!-- Поля формы -->
             {% for field in form %}
                 <div style="margin-bottom: 1.2rem;">
-                    <label for="{{ field.id_for_label }}" style="color: var(--accent-dark); font-weight: 600; margin-bottom: 0.3rem; display: block;">{{ field.label }}</label>
+                    <label for="{{ field.id_for_label }}" style="color: var(--accent-dark); font-weight: 600; margin-bottom: 0.3rem; display: block;">{% trans field.label %}</label>
                     <div style="display: flex; align-items: center; width: 100%;">
                         <span class="input-group-text" style="background-color: var(--white) !important; border: 2px solid var(--accent) !important; border-right: none !important; border-radius: 10px 0 0 10px !important; color: var(--accent-dark); padding-left: 0.75rem !important; padding-right: 0.75rem !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 42px !important; line-height: normal !important; font-size: 1.2em;">
                             {% if field.name == 'first_name' or field.name == 'last_name' %}
@@ -38,21 +39,21 @@
                             id="{{ field.id_for_label }}"
                             class="form-control"
                             value="{{ field.value|default_if_none:'' }}"
-                            placeholder="{{ field.field.widget.attrs.placeholder|default:field.label }}"
+                            placeholder="{% trans field.field.widget.attrs.placeholder|default:field.label %}"
                             {% if field.field.required %}required{% endif %}
                             style="flex:1; border: 2px solid var(--accent); border-left: none; border-radius: 0 10px 10px 0; background: var(--white); color: var(--accent-dark); font-family: 'Comfortaa', cursive; font-size: 1rem; transition: border-color 0.2s; box-shadow: none; height: 42px; padding-left: 0.75rem; padding-right: 0.75rem; padding-top: 0; padding-bottom: 0; line-height: normal;"
                         >
                     </div>
                     {% for error in field.errors %}
-                        <div style="color: #c0392b !important; font-size: 0.9rem; margin-top: 0.3rem;">{{ error }}</div>
+                        <div style="color: #c0392b !important; font-size: 0.9rem; margin-top: 0.3rem;">{% trans error %}</div>
                     {% endfor %}
                 </div>
             {% endfor %}
 
             <!-- Кнопки -->
             <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--accent); border: none; color: var(--white);">Зберегти</button>
-                <a href="{% url 'user_cabinet' %}" class="btn btn-secondary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--white); border: 2px solid var(--accent); color: var(--accent);">Скасувати</a>
+                <button type="submit" class="btn btn-primary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--accent); border: none; color: var(--white);">{% trans "Save" %}</button>
+                <a href="{% url 'user_cabinet' %}" class="btn btn-secondary" style="height: 42px !important; font-weight: 700 !important; font-size: 1.1rem !important; border-radius: 10px !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 0.5rem !important; padding: 0 12px !important; line-height: 1 !important; flex: 1 !important; background: var(--white); border: 2px solid var(--accent); color: var(--accent);">{% trans "Cancel" %}</a>
             </div>
         </form>
     </div>

@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+from django.utils.translation import gettext_lazy as _
 import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,8 +30,9 @@ INSTALLED_APPS = [
     'django_cleanup.apps.CleanupConfig',
     'social_django',
     'django_crontab',
+    'modeltranslation',
     #my_apps
-    'assortment',
+    'assortment.apps.AssortmentConfig',
     'producer',
     'cart',
     'accounts',
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -104,11 +107,18 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
+
+LANGUAGES = [
+    ('uk', _('Українська')),
+    ('ru', _('Русский')),
+]
+
 LANGUAGE_CODE = 'uk'
 
 TIME_ZONE = 'Europe/Kyiv'
 
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
@@ -168,9 +178,19 @@ LIQPAY_SANDBOX = config('LIQPAY_SANDBOX', cast=bool)
 NOVA_POSHTA_API_KEY = os.getenv('NOVA_POSHTA_API_KEY')
 
 CRONJOBS = [
+    ('0 2 * * *', 'django.core.management.call_command', ['backup_db']),
     ('0 3 * * *', 'django.core.management.call_command', ['clear_cart']),
     ('0 4 * * *', 'django.core.management.call_command', ['clear_verification_codes']),
     ('0 5 * * *', 'django.core.management.call_command', ['delete_unverified_users']),
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Добавляем настройки для языка
+LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60  # 1 год
+LANGUAGE_COOKIE_DOMAIN = None
+LANGUAGE_COOKIE_PATH = '/'
+LANGUAGE_COOKIE_SECURE = False
+LANGUAGE_COOKIE_HTTPONLY = False
+LANGUAGE_COOKIE_SAMESITE = None

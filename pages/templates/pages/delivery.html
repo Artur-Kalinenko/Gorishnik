@@ -1,89 +1,118 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Варіанти доставки{% endblock %}
+{% block title %}{% trans "Delivery options" %}{% endblock %}
 
 {% block content %}
-<!-- Страница с вариантами доставки -->
-<div class="container mt-5">
-    <h1 class="montserrat-category-title d-flex align-items-center justify-content-center">Варіанти доставки</h1>
-    <div class="row">
-        <!-- Карта: Нова Пошта -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/media/pictures/delivery_page/NovaPoshta.jpg" class="card-img-top" alt="Нова Пошта">
-                <div class="card-body">
-                    <h5 class="card-title">Нова Пошта</h5>
-                    <p class="card-text">
-                        Відправлення замовлень двічі на день.<br><br>
-                        <strong>Обов'язкові дані:</strong>
-                        <ol>
-                            <li>Прізвище та ім'я</li>
-                            <li>Населений пункт</li>
-                            <li>Номер відділення Нової Пошти</li>
-                            <li>Номер телефону</li>
-                        </ol>
-                        <strong>Способи оплати:</strong>
-                        <ul>
-                            <li>накладений платіж (при замовленні від 200 грн)</li>
-                            <li>оплата на карту</li>
-                        </ul>
-                    </p>
+<div class="delivery-page">
+    <div class="container mt-5">
+        <h1 class="delivery-title text-center mb-5">{% trans "Delivery options" %}</h1>
+        
+        <div class="row g-4">
+            <!-- Nova Poshta -->
+            <div class="col-md-4">
+                <div class="delivery-card">
+                    <div class="delivery-card-image">
+                        <img src="/media/pictures/delivery_page/NovaPoshta.jpg" alt="{% trans 'Nova Poshta' %}">
+                    </div>
+                    <div class="delivery-card-content">
+                        <h3 class="delivery-card-title">{% trans "Nova Poshta" %}</h3>
+                        <div class="delivery-info">
+                            <p class="delivery-frequency">{% trans "Orders are shipped twice a day" %}</p>
+                            
+                            <div class="delivery-details">
+                                <h4>{% trans "Required information" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-person"></i> {% trans "Full name" %}</li>
+                                    <li><i class="bi bi-geo-alt"></i> {% trans "City" %}</li>
+                                    <li><i class="bi bi-shop"></i> {% trans "Nova Poshta branch number" %}</li>
+                                    <li><i class="bi bi-telephone"></i> {% trans "Phone number" %}</li>
+                                </ul>
+                            </div>
+
+                            <div class="delivery-details">
+                                <h4>{% trans "Payment methods" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-cash"></i> {% trans "Cash on delivery (from 200 UAH)" %}</li>
+                                    <li><i class="bi bi-credit-card"></i> {% trans "Card payment" %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Карта: Укрпошта -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/media/pictures/delivery_page/UkrPoshta.jpg" class="card-img-top" alt="Укрпошта">
-                <div class="card-body">
-                    <h5 class="card-title">Укрпошта</h5>
-                    <p class="card-text">
-                        Відправлення замовлень щодня.<br><br>
-                        <strong>Обов'язкові дані:</strong>
-                        <ol>
-                            <li>Прізвище та ім'я</li>
-                            <li>Населений пункт</li>
-                            <li>Індекс</li>
-                            <li>Номер телефону</li>
-                        </ol>
-                        <strong>Способи оплати:</strong>
-                        <ul>
-                            <li>накладений платіж (при замовленні від 200 грн)</li>
-                            <li>оплата на карту</li>
-                        </ul>
-                    </p>
+            <!-- Ukrposhta -->
+            <div class="col-md-4">
+                <div class="delivery-card">
+                    <div class="delivery-card-image">
+                        <img src="/media/pictures/delivery_page/UkrPoshta.jpg" alt="{% trans 'Ukrposhta' %}">
+                    </div>
+                    <div class="delivery-card-content">
+                        <h3 class="delivery-card-title">{% trans "Ukrposhta" %}</h3>
+                        <div class="delivery-info">
+                            <p class="delivery-frequency">{% trans "Orders are shipped daily" %}</p>
+                            
+                            <div class="delivery-details">
+                                <h4>{% trans "Required information" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-person"></i> {% trans "Full name" %}</li>
+                                    <li><i class="bi bi-geo-alt"></i> {% trans "City" %}</li>
+                                    <li><i class="bi bi-envelope"></i> {% trans "Postal code" %}</li>
+                                    <li><i class="bi bi-telephone"></i> {% trans "Phone number" %}</li>
+                                </ul>
+                            </div>
+
+                            <div class="delivery-details">
+                                <h4>{% trans "Payment methods" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-cash"></i> {% trans "Cash on delivery (from 200 UAH)" %}</li>
+                                    <li><i class="bi bi-credit-card"></i> {% trans "Card payment" %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Карта: Самовивіз -->
-        <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                <img src="/media/pictures/delivery_page/OurBase.jpg" class="card-img-top" alt="Наш склад">
-                <div class="card-body">
-                    <h5 class="card-title">Самовивіз</h5>
-                    <p class="card-text">
-                        Забрати замовлення з магазину:<br>
-                        <strong>м. Харків, вул. Вернадського 22</strong><br><br>
-                        <strong>Обов'язкові дані:</strong>
-                        <ol>
-                            <li>Прізвище та ім'я</li>
-                            <li>Номер телефону</li>
-                        </ol>
-                        <strong>Способи оплати:</strong>
-                        <ul>
-                            <li>оплата на карту</li>
-                            <li>оплата при отриманні</li>
-                        </ul>
-                    </p>
+            <!-- Self-pickup -->
+            <div class="col-md-4">
+                <div class="delivery-card">
+                    <div class="delivery-card-image">
+                        <img src="/media/pictures/delivery_page/OurBase.jpg" alt="{% trans 'Our warehouse' %}">
+                    </div>
+                    <div class="delivery-card-content">
+                        <h3 class="delivery-card-title">{% trans "Self-pickup" %}</h3>
+                        <div class="delivery-info">
+                            <p class="delivery-address">
+                                <i class="bi bi-geo-alt-fill"></i>
+                                {% trans "Kharkiv, Vernadsky St. 22" %}
+                            </p>
+                            
+                            <div class="delivery-details">
+                                <h4>{% trans "Required information" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-person"></i> {% trans "Full name" %}</li>
+                                    <li><i class="bi bi-telephone"></i> {% trans "Phone number" %}</li>
+                                </ul>
+                            </div>
+
+                            <div class="delivery-details">
+                                <h4>{% trans "Payment methods" %}:</h4>
+                                <ul class="delivery-list">
+                                    <li><i class="bi bi-credit-card"></i> {% trans "Card payment" %}</li>
+                                    <li><i class="bi bi-cash"></i> {% trans "Cash on delivery" %}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Стили страницы доставки -->
+<!-- Delivery page styles -->
 <link rel="stylesheet" href="{% static 'pages/delivery.css' %}">
 {% endblock %}

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="checkout-container">
-    <h2>Оформлення замовлення</h2>
+    <h2>{% trans "Order checkout" %}</h2>
 
     {% if error %}
         <div class="alert alert-warning">{{ error }}</div>
@@ -36,52 +37,52 @@
             {% endif %}
         </div>
 
-        <!-- Спосіб доставки -->
+        <!-- Delivery method -->
         <div class="delivery-method-group">
-            <label class="form-label">Спосіб доставки:</label>
+            <label class="form-label">{% trans "Delivery method" %}:</label>
             <label>
                 <input type="radio" name="delivery_method" value="nova_poshta" checked>
-                <span>Нова Пошта</span>
+                <span>{% trans "Nova Poshta" %}</span>
             </label>
             <label>
                 <input type="radio" name="delivery_method" value="ukr_poshta">
-                <span>Укрпошта</span>
+                <span>{% trans "Ukrposhta" %}</span>
             </label>
             <label>
                 <input type="radio" name="delivery_method" value="pickup">
-                <span>Самовивіз</span>
+                <span>{% trans "Self-pickup" %}</span>
             </label>
         </div>
 
-        <!-- Поля для Новой Пошты -->
+        <!-- Nova Poshta fields -->
         <div id="nova-poshta-fields">
             <div class="form-group">
-                <label for="id_city">Місто (Нова Пошта):</label>
+                <label for="id_city">{% trans "City (Nova Poshta)" %}:</label>
                 <select id="id_city" name="city" class="form-control"></select>
             </div>
             <div class="form-group">
-                <label for="id_warehouse">Відділення (Нова Пошта):</label>
+                <label for="id_warehouse">{% trans "Warehouse (Nova Poshta)" %}:</label>
                 <select id="id_warehouse" name="warehouse" class="form-control"></select>
             </div>
         </div>
 
-        <!-- Поля для Укрпошти -->
+        <!-- Ukrposhta fields -->
         <div id="ukr-poshta-fields" style="display:none;">
             <div class="form-group">
-                <label for="ukr_city">Місто:</label>
-                <input type="text" name="ukr_city" id="ukr_city" class="form-control" placeholder="Введіть місто">
+                <label for="ukr_city">{% trans "City" %}:</label>
+                <input type="text" name="ukr_city" id="ukr_city" class="form-control" placeholder="{% trans 'Enter city' %}">
             </div>
             <div class="form-group">
-                <label for="ukr_address">Адреса відділення:</label>
-                <input type="text" name="ukr_address" id="ukr_address" class="form-control" placeholder="Введіть адресу відділення">
+                <label for="ukr_address">{% trans "Warehouse address" %}:</label>
+                <input type="text" name="ukr_address" id="ukr_address" class="form-control" placeholder="{% trans 'Enter warehouse address' %}">
             </div>
         </div>
 
-        <!-- Скрытые поля для отправки рефов -->
+        <!-- Hidden fields for refs -->
         <input type="hidden" name="city_ref" id="hidden_city_ref">
         <input type="hidden" name="warehouse_ref" id="hidden_warehouse_ref">
 
-        <!-- Поле для додаткових побажань (всегда внизу) -->
+        <!-- Additional notes field -->
         <div class="form-group">
             {{ form.additional_notes.label_tag }}
             {{ form.additional_notes }}
@@ -91,14 +92,14 @@
         </div>
 
         <div class="delivery-method-group">
-            <label class="form-label">Спосіб оплати:</label>
+            <label class="form-label">{% trans "Payment method" %}:</label>
             {{ form.payment_method }}
             {% if form.payment_method.errors %}
                 <div class="alert alert-warning">{{ form.payment_method.errors }}</div>
             {% endif %}
         </div>
 
-        <button type="submit" class="submit-button">Відправити замовлення</button>
+        <button type="submit" class="submit-button">{% trans "Submit order" %}</button>
     </form>
 </div>
 

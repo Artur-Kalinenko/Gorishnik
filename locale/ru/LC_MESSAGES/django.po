@@ -1,0 +1,688 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Gorishnik_ua\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-19 12:00+0000\n"
+"PO-Revision-Date: 2024-03-19 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: accounts/admin.py:16
+msgid "Permissions"
+msgstr ""
+
+#: accounts/admin.py:17
+msgid "Important dates"
+msgstr ""
+
+#: accounts/forms.py:10 accounts/forms.py:119
+msgid "Ім'я"
+msgstr "Имя"
+
+#: accounts/forms.py:11
+msgid "Email"
+msgstr "Email"
+
+#: accounts/forms.py:13 accounts/forms.py:120
+msgid "Телефон"
+msgstr "Телефон"
+
+#: accounts/forms.py:19 accounts/forms.py:62
+msgid "Пароль"
+msgstr "Пароль"
+
+#: accounts/forms.py:20
+msgid "Підтвердіть пароль"
+msgstr "Подтвердите пароль"
+
+#: accounts/forms.py:26 accounts/forms.py:104
+msgid "Користувач з таким email вже існує."
+msgstr "Пользователь с таким email уже существует."
+
+#: accounts/forms.py:35
+msgid "Користувач з таким телефоном вже існує."
+msgstr "Пользователь с таким телефоном уже существует."
+
+#: accounts/forms.py:44
+msgid "Паролі не співпадають."
+msgstr "Пароли не совпадают."
+
+#: accounts/forms.py:53
+msgid "Email або телефон"
+msgstr "Email или телефон"
+
+#: accounts/forms.py:57
+msgid "Введіть email або телефон"
+msgstr "Введите email или телефон"
+
+#: accounts/forms.py:66
+msgid "Введіть пароль"
+msgstr "Введите пароль"
+
+#: accounts/forms.py:73
+msgid "Ваша електронна адреса"
+msgstr "Ваш email адрес"
+
+#: accounts/forms.py:78
+msgid "Користувача з таким email не існує."
+msgstr "Пользователя с таким email не существует."
+
+#: accounts/forms.py:82
+msgid "Код підтвердження"
+msgstr "Код подтверждения"
+
+#: accounts/forms.py:85
+msgid "Новий пароль"
+msgstr "Новый пароль"
+
+#: accounts/forms.py:86
+msgid "Підтвердіть новий пароль"
+msgstr "Подтвердите новый пароль"
+
+#: accounts/forms.py:99
+msgid "Новий email"
+msgstr "Новый email"
+
+#: gorishnik/settings.py:111
+msgid "Українська"
+msgstr ""
+
+#: gorishnik/settings.py:112
+msgid "Русский"
+msgstr ""
+
+msgid "Gorishnik"
+msgstr "Gorishnik"
+
+msgid "What are we looking for?"
+msgstr "Что будем искать?"
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Cart"
+msgstr "Корзина"
+
+msgid "Logout"
+msgstr "Выйти"
+
+msgid "Login"
+msgstr "Войти"
+
+msgid "Menu"
+msgstr "Меню"
+
+msgid "Categories"
+msgstr "Категории товаров"
+
+msgid "Assortment"
+msgstr "Ассортимент"
+
+msgid "Producers"
+msgstr "Производители"
+
+msgid "Delivery"
+msgstr "Доставка"
+
+msgid "Reviews"
+msgstr "Отзывы"
+
+msgid "My Cabinet"
+msgstr "Мой кабинет"
+
+msgid "Admin"
+msgstr "Админ"
+
+msgid "Navigation"
+msgstr "Навигация"
+
+msgid "Login to Account"
+msgstr "Вход в аккаунт"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Email or phone"
+msgstr "Email или телефон"
+
+msgid "Password"
+msgstr "Пароль"
+
+msgid "Forgot password?"
+msgstr "Забыли пароль?"
+
+msgid "Don't have an account yet?"
+msgstr "Еще нет аккаунта?"
+
+msgid "Registration"
+msgstr "Регистрация"
+
+msgid "or"
+msgstr "или"
+
+msgid "Login with Google"
+msgstr "Войти через Google"
+
+msgid "All rights reserved"
+msgstr "Все права защищены"
+
+msgid "To add an item to"
+msgstr "Чтобы добавить товар в"
+
+msgid "Favorites"
+msgstr "Избранные товары"
+
+msgid "please"
+msgstr "пожалуйста"
+
+msgid "login or register"
+msgstr "войдите или зарегистрируйтесь"
+
+msgid "Item added to"
+msgstr "Товар добавлен в"
+
+msgid "cart"
+msgstr "корзину"
+
+msgid "Item removed from cart"
+msgstr "Товар удален из корзины"
+
+msgid "Change Email Address"
+msgstr "Изменение адреса электронной почты"
+
+msgid "New email address"
+msgstr "Новый адрес email"
+
+msgid "Enter new email address"
+msgstr "Введите новый адрес email"
+
+msgid "Send verification code"
+msgstr "Отправить код подтверждения"
+
+msgid "Change Password"
+msgstr "Изменение пароля"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Code Confirmation"
+msgstr "Подтверждение кода"
+
+msgid "Enter the 6-digit code sent to your email."
+msgstr "Введите 6-значный код, отправленный вам на почту."
+
+msgid "Confirmation code"
+msgstr "Код подтверждения"
+
+msgid "Enter code"
+msgstr "Введите код"
+
+msgid "Confirm"
+msgstr "Подтвердить"
+
+msgid "Resend code"
+msgstr "Отправить код повторно"
+
+msgid "Edit Profile"
+msgstr "Редактировать профиль"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "You cancelled Google login."
+msgstr "Вы отменили вход через Google."
+
+msgid "New Password"
+msgstr "Новый пароль"
+
+msgid "Enter new password"
+msgstr "Введите новый пароль"
+
+msgid "Confirm password"
+msgstr "Подтвердите пароль"
+
+msgid "Repeat new password"
+msgstr "Повторите новый пароль"
+
+msgid "Password Recovery"
+msgstr "Восстановление пароля"
+
+msgid "Enter your email"
+msgstr "Введите ваш email"
+
+msgid "Send Code"
+msgstr "Отправить код"
+
+msgid "Name"
+msgstr "Имя"
+
+msgid "Your name"
+msgstr "Ваше имя"
+
+msgid "Your email address"
+msgstr "Ваш email адрес"
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Your phone number"
+msgstr "Ваш номер телефона"
+
+msgid "Enter password"
+msgstr "Введите пароль"
+
+msgid "Enter the same password as above"
+msgstr "Введите тот же пароль, что и выше"
+
+msgid "Register"
+msgstr "Зарегистрироваться"
+
+msgid "Already have an account?"
+msgstr "Уже есть аккаунт?"
+
+msgid "My Account"
+msgstr "Мой аккаунт"
+
+msgid "Personal Information"
+msgstr "Личная информация"
+
+msgid "(not specified)"
+msgstr "(не указано)"
+
+msgid "Favorite Products"
+msgstr "Избранные товары"
+
+msgid "You don't have any favorite products yet."
+msgstr "У вас пока нет избранных товаров."
+
+msgid "Previous"
+msgstr "Предыдущий"
+
+msgid "Next"
+msgstr "Следующий"
+
+msgid "Order History"
+msgstr "История заказов"
+
+msgid "Order"
+msgstr "Заказ"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Delivery Method"
+msgstr "Способ доставки"
+
+msgid "Products"
+msgstr "Товары"
+
+msgid "pcs"
+msgstr "шт"
+
+msgid "Total"
+msgstr "Итого"
+
+msgid "UAH"
+msgstr "грн"
+
+msgid "You don't have any orders yet."
+msgstr "У вас пока нет заказов."
+
+msgid "Оцінка"
+msgstr "Оценка"
+
+msgid "Відгук"
+msgstr "Отзыв"
+
+msgid "Відгук не повинен перевищувати 500 символів."
+msgstr "Отзыв не должен превышать 500 символов."
+
+msgid "Категорії товарів"
+msgstr "Категории товаров"
+
+msgid "Всі товари"
+msgstr "Все товары"
+
+msgid "Переглянути товари"
+msgstr "Просмотреть товары"
+
+msgid "Search results for"
+msgstr "Результаты поиска для"
+
+msgid "Sort by..."
+msgstr "Сортировать..."
+
+msgid "By popularity"
+msgstr "По популярности"
+
+msgid "Newest"
+msgstr "Новинки"
+
+msgid "By price ↑"
+msgstr "По цене ↑"
+
+msgid "By price ↓"
+msgstr "По цене ↓"
+
+msgid "By rating"
+msgstr "По рейтингу"
+
+msgid "Confirmation"
+msgstr "Подтверждение"
+
+msgid "Are you sure you want to delete the review?"
+msgstr "Вы уверены, что хотите удалить отзыв?"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Home"
+msgstr "Главная"
+
+msgid "Catalog"
+msgstr "Каталог"
+
+msgid "No image available"
+msgstr "Изображение отсутствует"
+
+msgid "Producer"
+msgstr "Производитель"
+
+msgid "In stock,Out of stock"
+msgstr "В наличии,Нет в наличии"
+
+msgid "Select weight"
+msgstr "Выберите вес"
+
+msgid "Add to cart"
+msgstr "В корзину"
+
+msgid "Product description"
+msgstr "Описание продукта"
+
+msgid "No reviews yet."
+msgstr "Нет отзывов."
+
+msgid "Leave a review"
+msgstr "Оставить отзыв"
+
+msgid "Submit"
+msgstr "Отправить"
+
+msgid "You have already left a review."
+msgstr "Вы уже оставили отзыв."
+
+msgid "Please log in to leave a review."
+msgstr "Пожалуйста, войдите в аккаунт, чтобы оставить отзыв."
+
+msgid "Additional"
+msgstr "Дополнительно"
+
+msgid "New items"
+msgstr "Новинки"
+
+msgid "My favorite items"
+msgstr "Мои избранные товары"
+
+msgid "Show all filters"
+msgstr "Показать все фильтры"
+
+msgid "Clear filters"
+msgstr "Очистить фильтры"
+
+msgid "New"
+msgstr "Новинка"
+
+msgid "Sale"
+msgstr "Акция"
+
+msgid "g"
+msgstr "г"
+
+msgid "Buy"
+msgstr "Купить"
+
+msgid "Buy product"
+msgstr "Купить товар"
+
+msgid "No search results found."
+msgstr "Результаты поиска отсутствуют."
+
+msgid "Remove"
+msgstr "Удалить"
+
+msgid "No image"
+msgstr "Нет изображения"
+
+msgid "Total amount"
+msgstr "Общая сумма"
+
+msgid "Place order"
+msgstr "Сделать заказ"
+
+msgid "Your cart is empty"
+msgstr "Ваша корзина пуста"
+
+msgid "Go to shopping"
+msgstr "Перейти к покупкам"
+
+msgid "Order checkout"
+msgstr "Оформление заказа"
+
+msgid "Recipient full name"
+msgstr "ФИО получателя"
+
+msgid "Recipient contact number"
+msgstr "Контактный номер получателя"
+
+msgid "Delivery method"
+msgstr "Способ доставки"
+
+msgid "Nova Poshta"
+msgstr "Новая Почта"
+
+msgid "Ukrposhta"
+msgstr "Укрпочта"
+
+msgid "Self-pickup"
+msgstr "Самовывоз"
+
+msgid "Additional notes"
+msgstr "Дополнительные пожелания"
+
+msgid "Your order preferences. If you are ordering delivery as a gift, please provide your phone number and name for contact!"
+msgstr "Ваши пожелания к заказу. Если вы заказываете доставку в качестве подарка, пожалуйста, укажите ваш номер телефона и имя для связи с вами!"
+
+msgid "Payment method"
+msgstr "Способ оплаты"
+
+msgid "Cash on delivery"
+msgstr "Оплата при получении"
+
+msgid "Online payment"
+msgstr "Оплата на сайте"
+
+msgid "Payment by invoice"
+msgstr "Оплата по реквизитам"
+
+msgid "City (Nova Poshta)"
+msgstr "Город (Новая Почта)"
+
+msgid "Warehouse (Nova Poshta)"
+msgstr "Отделение (Новая Почта)"
+
+msgid "Enter city"
+msgstr "Введите город"
+
+msgid "Warehouse address"
+msgstr "Адрес отделения"
+
+msgid "Enter warehouse address"
+msgstr "Введите адрес отделения"
+
+msgid "Submit order"
+msgstr "Отправить заказ"
+
+msgid "Welcome"
+msgstr "Добро пожаловать"
+
+msgid "Welcome to GORISHNIK_UA"
+msgstr "Добро пожаловать в GORISHNIK_UA"
+
+msgid "Your reliable partner in the world of quality products"
+msgstr "Ваш надежный партнер в мире качественных товаров"
+
+msgid "View products"
+msgstr "Просмотреть товары"
+
+msgid "Popular categories"
+msgstr "Популярные категории"
+
+msgid "Nuts"
+msgstr "Орехи"
+
+msgid "Wide selection of fresh and delicious nuts"
+msgstr "Большой выбор свежих и вкусных орехов"
+
+msgid "Learn more"
+msgstr "Подробнее"
+
+msgid "Dried fruits"
+msgstr "Сухофрукты"
+
+msgid "Natural dried fruits for healthy eating"
+msgstr "Натуральные сухофрукты для здорового питания"
+
+msgid "European goods and Groceries"
+msgstr "Евротовары и Бакалея"
+
+msgid "European goods and groceries for your table"
+msgstr "Европейские товары и бакалея для вашего стола"
+
+msgid "Why choose us"
+msgstr "Почему выбирают нас"
+
+msgid "Fast delivery"
+msgstr "Быстрая доставка"
+
+msgid "We deliver throughout Ukraine"
+msgstr "Доставляем по всей Украине"
+
+msgid "Product quality"
+msgstr "Качество товаров"
+
+msgid "We check every product"
+msgstr "Проверяем каждый товар"
+
+msgid "24/7 Support"
+msgstr "Поддержка 24/7"
+
+msgid "Always in touch"
+msgstr "Всегда на связи"
+
+msgid "Affordable prices"
+msgstr "Доступные цены"
+
+msgid "Best offers"
+msgstr "Лучшие предложения"
+
+msgid "Ready to start shopping?"
+msgstr "Готовы начать покупки?"
+
+msgid "Browse our catalog and find the perfect products for yourself"
+msgstr "Просмотрите наш каталог и найдите идеальные товары для себя"
+
+msgid "Go to catalog"
+msgstr "Перейти в каталог"
+
+msgid "Delivery options"
+msgstr "Варианты доставки"
+
+msgid "Orders are shipped twice a day"
+msgstr "Отправка заказов дважды в день"
+
+msgid "Required information"
+msgstr "Обязательные данные"
+
+msgid "Full name"
+msgstr "ФИО"
+
+msgid "City"
+msgstr "Населенный пункт"
+
+msgid "Nova Poshta branch number"
+msgstr "Номер отделения Новой Почты"
+
+msgid "Phone number"
+msgstr "Номер телефона"
+
+msgid "Payment methods"
+msgstr "Способы оплаты"
+
+msgid "Cash on delivery (from 200 UAH)"
+msgstr "Наложенный платеж (от 200 грн)"
+
+msgid "Card payment"
+msgstr "Оплата на карту"
+
+msgid "Orders are shipped daily"
+msgstr "Отправка заказов ежедневно"
+
+msgid "Postal code"
+msgstr "Индекс"
+
+msgid "Our warehouse"
+msgstr "Наш склад"
+
+msgid "Kharkiv, Vernadsky St. 22"
+msgstr "г. Харьков, ул. Вернадского 22"
+
+msgid "Our producers"
+msgstr "Наши производители"
+
+#: payments/templates/payments/checkout_done.html:7
+msgid "Ваше замовлення прийнято і буде опрацьовано найближчим часом."
+msgstr "Ваш заказ принят и будет обработан в ближайшее время."
+
+#: payments/templates/payments/checkout_done.html:8
+msgid "Повернутись на головну"
+msgstr "Вернуться на главную"
+
+#: payments/templates/payments/checkout_failed.html:6
+msgid "Оплата не вдалася"
+msgstr "Оплата не удалась"
+
+#: payments/templates/payments/checkout_failed.html:7
+msgid "Щось пішло не так під час обробки платежу. Спробуйте ще раз."
+msgstr "Что-то пошло не так во время обработки платежа. Попробуйте еще раз."
+
+#: payments/templates/payments/checkout_failed.html:8
+msgid "Повернутись до кошика"
+msgstr "Вернуться в корзину"
+
+#: payments/templates/payments/order_invoice.html:6
+msgid "Дякуємо за замовлення!"
+msgstr "Спасибо за заказ!"
+
+#: payments/templates/payments/order_invoice.html:7
+msgid "Ми звʼяжемося з вами для виставлення рахунку і надішлемо реквізити для оплати найближчим часом."
+msgstr "Мы свяжемся с вами для выставления счета и отправим реквизиты для оплаты в ближайшее время."
+
+#: payments/templates/payments/order_success.html:6
+msgid "Ваше замовлення оформлено!"
+msgstr "Ваш заказ оформлен!"
+
+#: payments/templates/payments/order_success.html:7
+msgid "Дякуємо за замовлення. Ми вже працюємо над його відправкою."
+msgstr "Спасибо за заказ. Мы уже работаем над его отправкой."

@@ -2,12 +2,21 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.i18n import i18n_patterns
+from django.shortcuts import redirect
+
+def redirect_to_uk(request):
+    # Получаем язык из cookie или используем язык по умолчанию
+    language = request.COOKIES.get('django_language', settings.LANGUAGE_CODE)
+    return redirect(f'/{language}/')
 
 urlpatterns = [
-    # Админка
-    path('admin/', admin.site.urls),
+    path('', redirect_to_uk),
+    path('i18n/', include('django.conf.urls.i18n')),
+]
 
-    # Приложения
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
     path('assortment/', include('assortment.urls')),
     path('producer/', include('producer.urls')),
     path('cart/', include('cart.urls')),
@@ -17,8 +26,7 @@ urlpatterns = [
     path('favorites/', include('favorites.urls')),
     path('', include('accounts.urls')),
     path('', include('pages.urls')),
-]
+)
 
-# Медиафайлы в режиме DEBUG
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block title %}
     {{ assortment.assortment_name }}
@@ -10,23 +11,23 @@
 <div id="customConfirmModal" class="custom-modal">
   <div class="custom-modal-content">
     <div class="custom-modal-header">
-      <span class="custom-modal-title">Підтвердження</span>
+      <span class="custom-modal-title">{% trans "Confirmation" %}</span>
       <button type="button" class="custom-modal-close" id="closeConfirmModal">&times;</button>
     </div>
     <div class="custom-modal-body">
-      Ви впевнені, що хочете видалити відгук?
+      {% trans "Are you sure you want to delete the review?" %}
     </div>
     <div class="custom-modal-actions">
-      <button class="btn btn-danger" id="confirmDeleteBtn">Видалити</button>
-      <button class="btn btn-secondary" id="cancelDeleteBtn">Скасувати</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn">{% trans "Delete" %}</button>
+      <button class="btn btn-secondary" id="cancelDeleteBtn">{% trans "Cancel" %}</button>
     </div>
   </div>
 </div>
 <div class="container mt-5">
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'welcome' %}" class="text-decoration-none">Головна</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'assortment_list' %}" class="text-decoration-none">Каталог</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'welcome' %}" class="text-decoration-none">{% trans "Home" %}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'assortment_list' %}" class="text-decoration-none">{% trans "Catalog" %}</a></li>
             {% for cat in assortment.assortment_categories.all %}
                 <li class="breadcrumb-item">
                     <a href="{% url 'assortment_list' %}?category={{ cat.category }}" class="text-decoration-none">{{ cat.category }}</a>
@@ -50,7 +51,7 @@
                         <img id="mainImage"
                              src="{% static 'images/default.jpg' %}"
                              class="main-image img-fluid rounded shadow-sm"
-                             alt="No image available">
+                             alt="{% trans 'No image available' %}">
                     {% endif %}
                 </div>
                 {% if images %}
@@ -94,12 +95,12 @@
                     {% endfor %}
                 </div>
                 <div class="producer-info mb-3">
-                    <span class="text-muted">Виробник:</span>
+                    <span class="text-muted">{% trans "Producer" %}:</span>
                     <span class="fw-bold">{{ assortment.producer.producer_name }}</span>
                 </div>
                 <div class="availability mb-3">
                     <span class="badge {% if assortment.is_available %}bg-success{% else %}bg-danger{% endif %}">
-                        {{ assortment.is_available|yesno:"У наявності,Нема у наявності" }}
+                        {{ assortment.is_available|yesno:_("In stock,Out of stock") }}
                     </span>
                 </div>
                 <!-- Цена -->
@@ -141,7 +142,7 @@
                     {% if variants.count > 1 %}
                         <div class="cart-switch" id="cart-switch-{{ assortment.id }}">
                             <div class="select-variant-button-block" id="select-variant-{{ assortment.id }}" style="display: block;">
-                                <button class="select-variant-button category-btn w-100" disabled>Оберіть грамовку</button>
+                                <button class="select-variant-button category-btn w-100" disabled>{% trans "Select weight" %}</button>
                             </div>
                             <div class="cart-controls fade-in" id="controls-{{ assortment.id }}" style="display: none;">
                                 <button class="quantity-btn decrease-quantity" data-product-id="{{ assortment.id }}">−</button>
@@ -151,7 +152,7 @@
                                     <img src="{{ MEDIA_URL }}icons/cart_brown.png"
                                          data-hover="{{ MEDIA_URL }}icons/cart_white.png"
                                          data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                                         alt="В корзину"
+                                         alt="{% trans 'Add to cart' %}"
                                          class="category-icon"
                                          style="width: 24px; height: 24px;">
                                 </button>
@@ -167,7 +168,7 @@
                                 <img src="{{ MEDIA_URL }}icons/cart_brown.png"
                                      data-hover="{{ MEDIA_URL }}icons/cart_white.png"
                                      data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                                     alt="В корзину"
+                                     alt="{% trans 'Add to cart' %}"
                                      class="category-icon"
                                      style="width: 24px; height: 24px;">
                             </button>
@@ -189,7 +190,7 @@
     <div class="row mt-4">
         <div class="col-12">
             <div class="description mb-4 p-4 rounded shadow-sm bg-white">
-                <h5 class="mb-3">Опис продукту:</h5>
+                <h5 class="mb-3">{% trans "Product description" %}:</h5>
                 <p class="text-muted mb-0">{{ assortment.assortment_description|default:'-' }}</p>
             </div>
         </div>
@@ -197,7 +198,7 @@
 
     <!-- Отзывы -->
     <div class="reviews-section mt-5">
-        <h3 class="mb-4">Відгуки</h3>
+        <h3 class="mb-4">{% trans "Reviews" %}</h3>
         {% if reviews %}
             <div class="reviews-list">
                 {% for review in reviews %}
@@ -224,7 +225,7 @@
                                             <img src="{{ MEDIA_URL }}icons/delete_brown.png"
                                                  data-brown="{{ MEDIA_URL }}icons/delete_brown.png"
                                                  data-white="{{ MEDIA_URL }}icons/delete_white.png"
-                                                 alt="Видалити"
+                                                 alt="{% trans 'Delete' %}"
                                                  class="category-icon review-delete-icon"
                                                  style="width: 27px; height: 27px;">
                                         </a>
@@ -239,12 +240,12 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="text-muted">Немає відгуків.</p>
+            <p class="text-muted">{% trans "No reviews yet." %}</p>
         {% endif %}
 
         {% if user.is_authenticated and not user_review %}
         <div class="add-review-section mt-4">
-            <h4>Залишити відгук</h4>
+            <h4>{% trans "Leave a review" %}</h4>
             <form method="post" class="review-form">
                 {% csrf_token %}
                 <div class="rating-stars mb-4" id="ratingStars">
@@ -266,17 +267,17 @@
                     {% endif %}
                 </div>
                 <button type="submit" class="btn review-submit-btn">
-                    <i class="fas fa-paper-plane me-2"></i> Надіслати
+                    <i class="fas fa-paper-plane me-2"></i> {% trans "Submit" %}
                 </button>
             </form>
         </div>
         {% elif user_review %}
             <div class="alert alert-info mt-4">
-                <i class="fas fa-info-circle me-2"></i>Ви вже залишали відгук.
+                <i class="fas fa-info-circle me-2"></i>{% trans "You have already left a review." %}
             </div>
         {% elif not user.is_authenticated %}
             <div class="alert alert-warning mt-4">
-                <i class="fas fa-exclamation-circle me-2"></i>Щоб залишити відгук, увійдіть до акаунту.
+                <i class="fas fa-exclamation-circle me-2"></i>{% trans "Please log in to leave a review." %}
             </div>
         {% endif %}
     </div>

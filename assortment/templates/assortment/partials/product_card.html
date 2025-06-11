@@ -1,14 +1,15 @@
 {% load static %}
+{% load i18n %}
 
 <div
     class="product-card {% if item.variants.count > 1 %}has-variants{% endif %}"
     data-product-id="{{ item.id }}">
     <!-- Плашки -->
     {% if item.is_new %}
-        <span class="badge badge-new">Новинка</span>
+        <span class="badge badge-new">{% trans "New" %}</span>
     {% endif %}
     {% if item.is_discounted %}
-        <span class="badge badge-sale">Акція</span>
+        <span class="badge badge-sale">{% trans "Sale" %}</span>
     {% endif %}
 
     <!-- Звезда "Обране" -->
@@ -43,11 +44,11 @@
                 {% if item.variants.exists %}
                     {% with min_variant=item.variants.all|dictsort:"price"|first %}
                         <span class="price">{{ min_variant.price }} ₴</span>
-                        <p class="grams-text">{{ min_variant.grams }} г</p>
+                        <p class="grams-text">{{ min_variant.grams }} {% trans "g" %}</p>
                     {% endwith %}
                 {% else %}
                     <span class="price">{{ item.price }} ₴</span>
-                    <p class="grams-text">{{ item.grams }} г</p>
+                    <p class="grams-text">{{ item.grams }} {% trans "g" %}</p>
                 {% endif %}
             </div>
 
@@ -65,7 +66,7 @@
                         {% for variant in item.variants.all %}
                             <a href="{% url 'assortment_detail' item.pk %}"
                                class="gram-button category-btn d-inline-flex align-items-center justify-content-center">
-                                {{ variant.grams }}г
+                                {{ variant.grams }}{% trans "g" %}
                             </a>
                         {% endfor %}
                     </div>
@@ -79,10 +80,10 @@
             <img src="{{ MEDIA_URL }}icons/cart_brown.png"
                  data-hover="{{ MEDIA_URL }}icons/cart_white.png"
                  data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                 alt="Купити"
+                 alt="{% trans 'Buy' %}"
                  class="category-icon me-2"
                  style="width: 24px; height: 24px;">
-            Купити товар
+            {% trans "Buy product" %}
         </a>
     </div>
 </div>

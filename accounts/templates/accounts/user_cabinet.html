@@ -1,28 +1,29 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4">Мій кабінет</h2>
+    <h2 class="mb-4">{% trans "My Account" %}</h2>
 
     <!-- Особисті дані -->
     <div class="card mb-4">
-        <div class="card-header">Особисті дані</div>
+        <div class="card-header">{% trans "Personal Information" %}</div>
         <div class="card-body">
-            <p><strong>Ім'я:</strong> {{ user.first_name }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Телефон:</strong> {{ user.phone|default:"(не вказано)" }}</p>
+            <p><strong>{% trans "Name" %}:</strong> {{ user.first_name }}</p>
+            <p><strong>{% trans "Email" %}:</strong> {{ user.email }}</p>
+            <p><strong>{% trans "Phone" %}:</strong> {{ user.phone|default:_("(not specified)") }}</p>
             <div style="display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.2rem;">
-                <a href="{% url 'edit_profile' %}" class="btn profile-btn">Редагувати профіль</a>
-                <a href="{% url 'change_email' %}" class="btn profile-btn">Змінити email</a>
-                <a href="{% url 'change_password' %}" class="btn profile-btn">Змінити пароль</a>
+                <a href="{% url 'edit_profile' %}" class="btn profile-btn">{% trans "Edit Profile" %}</a>
+                <a href="{% url 'change_email' %}" class="btn profile-btn">{% trans "Change Email Address" %}</a>
+                <a href="{% url 'change_password' %}" class="btn profile-btn">{% trans "Change Password" %}</a>
             </div>
         </div>
     </div>
 
     <!-- Обрані товари -->
     <div class="card mb-4">
-        <div class="card-header">Обрані товари</div>
+        <div class="card-header">{% trans "Favorite Products" %}</div>
         <div class="card-body">
             {% if favorites %}
                 {% if favorites|length <= 3 %}
@@ -30,7 +31,7 @@
                         {% for fav in favorites %}
                             {% with item=fav.product %}
                                 <div class="col-auto mb-4">
-                                    {% include 'assortment/partials/product_card.html' %}
+                                    {% include 'assortment/partials/product_card.html' with item=item favorites_ids=favorites_ids user=user %}
                                 </div>
                             {% endwith %}
                         {% endfor %}
@@ -45,7 +46,7 @@
                                             {% if fav %}
                                                 {% with item=fav.product %}
                                                     <div class="col-auto">
-                                                        {% include 'assortment/partials/product_card.html' %}
+                                                        {% include 'assortment/partials/product_card.html' with item=item favorites_ids=favorites_ids user=user %}
                                                     </div>
                                                 {% endwith %}
                                             {% endif %}
@@ -56,32 +57,32 @@
                         </div>
                         <button class="carousel-control-prev" type="button" data-bs-target="#favoritesCarousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Попередній</span>
+                            <span class="visually-hidden">{% trans "Previous" %}</span>
                         </button>
                         <button class="carousel-control-next" type="button" data-bs-target="#favoritesCarousel" data-bs-slide="next">
                             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Наступний</span>
+                            <span class="visually-hidden">{% trans "Next" %}</span>
                         </button>
                     </div>
                 {% endif %}
             {% else %}
-                <p>У вас ще немає обраних товарів.</p>
+                <p>{% trans "You don't have any favorite products yet." %}</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Історія замовлень -->
     <div class="card">
-        <div class="card-header">Історія замовлень</div>
+        <div class="card-header">{% trans "Order History" %}</div>
         <div class="card-body">
             {% if orders %}
                 <ul class="list-group">
                     {% for order in orders %}
                         <li class="list-group-item">
-                            <strong>Замовлення №{{ order.id }}</strong><br>
-                            Дата: {{ order.created_at|date:"d.m.Y H:i" }}<br>
-                            Спосіб доставки: {{ order.get_delivery_method_display|default:order.delivery_method }}<br>
-                            Товари:
+                            <strong>{% trans "Order" %} #{{ order.id }}</strong><br>
+                            {% trans "Date" %}: {{ order.created_at|date:"d.m.Y H:i" }}<br>
+                            {% trans "Delivery Method" %}: {{ order.get_delivery_method_display|default:order.delivery_method }}<br>
+                            {% trans "Products" %}:
                             <ul>
                                 {% for item in order.items.all %}
                                     <li>
@@ -89,16 +90,16 @@
                                         {% if item.variant %}
                                             ({{ item.variant.grams }}г)
                                         {% endif %}
-                                        — {{ item.quantity }} шт
+                                        — {{ item.quantity }} {% trans "pcs" %}
                                     </li>
                                 {% endfor %}
                             </ul>
-                            <strong>Сума: {{ order.total_price }} грн</strong>
+                            <strong>{% trans "Total" %}: {{ order.total_price }} {% trans "UAH" %}</strong>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>У вас ще немає замовлень.</p>
+                <p>{% trans "You don't have any orders yet." %}</p>
             {% endif %}
         </div>
     </div>

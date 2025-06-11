@@ -1,8 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Функция для обновления количества
     const updateQuantity = (itemId, action) => {
+        // Универсально ищем оба варианта инпута
+        const quantityInputMobile = document.getElementById(`quantity-input-mobile-${itemId}`);
         const quantityInput = document.getElementById(`quantity-input-${itemId}`);
-        let quantity = parseInt(quantityInput.value);
+        // Выбираем тот, что есть (или оба)
+        let quantity = 1;
+        if (quantityInputMobile) {
+            quantity = parseInt(quantityInputMobile.value);
+        } else if (quantityInput) {
+            quantity = parseInt(quantityInput.value);
+        }
 
         if (action === 'increase') {
             quantity++;
@@ -10,7 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
             quantity--;
         }
 
-        fetch(`/cart/update_quantity/${itemId}/`, {
+        // Get current language prefix from URL
+        const langPrefix = window.location.pathname.split('/')[1];
+        const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
+
+        fetch(`${baseUrl}/cart/update_quantity/${itemId}/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
@@ -21,8 +33,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    quantityInput.value = quantity;
-                    document.getElementById(`total-price-${itemId}`).textContent = data.item_total_price;
+                    if (quantityInput) quantityInput.value = quantity;
+                    if (quantityInputMobile) quantityInputMobile.value = quantity;
+                    // Обновляем цену и в мобильной карточке, если есть
+                    const mobileTotal = document.getElementById(`total-price-mobile-${itemId}`);
+                    if (mobileTotal) mobileTotal.textContent = data.item_total_price;
+                    const total = document.getElementById(`total-price-${itemId}`);
+                    if (total) total.textContent = data.item_total_price;
                     document.getElementById('cart-total-price').textContent = data.cart_total_price;
 
                     // ✅ Обновляем иконку корзины в шапке
@@ -41,56 +58,43 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.show();
     };
 
-    // Удаление товара
+    // Функция для удаления товара
     const removeItem = (itemId) => {
-        fetch(`/cart/remove/${itemId}/`, {
+        // Get current language prefix from URL
+        const langPrefix = window.location.pathname.split('/')[1];
+        const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
+
+        fetch(`${baseUrl}/cart/remove/${itemId}/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
             },
         })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    document.getElementById(`cart-item-${itemId}`).remove();
+                    // Удаляем элемент из DOM
+                    const itemElement = document.getElementById(`cart-item-${itemId}`);
+                    const mobileItemElement = document.getElementById(`cart-item-mobile-${itemId}`);
+                    if (itemElement) itemElement.remove();
+                    if (mobileItemElement) mobileItemElement.remove();
+
+                    // Обновляем общую сумму
                     document.getElementById('cart-total-price').textContent = data.cart_total_price;
 
-                    // Показываем тост об удалении
-                    showRemoveToast();
-
-                    // Корректно обновляем иконку корзины в шапке
+                    // Обновляем количество в корзине
                     updateCartItemCount(data.cart_total_quantity);
 
-                    // Проверяем, остались ли товары
-                    const cartTable = document.querySelector('.cart-table');
-                    const cartItems = document.querySelectorAll('.cart-table tbody tr');
-                    if (cartItems.length === 0) {
-                        if (cartTable) cartTable.style.display = 'none';
-                        // Скрываем или удаляем блок с общей суммой
-                        let cartTotalBlock = document.querySelector('.cart-total');
-                        if (cartTotalBlock) cartTotalBlock.style.display = 'none';
-                        let emptyBlock = document.querySelector('.empty-cart');
-                        if (emptyBlock) {
-                            emptyBlock.style.display = 'block';
-                        } else {
-                            // Если блока нет, создаём его
-                            const cartContainer = document.querySelector('.cart-container');
-                            if (cartContainer) {
-                                cartContainer.insertAdjacentHTML('beforeend', `
-                                    <div class="empty-cart">
-                                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                                        <p class="empty-cart-text">Ваша корзина пуста</p>
-                                        <a href="/assortment/" class="checkout-btn">
-                                            <i class="fas fa-arrow-left"></i>
-                                            Перейти к покупкам
-                                        </a>
-                                    </div>
-                                `);
-                            }
-                        }
+                    // Показываем тост
+                    showRemoveToast();
+
+                    // Если корзина пуста, перезагружаем страницу
+                    if (data.cart_total_quantity === 0) {
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
                     }
-                } else {
-                    console.error(data.message || 'Не вдалося видалити товар');
                 }
             })
             .catch(error => console.error('Помилка:', error));

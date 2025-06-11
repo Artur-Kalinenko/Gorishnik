@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 {% load form_tags %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="register-container">
-    <h2>Реєстрація</h2>
+    <h2>{% trans "Registration" %}</h2>
 
     <form method="post" novalidate>
         {% csrf_token %}
@@ -12,88 +13,88 @@
         <!-- Общие ошибки формы -->
         {% if form.non_field_errors %}
             <div class="alert alert-danger">
-                {{ form.non_field_errors }}
+                {% trans form.non_field_errors %}
             </div>
         {% endif %}
 
         <!-- Поле: Имя -->
         <div class="form-group">
-            <label for="id_first_name">Ім'я</label>
+            <label for="id_first_name">{% trans "Name" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value|default:'' }}" placeholder="Ваше імʼя" required>
+                <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ form.first_name.value|default:'' }}" placeholder="{% trans 'Your name' %}" required>
             </div>
             {% for error in form.first_name.errors %}
-                <div class="text-danger">{{ error }}</div>
+                <div class="text-danger">{% trans error %}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Email -->
         <div class="form-group">
-            <label for="id_email">Email</label>
+            <label for="id_email">{% trans "Email" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}" placeholder="Адреса вашої пошти" required>
+                <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}" placeholder="{% trans 'Your email address' %}" required>
             </div>
             {% for error in form.email.errors %}
-                <div class="text-danger">{{ error }}</div>
+                <div class="text-danger">{% trans error %}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Телефон -->
         <div class="form-group">
-            <label for="id_phone">Телефон</label>
+            <label for="id_phone">{% trans "Phone" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                <input type="tel" name="phone" id="phone-input" class="form-control" value="{{ form.phone.value|default:'' }}" placeholder="Ваш номер телефону" required>
+                <input type="tel" name="phone" id="phone-input" class="form-control" value="{{ form.phone.value|default:'' }}" placeholder="{% trans 'Your phone number' %}" required>
             </div>
             {% for error in form.phone.errors %}
-                <div class="text-danger">{{ error }}</div>
+                <div class="text-danger">{% trans error %}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Пароль -->
         <div class="form-group">
-            <label for="id_password1">Пароль</label>
+            <label for="id_password1">{% trans "Password" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="Введіть пароль" required>
+                <input type="password" name="password1" id="id_password1" class="form-control" placeholder="{% trans 'Enter password' %}" required>
             </div>
             {% for error in form.password1.errors %}
-                <div class="text-danger">{{ error }}</div>
+                <div class="text-danger">{% trans error %}</div>
             {% endfor %}
         </div>
 
         <!-- Поле: Подтверждение пароля -->
         <div class="form-group">
-            <label for="id_password2">Підтвердження паролю</label>
+            <label for="id_password2">{% trans "Confirm password" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="Введіть той саме пароль, що і вище" required>
+                <input type="password" name="password2" id="id_password2" class="form-control" placeholder="{% trans 'Enter the same password as above' %}" required>
             </div>
             {% for error in form.password2.errors %}
-                <div class="text-danger">{{ error }}</div>
+                <div class="text-danger">{% trans error %}</div>
             {% endfor %}
         </div>
 
         <!-- Кнопка регистрации -->
-        <button type="submit" class="btn btn-primary">Зареєструватися</button>
+        <button type="submit" class="btn btn-primary">{% trans "Register" %}</button>
     </form>
 
     <div class="divider">
-        <span>Вже є акаунт?</span>
+        <span>{% trans "Already have an account?" %}</span>
     </div>
 
     <!-- Кнопка входа -->
-    <a href="{% url 'login' %}" class="btn btn-outline-success">Увійти</a>
+    <a href="{% url 'login' %}" class="btn btn-outline-success">{% trans "Login" %}</a>
 
     <div class="divider">
-        <span>або</span>
+        <span>{% trans "or" %}</span>
     </div>
 
     <!-- Кнопка входа через Google -->
     <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger">
-        <i class="bi bi-google"></i> Увійти через Google
+        <i class="bi bi-google"></i> {% trans "Login with Google" %}
     </a>
 </div>
 

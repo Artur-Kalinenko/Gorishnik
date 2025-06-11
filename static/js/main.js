@@ -97,8 +97,11 @@ function updateCartItemCount(count) {
 
 function addToCart(productId, quantity = 1, variantId = null) {
     const csrfToken = getCookie('csrftoken');
+    // Get current language prefix from URL
+    const langPrefix = window.location.pathname.split('/')[1];
+    const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
 
-    fetch(`/cart/add/${productId}/`, {
+    fetch(`${baseUrl}/cart/add/${productId}/`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': csrfToken,
@@ -163,3 +166,79 @@ function showCartToast() {
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
     toast.show();
 }
+
+// Мобильное меню
+function toggleMobileMenu() {
+    const mobileMenu = document.querySelector('.mobile-menu');
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const body = document.body;
+    
+    // Show mobile menu button only on mobile screens
+    if (window.innerWidth <= 480) {
+        mobileMenuBtn.style.display = 'flex';
+        } else {
+        mobileMenuBtn.style.display = 'none';
+    }
+
+    // Toggle mobile menu
+    mobileMenuBtn.addEventListener('click', () => {
+        mobileMenu.classList.toggle('active');
+        body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+        });
+
+    // Close mobile menu
+    const closeBtn = document.querySelector('.mobile-menu-close');
+    closeBtn.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+        body.style.overflow = '';
+    });
+
+    // Handle mobile menu tabs
+    const tabs = document.querySelectorAll('.mobile-menu-tab');
+    const sections = document.querySelectorAll('.mobile-menu-section');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Show corresponding section
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === `${tabName}-section`) {
+                section.classList.add('active');
+            }
+            });
+        });
+    });
+}
+
+// Initialize mobile menu
+document.addEventListener('DOMContentLoaded', () => {
+    toggleMobileMenu();
+    
+    // Update mobile menu on window resize
+    window.addEventListener('resize', () => {
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        if (window.innerWidth <= 480) {
+            mobileMenuBtn.style.display = 'flex';
+        } else {
+            mobileMenuBtn.style.display = 'none';
+            document.querySelector('.mobile-menu').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+});
+
+// Language switcher
+document.addEventListener('DOMContentLoaded', function() {
+    const languageSelect = document.querySelector('select[name="language"]');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+});

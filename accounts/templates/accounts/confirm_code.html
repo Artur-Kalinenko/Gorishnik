@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}{{ title|default:"Підтвердження коду" }}{% endblock %}
+{% block title %}{% trans title|default:"Code Confirmation" %}{% endblock %}
 
 {% block content %}
 <div class="confirm-container">
-    <h2>{{ title|default:"Підтвердження коду" }}</h2>
-    <p>{{ description|default:"Введіть 6-значний код, надісланий вам на пошту." }}</p>
+    <h2>{% trans title|default:"Code Confirmation" %}</h2>
+    <p>{% trans description|default:"Enter the 6-digit code sent to your email." %}</p>
 
     {% if messages %}
         {% for message in messages %}
@@ -20,17 +21,17 @@
         {{ form.non_field_errors }}
 
         <div class="form-group">
-            <label for="id_code">Код підтвердження</label>
+            <label for="id_code">{% trans "Confirmation code" %}</label>
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
-                <input type="text" name="code" id="id_code" class="form-control" maxlength="6" pattern="[0-9]{6}" placeholder="Введіть код" required value="{{ form.code.value|default:'' }}">
+                <input type="text" name="code" id="id_code" class="form-control" maxlength="6" pattern="[0-9]{6}" placeholder="{% trans 'Enter code' %}" required value="{{ form.code.value|default:'' }}">
             </div>
             {% if form.code.errors %}
-                <div class="text-danger small">{{ form.code.errors.0 }}</div>
+                <div class="text-danger small">{% trans form.code.errors.0 %}</div>
             {% endif %}
         </div>
 
-        <button type="submit" class="btn btn-primary">Підтвердити</button>
+        <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
     </form>
 
     <!-- Форма повторної відправки коду -->
@@ -44,7 +45,7 @@
                     data-code-resend
                     data-sent-at="{{ sent_at|default:'' }}"
                     data-is-first="{{ is_first|yesno:'true,false' }}">
-                Надіслати код повторно
+                {% trans "Resend code" %}
             </button>
             <span id="timer-placeholder" class="text-muted" style="margin-top: 0.2em;"></span>
         </form>

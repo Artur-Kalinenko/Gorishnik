@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <!-- Страница подтверждения успешного заказа -->
 <div class="checkout-container">
-    <h2>Дякуємо за замовлення!</h2>
-    <p>Ваше замовлення прийнято і буде опрацьовано найближчим часом.</p>
-    <a href="/" class="return-home-btn">Повернутись на головну</a>
+    <h2>{% trans "Дякуємо за замовлення!" %}</h2>
+    <p>{% trans "Ваше замовлення прийнято і буде опрацьовано найближчим часом." %}</p>
+    <a href="/" class="return-home-btn">{% trans "Повернутись на головну" %}</a>
 </div>
 <link rel="stylesheet" href="{% static 'payments/payment.css' %}">
 {% endblock %}

@@ -6,7 +6,11 @@ function getCSRFToken() {
 
 // Добавление товара в корзину
 function addToCart(productId, quantity, variantId = null, grams = '') {
-    fetch(`/cart/add/${productId}/`, {
+    // Get current language prefix from URL
+    const langPrefix = window.location.pathname.split('/')[1];
+    const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
+    
+    fetch(`${baseUrl}/cart/add/${productId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

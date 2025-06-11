@@ -1,10 +1,11 @@
 {% load static %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gorishnik{% endblock %}</title>
+    <title>{% block title %}{% trans "Gorishnik" %}{% endblock %}</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -31,7 +32,6 @@
     <!-- Верхний ярус -->
     <div class="top-bar py-2">
         <div class="container d-flex justify-content-between align-items-center">
-
             {% get_media_prefix as MEDIA_URL %}
             <!-- Левая колонка: Логотип -->
             <div class="d-flex align-items-center">
@@ -46,32 +46,32 @@
                 </a>
             </div>
 
-            <!-- Центр: Поиск -->
-            <div class="d-flex justify-content-center flex-grow-1">
+            <!-- Центр: Поиск (только для десктопа) -->
+            <div class="d-flex justify-content-center flex-grow-1 desktop-only">
                 <form class="position-relative d-flex align-items-stretch" method="get" action="{% url 'assortment_items' %}" style="max-width: 500px; width: 100%;">
                     {% csrf_token %}
                     <input class="form-control w-100 ps-4 pe-5" type="search" name="q" id="search-input"
-                           placeholder="Що будемо шукати?" autocomplete="off" value="{{ query|default:'' }}">
+                           placeholder="{% trans 'What are we looking for?' %}" autocomplete="off" value="{{ query|default:'' }}">
                     <div id="suggestions" class="list-group position-absolute w-100"></div>
                     <button type="submit"
                             class="search-icon-btn category-btn d-flex align-items-center justify-content-center">
                         <img src="{{ MEDIA_URL }}icons/search_brown.png"
                              data-hover="{{ MEDIA_URL }}icons/search_white.png"
                              data-original="{{ MEDIA_URL }}icons/search_brown.png"
-                             alt="Пошук"
+                             alt="{% trans 'Search' %}"
                              class="category-icon"
                              style="width: 28px; height: 28px;">
                     </button>
                 </form>
             </div>
 
-            <!-- Правая колонка: Кошик + Авторизация -->
+            <!-- Правая колонка: Кошик + Меню -->
             <div class="d-flex align-items-center gap-2 ms-3">
                 <a href="{% url 'cart' %}" id="cart-button" class="category-btn d-flex align-items-center {% if request.path == '/cart/' %}btn-primary{% endif %}" style="padding: 0 12px;">
                     <img src="{{ MEDIA_URL }}icons/cart_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/cart_white.png"
                          data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                         alt="Кошик"
+                         alt="{% trans 'Cart' %}"
                          class="category-icon"
                          style="width: 28px; height: 28px;">
                     <span id="cart-item-count" class="cart-count ms-2" style="font-weight: bold;">
@@ -79,36 +79,51 @@
                     </span>
                 </a>
 
+                <!-- Языковой переключатель -->
+                <form action="{% url 'set_language' %}" method="post" class="ms-2" id="language-form">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.path }}">
+                    <select name="language" class="form-select language-select category-btn" id="language-select" onchange="this.form.submit()">
+                        <option value="uk" {% if request.LANGUAGE_CODE == 'uk' %}selected{% endif %}>UA</option>
+                        <option value="ru" {% if request.LANGUAGE_CODE == 'ru' %}selected{% endif %}>RU</option>
+                    </select>
+                </form>
+
+                <!-- Кнопка входа/выхода для десктопа -->
                 {% if user.is_authenticated %}
-                    <form id="logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
-                    <button type="submit" form="logout-form" id="auth-button" class="category-btn d-flex align-items-center" style="padding: 0 12px;">
+                    <form id="desktop-logout-form" method="post" action="{% url 'logout' %}" class="d-none d-lg-block ms-2">{% csrf_token %}</form>
+                    <button type="submit" form="desktop-logout-form" class="category-btn d-flex align-items-center d-none d-lg-flex">
                         <img src="{{ MEDIA_URL }}icons/logout_brown.png"
                              data-hover="{{ MEDIA_URL }}icons/logout_white.png"
                              data-original="{{ MEDIA_URL }}icons/logout_brown.png"
-                             alt="Вийти"
+                             alt="{% trans 'Logout' %}"
                              class="category-icon"
                              style="width: 28px; height: 28px;">
-                        <span class="auth-label ms-2">Вийти</span>
+                        <span class="ms-2">{% trans "Logout" %}</span>
                     </button>
                 {% else %}
-                    <button id="auth-button" class="category-btn d-flex align-items-center" style="padding: 0 12px;"
-                            data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <button class="category-btn d-flex align-items-center d-none d-lg-flex ms-2" data-bs-toggle="modal" data-bs-target="#loginModal">
                         <img src="{{ MEDIA_URL }}icons/login_brown.png"
                              data-hover="{{ MEDIA_URL }}icons/login_white.png"
                              data-original="{{ MEDIA_URL }}icons/login_brown.png"
-                             alt="Увійти"
+                             alt="{% trans 'Login' %}"
                              class="category-icon"
                              style="width: 28px; height: 28px;">
-                        <span class="auth-label ms-2">Увійти</span>
+                        <span class="ms-2">{% trans "Login" %}</span>
                     </button>
                 {% endif %}
-            </div>
 
+                <!-- Кнопка меню как category-btn -->
+                <a href="javascript:void(0);" class="category-btn d-flex align-items-center ms-2 mobile-menu-btn" type="button">
+                    <i class="bi bi-list category-icon" style="width: 28px; height: 28px;"></i>
+                    <span class="ms-2">{% trans "Menu" %}</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Нижний ярус -->
-    <nav class="main-nav py-2">
+    <!-- Нижний ярус (только для десктопа) -->
+    <nav class="main-nav py-2 desktop-only">
         <div class="container d-flex justify-content-between align-items-center">
             <!-- Левая часть: Асортимент с дропдауном -->
             <div class="nav-left dropdown">
@@ -118,10 +133,10 @@
                     <img src="{{ MEDIA_URL }}icons/category_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/category_white.png"
                          data-original="{{ MEDIA_URL }}icons/category_brown.png"
-                         alt="Категорії товарів"
+                         alt="{% trans 'Categories' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
-                    <span class="ms-2">Категорії товарів </span>
+                    <span class="ms-2">{% trans "Categories" %} </span>
                 </button>
 
                 <ul class="dropdown-menu category-dropdown category-dropdown-multicol" aria-labelledby="assortmentDropdown">
@@ -154,47 +169,47 @@
                     <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
                          data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
-                         alt="Асортимент"
+                         alt="{% trans 'Assortment' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
-                    <span class="ms-2">Асортимент</span>
+                    <span class="ms-2">{% trans "Assortment" %}</span>
                 </a>
                 <a class="category-btn d-flex align-items-center {% if request.path == '/producer/' %}btn-primary{% endif %}" href="/producer/" style="padding: 0 12px;">
                     <img src="{{ MEDIA_URL }}icons/factory_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/factory_white.png"
                          data-original="{{ MEDIA_URL }}icons/factory_brown.png"
-                         alt="Виробники"
+                         alt="{% trans 'Producers' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
-                    <span class="ms-2">Виробники</span>
+                    <span class="ms-2">{% trans "Producers" %}</span>
                 </a>
                 <a class="category-btn d-flex align-items-center {% if request.path == '/delivery/' %}btn-primary{% endif %}" href="/delivery/" style="padding: 0 12px;">
                     <img src="{{ MEDIA_URL }}icons/truck_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/truck_white.png"
                          data-original="{{ MEDIA_URL }}icons/truck_brown.png"
-                         alt="Доставка"
+                         alt="{% trans 'Delivery' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
-                    <span class="ms-2">Доставка</span>
+                    <span class="ms-2">{% trans "Delivery" %}</span>
                 </a>
                 <a class="category-btn d-flex align-items-center {% if request.path == '/reviews/' %}btn-primary{% endif %}" href="/reviews/" style="padding: 0 12px;">
                     <img src="{{ MEDIA_URL }}icons/star_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/star_white.png"
                          data-original="{{ MEDIA_URL }}icons/star_brown.png"
-                         alt="Відгуки"
+                         alt="{% trans 'Reviews' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
-                    <span class="ms-2">Відгуки</span>
+                    <span class="ms-2">{% trans "Reviews" %}</span>
                 </a>
                 {% if user.is_authenticated and not user.is_staff %}
                     <a class="category-btn d-flex align-items-center {% if request.path == '/cabinet/' %}btn-primary{% endif %}" href="{% url 'user_cabinet' %}" style="padding: 0 12px;">
                         <img src="{{ MEDIA_URL }}icons/user_brown.png"
                              data-hover="{{ MEDIA_URL }}icons/user_white.png"
                              data-original="{{ MEDIA_URL }}icons/user_brown.png"
-                             alt="Мій кабінет"
+                             alt="{% trans 'My Cabinet' %}"
                              class="category-icon"
                              style="width: 24px; height: 24px;">
-                        <span class="ms-2">Мій кабінет</span>
+                        <span class="ms-2">{% trans "My Cabinet" %}</span>
                     </a>
                 {% endif %}
                 {% if request.user.is_staff %}
@@ -202,16 +217,124 @@
                         <img src="{{ MEDIA_URL }}icons/settings_brown.png"
                              data-hover="{{ MEDIA_URL }}icons/settings_white.png"
                              data-original="{{ MEDIA_URL }}icons/settings_brown.png"
-                             alt="Адмін"
+                             alt="{% trans 'Admin' %}"
                              class="category-icon"
                              style="width: 24px; height: 24px;">
-                        <span class="ms-2">Адмін</span>
+                        <span class="ms-2">{% trans "Admin" %}</span>
                     </a>
                 {% endif %}
             </div>
         </div>
     </nav>
 </header>
+
+<!-- Мобильное меню -->
+<div class="mobile-menu">
+    <div class="mobile-menu-header">
+        <h5 class="mb-0">{% trans "Menu" %}</h5>
+        <button class="mobile-menu-close">&times;</button>
+    </div>
+    
+    <div class="mobile-menu-search">
+        <form method="get" action="{% url 'assortment_items' %}">
+            {% csrf_token %}
+            <input class="form-control" type="search" name="q" placeholder="{% trans 'What are we looking for?' %}" autocomplete="off">
+        </form>
+    </div>
+
+    <div class="mobile-menu-tabs">
+        <div class="mobile-menu-tab active" data-tab="categories">{% trans "Categories" %}</div>
+        <div class="mobile-menu-tab" data-tab="navigation">{% trans "Navigation" %}</div>
+    </div>
+
+    <div class="mobile-menu-content">
+        <!-- Секция категорий -->
+        <div class="mobile-menu-section active" id="categories-section" style="max-height: 55vh; overflow-y: auto;">
+            {% for column in categories_columns %}
+                {% for category in column %}
+                    <a href="{{ category.get_absolute_url }}" class="mobile-menu-category category-btn">
+                        {% if category.button_icon_brown %}
+                            <img src="{{ category.button_icon_brown.url }}"
+                                 data-hover="{{ category.button_icon_white.url }}"
+                                 alt="{{ category.category }}"
+                                 class="category-icon"
+                                 style="width: 24px; height: 24px; margin-right: 8px;">
+                        {% endif %}
+                        {{ category.category }}
+                    </a>
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <!-- Секция навигации -->
+        <div class="mobile-menu-section" id="navigation-section">
+            <a href="{% url 'assortment_list' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
+                     data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
+                     alt="{% trans 'Assortment' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Assortment" %}</span>
+            </a>
+            <a href="/producer/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/factory_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/factory_white.png"
+                     data-original="{{ MEDIA_URL }}icons/factory_brown.png"
+                     alt="{% trans 'Producers' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Producers" %}</span>
+            </a>
+            <a href="/delivery/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/truck_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/truck_white.png"
+                     data-original="{{ MEDIA_URL }}icons/truck_brown.png"
+                     alt="{% trans 'Delivery' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Delivery" %}</span>
+            </a>
+            <a href="/reviews/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/star_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/star_white.png"
+                     data-original="{{ MEDIA_URL }}icons/star_brown.png"
+                     alt="{% trans 'Reviews' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Reviews" %}</span>
+            </a>
+            {% if user.is_authenticated and not user.is_staff %}
+                <a href="{% url 'user_cabinet' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                    <img src="{{ MEDIA_URL }}icons/user_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/user_white.png"
+                         data-original="{{ MEDIA_URL }}icons/user_brown.png"
+                         alt="{% trans 'My Cabinet' %}" class="category-icon" style="width: 24px; height: 24px;">
+                    <span class="ms-2">{% trans "My Cabinet" %}</span>
+                </a>
+            {% endif %}
+            {% if request.user.is_staff %}
+                <a href="/admin/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                    <img src="{{ MEDIA_URL }}icons/settings_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/settings_white.png"
+                         data-original="{{ MEDIA_URL }}icons/settings_brown.png"
+                         alt="{% trans 'Admin' %}" class="category-icon" style="width: 24px; height: 24px;">
+                    <span class="ms-2">{% trans "Admin" %}</span>
+                </a>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <form id="mobile-logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
+                <button type="submit" form="mobile-logout-form" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                    <img src="{{ MEDIA_URL }}icons/logout_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/logout_white.png"
+                         data-original="{{ MEDIA_URL }}icons/logout_brown.png"
+                         alt="{% trans 'Logout' %}" class="category-icon" style="width: 24px; height: 24px;">
+                    <span class="ms-2">{% trans "Logout" %}</span>
+                </button>
+            {% else %}
+                <button class="mobile-menu-nav-item category-btn d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#loginModal">
+                    <img src="{{ MEDIA_URL }}icons/login_brown.png"
+                         data-hover="{{ MEDIA_URL }}icons/login_white.png"
+                         data-original="{{ MEDIA_URL }}icons/login_brown.png"
+                         alt="{% trans 'Login' %}" class="category-icon" style="width: 24px; height: 24px;">
+                    <span class="ms-2">{% trans "Login" %}</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 <!-- Контент -->
 <div class="container">
@@ -225,8 +348,8 @@
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <div class="modal-header">
-          <h5 class="modal-title">Вхід до акаунту</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+          <h5 class="modal-title">{% trans "Login to Account" %}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
         </div>
         <div class="modal-body">
           {% if messages %}
@@ -236,41 +359,41 @@
           {% endif %}
           {{ login_form.non_field_errors }}
           <div class="mb-3">
-            <label for="id_identifier" class="form-label">Email або телефон</label>
+            <label for="id_identifier" class="form-label">{% trans "Email or phone" %}</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-person"></i></span>
               {{ login_form.identifier }}
             </div>
           </div>
           <div class="mb-3">
-            <label for="id_password" class="form-label">Пароль</label>
+            <label for="id_password" class="form-label">{% trans "Password" %}</label>
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-lock"></i></span>
               {{ login_form.password }}
             </div>
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <a href="{% url 'password_reset_request' %}" class="btn btn-link p-0">Забули пароль?</a>
+            <a href="{% url 'password_reset_request' %}" class="btn btn-link p-0">{% trans "Forgot password?" %}</a>
           </div>
         </div>
 
         <!-- Вот тут modal-footer: три кнопки одна за другой -->
         <div class="modal-footer flex-column">
-          <button type="submit" class="btn btn-primary w-100 mb-2">Увійти</button>
+          <button type="submit" class="btn btn-primary w-100 mb-2">{% trans "Login" %}</button>
           
           <div class="divider">
-            <span>Ще немає акаунту?</span>
+            <span>{% trans "Don't have an account yet?" %}</span>
           </div>
           
-          <a href="{% url 'register' %}" class="btn btn-outline-success w-100 mb-2">Реєстрація</a>
+          <a href="{% url 'register' %}" class="btn btn-outline-success w-100 mb-2">{% trans "Registration" %}</a>
           
           <div class="divider">
-            <span>або</span>
+            <span>{% trans "or" %}</span>
           </div>
           
           <!-- Кнопка Google сразу после них, без лишних отступов -->
           <button type="button" class="btn btn-danger w-100" onclick="saveSessionAndRedirect()">
-            <i class="bi bi-google"></i> Увійти через Google
+            <i class="bi bi-google"></i> {% trans "Login with Google" %}
           </button>
         </div>
       </form>
@@ -281,7 +404,7 @@
 
 <!-- Футер -->
 <footer class="footer mt-5 text-center py-3 border-top">
-    © 2025 Gorishnik | Всі права захищені
+    © 2025 Gorishnik | {% trans "All rights reserved" %}
 </footer>
 
 <!-- Тосты -->
@@ -289,32 +412,32 @@
     <div id="favorite-toast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="d-flex">
             <div class="toast-body" id="favorite-toast-message"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="hideFavoriteToast()" aria-label="Закрити"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" onclick="hideFavoriteToast()" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
     <div id="loginToast" class="toast text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="7000">
         <div class="d-flex">
             <div class="toast-body">
-                Щоб додати товар в <strong>«Обрані товари»</strong>, будь ласка,
-                <a href="#" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#loginModal">увійдіть або зареєструйтесь</a>!
+                {% trans "To add an item to" %} <strong>«{% trans "Favorites" %}»</strong>, {% trans "please" %},
+                <a href="#" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#loginModal">{% trans "login or register" %}</a>!
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрити"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
     <div id="cartToast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="d-flex">
             <div class="toast-body">
-                Товар додано у <a href="{% url 'cart' %}" class="text-white text-decoration-underline">кошик</a>!
+                {% trans "Item added to" %} <a href="{% url 'cart' %}" class="text-white text-decoration-underline">{% trans "cart" %}</a>!
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрити"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
     <div id="removeCartToast" class="toast text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="d-flex">
             <div class="toast-body">
-                Товар видалено з кошика!
+                {% trans "Item removed from cart" %}!
             </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрити"></button>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
 </div>
@@ -325,6 +448,25 @@
 <script src="{% static 'js/icon_hover.js' %}"></script>
 <script src="{% static 'js/favorites.js' %}"></script>
 <script src="{% static 'assortment/product_card.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const languageSelect = document.getElementById('language-select');
+        if (languageSelect) {
+            languageSelect.addEventListener('change', function() {
+                const form = this.form;
+                const currentPath = window.location.pathname;
+                const newLang = this.value;
+                const newPath = currentPath.replace(/^\/(uk|ru)/, '/' + newLang);
+                
+                // Обновляем значение next перед отправкой формы
+                form.querySelector('input[name="next"]').value = newPath;
+                
+                // Отправляем форму
+                form.submit();
+            });
+        }
+    });
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

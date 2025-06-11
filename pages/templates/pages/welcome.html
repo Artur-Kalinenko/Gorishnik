@@ -1,55 +1,56 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
-{% block title %}Welcome{% endblock %}
+{% block title %}{% trans "Welcome" %}{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <div class="welcome-hero-full">
     <div class="welcome-hero-content hero-title-block">
-        <h1 class="welcome-title hero-title">Ласкаво просимо до GORISHNIK_UA</h1>
+        <h1 class="welcome-title hero-title">{% trans "Welcome to GORISHNIK_UA" %}</h1>
     </div>
-    <img src="/media/pictures/welcome_page/main_pic.png" alt="Welcome" class="welcome-hero-image-full hero-image-rounded">
+    <img src="/media/pictures/welcome_page/main_pic.png" alt="{% trans 'Welcome' %}" class="welcome-hero-image-full hero-image-rounded">
     <div class="welcome-hero-content" style="padding-top: 0;">
-        <div class="welcome-subtitle hero-subtitle">Ваш надійний партнер у світі якісних товарів</div>
-        <a href="{% url 'assortment_list' %}" class="btn btn-primary btn-lg welcome-main-btn" style="width: 100%; max-width: 100%;">Переглянути товари</a>
+        <div class="welcome-subtitle hero-subtitle">{% trans "Your reliable partner in the world of quality products" %}</div>
+        <a href="{% url 'assortment_list' %}" class="btn btn-primary btn-lg welcome-main-btn" style="width: 100%; max-width: 100%;">{% trans "View products" %}</a>
     </div>
 </div>
 
 <!-- Featured Categories -->
 <div class="featured-categories">
     <div class="container">
-        <h2 class="section-title">Популярні категорії</h2>
+        <h2 class="section-title">{% trans "Popular categories" %}</h2>
         <div class="row featured-row">
             <div class="category-card">
                 <div class="category-image-wrapper">
-                    <img src="/media/pictures/welcome_page/oreh.png" alt="Горіхи" class="category-image">
+                    <img src="/media/pictures/welcome_page/oreh.png" alt="{% trans 'Nuts' %}" class="category-image">
                 </div>
                 <div class="category-card-content">
-                    <h3>Горіхи</h3>
-                    <p>Великий вибір свіжих та смачних горіхів</p>
+                    <h3>{% trans "Nuts" %}</h3>
+                    <p>{% trans "Wide selection of fresh and delicious nuts" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Горіхи" class="category-view-btn"><span>Детальніше</span></a>
+                <a href="/assortment/items/?category=Горіхи" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
             <div class="category-card">
                 <div class="category-image-wrapper">
-                    <img src="/media/pictures/welcome_page/suhofrukt.png" alt="Сухофрукти" class="category-image">
+                    <img src="/media/pictures/welcome_page/suhofrukt.png" alt="{% trans 'Dried fruits' %}" class="category-image">
                 </div>
                 <div class="category-card-content">
-                    <h3>Сухофрукти</h3>
-                    <p>Натуральні сухофрукти для здорового харчування</p>
+                    <h3>{% trans "Dried fruits" %}</h3>
+                    <p>{% trans "Natural dried fruits for healthy eating" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Cухофрукти" class="category-view-btn"><span>Детальніше</span></a>
+                <a href="/assortment/items/?category=Cухофрукти" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
             <div class="category-card">
                 <div class="category-image-wrapper">
-                    <img src="/media/pictures/welcome_page/eurotov.png" alt="Євротовари та Бакалія" class="category-image">
+                    <img src="/media/pictures/welcome_page/eurotov.png" alt="{% trans 'European goods and Groceries' %}" class="category-image">
                 </div>
                 <div class="category-card-content">
-                    <h3>Євротовари та Бакалія</h3>
-                    <p>Європейські товари та бакалія для вашого столу</p>
+                    <h3>{% trans "European goods and Groceries" %}</h3>
+                    <p>{% trans "European goods and groceries for your table" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Євротовари%20та%20Бакалія" class="category-view-btn"><span>Детальніше</span></a>
+                <a href="/assortment/items/?category=Євротовари%20та%20Бакалія" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
         </div>
     </div>
@@ -58,27 +59,27 @@
 <!-- Why Choose Us -->
 <div class="why-choose-us">
     <div class="container">
-        <h2 class="section-title">Чому обирають нас</h2>
+        <h2 class="section-title">{% trans "Why choose us" %}</h2>
         <div class="row why-row">
             <div class="feature-card">
                 <i class="bi bi-truck"></i>
-                <h3>Швидка доставка</h3>
-                <p>Доставляємо по всій Україні</p>
+                <h3>{% trans "Fast delivery" %}</h3>
+                <p>{% trans "We deliver throughout Ukraine" %}</p>
             </div>
             <div class="feature-card">
                 <i class="bi bi-shield-check"></i>
-                <h3>Якість товарів</h3>
-                <p>Перевіряємо кожен товар</p>
+                <h3>{% trans "Product quality" %}</h3>
+                <p>{% trans "We check every product" %}</p>
             </div>
             <div class="feature-card">
                 <i class="bi bi-headset"></i>
-                <h3>Підтримка 24/7</h3>
-                <p>Завжди на зв'язку</p>
+                <h3>{% trans "24/7 Support" %}</h3>
+                <p>{% trans "Always in touch" %}</p>
             </div>
             <div class="feature-card">
                 <i class="bi bi-currency-dollar"></i>
-                <h3>Доступні ціни</h3>
-                <p>Найкращі пропозиції</p>
+                <h3>{% trans "Affordable prices" %}</h3>
+                <p>{% trans "Best offers" %}</p>
             </div>
         </div>
     </div>
@@ -88,11 +89,12 @@
 <div class="cta-section cta-rounded">
     <div class="container">
         <div class="cta-content">
-            <h2>Готові почати покупки?</h2>
-            <p>Перегляньте наш каталог та знайдіть ідеальні товари для себе</p>
-            <a href="{% url 'assortment_list' %}" class="btn btn-primary">Перейти до каталогу</a>
+            <h2>{% trans "Ready to start shopping?" %}</h2>
+            <p>{% trans "Browse our catalog and find the perfect products for yourself" %}</p>
+            <a href="{% url 'assortment_list' %}" class="btn btn-primary">{% trans "Go to catalog" %}</a>
         </div>
     </div>
 </div>
 <link rel="stylesheet" href="{% static 'pages/welcome.css' %}">
+<script src="{% static 'pages/welcome.js' %}"></script>
 {% endblock %}

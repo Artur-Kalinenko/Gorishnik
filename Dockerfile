@@ -1,5 +1,3 @@
-# Dockerfile
-
 FROM python:3.12
 
 # Отключаем pyc и буферизацию
@@ -12,9 +10,12 @@ WORKDIR /app
 # Копируем зависимости
 COPY requirements.txt .
 
-RUN apt-get update && apt-get install -y cron && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Устанавливаем cron и клиент PostgreSQL, качаем библиотеки Python
+RUN apt-get update \
+    && apt-get install -y cron postgresql-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Копируем весь проект
 COPY . .

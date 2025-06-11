@@ -1,90 +1,67 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Корзина{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Cart" %}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="cart-container">
-        <h1 class="cart-title">Корзина</h1>
+        <h1 class="cart-title">{% trans "Cart" %}</h1>
 
         {% if items %}
-            <table class="cart-table">
-                <thead>
-                    <tr>
-                        <th>Фото</th>
-                        <th>Продукт</th>
-                        <th>Граммовка</th>
-                        <th>Количество</th>
-                        <th>Цена за единицу</th>
-                        <th>Итого</th>
-                        <th>Действие</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr id="cart-item-{{ item.id }}">
-                        <td>
+            <div class="cart-list">
+                {% for item in items %}
+                <div class="cart-card" id="cart-mobile-item-{{ item.id }}">
+                    <button class="remove-item mobile" data-item-id="{{ item.id }}" aria-label="{% trans 'Remove' %}">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <div class="cart-card-top">
+                        <div class="cart-card-img">
                             {% if item.product.poster %}
                                 <img src="{{ item.product.poster.url }}" alt="{{ item.product.assortment_name }}" class="cart-product-image">
                             {% else %}
-                                <img src="{% static 'images/default.jpg' %}" alt="No image" class="cart-product-image">
+                                <img src="{% static 'images/default.jpg' %}" alt="{% trans 'No image' %}" class="cart-product-image">
                             {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'assortment_detail' item.product.pk %}" class="cart-product-name">
-                                {{ item.product.assortment_name }}
-                            </a>
-                        </td>
-                        <td>
-                            {% if item.variant %}
-                                {{ item.variant.grams }}г
-                            {% else %}
-                                {{ item.product.grams }}г
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="cart-quantity-controls">
-                                <button class="quantity-btn update-quantity" data-item-id="{{ item.id }}" data-action="decrease">−</button>
-                                <input type="number" value="{{ item.quantity }}" min="1" id="quantity-input-{{ item.id }}" class="quantity-input" readonly>
-                                <button class="quantity-btn update-quantity" data-item-id="{{ item.id }}" data-action="increase">+</button>
+                        </div>
+                        <div class="cart-card-info">
+                            <a href="{% url 'assortment_detail' item.product.pk %}" class="cart-product-name">{{ item.product.assortment_name }}</a>
+                            <div class="cart-card-grams">
+                                {% if item.variant %}{{ item.variant.grams }}г{% else %}{{ item.product.grams }}г{% endif %}
                             </div>
-                        </td>
-                        <td>
-                            {% if item.variant %}
-                                ₴<span id="unit-price-{{ item.id }}">{{ item.variant.price }}</span>
-                            {% else %}
-                                ₴<span id="unit-price-{{ item.id }}">{{ item.product.price }}</span>
-                            {% endif %}
-                        </td>
-                        <td>₴<span id="total-price-{{ item.id }}">{{ item.total_price }}</span></td>
-                        <td>
-                            <button class="remove-item" data-item-id="{{ item.id }}">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                        </div>
+                    </div>
+                    <div class="cart-card-bottom">
+                        <div class="cart-quantity-controls">
+                            <button class="quantity-btn update-quantity" data-item-id="{{ item.id }}" data-action="decrease">−</button>
+                            <input type="number" value="{{ item.quantity }}" min="1" id="quantity-input-mobile-{{ item.id }}" class="quantity-input" readonly>
+                            <button class="quantity-btn update-quantity" data-item-id="{{ item.id }}" data-action="increase">+</button>
+                        </div>
+                        <div class="cart-card-total">
+                            ₴<span id="total-price-mobile-{{ item.id }}">{{ item.total_price }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
 
             <div class="cart-total">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <span class="cart-total-price">Общая сумма: ₴<span id="cart-total-price">{{ total_price }}</span></span>
+                        <span class="cart-total-price">{% trans "Total amount" %}: ₴<span id="cart-total-price">{{ total_price }}</span></span>
                     </div>
                     <a href="{% url 'checkout' %}" class="checkout-btn">
                         <i class="fas fa-shopping-cart"></i>
-                        Сделать заказ
+                        {% trans "Place order" %}
                     </a>
                 </div>
             </div>
         {% else %}
             <div class="empty-cart">
                 <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                <p class="empty-cart-text">Ваша корзина пуста</p>
+                <p class="empty-cart-text">{% trans "Your cart is empty" %}</p>
                 <a href="{% url 'assortment_list' %}" class="checkout-btn">
                     <i class="fas fa-arrow-left"></i>
-                    Перейти к покупкам
+                    {% trans "Go to shopping" %}
                 </a>
             </div>
         {% endif %}

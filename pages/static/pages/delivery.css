@@ -3,3 +3,142 @@
     height: 250px; /* Встановлюємо фіксовану висоту */
     object-fit: cover; /* Обрізка зображення із збереженням пропорцій */
 }
+
+.delivery-page {
+    padding: 2rem 0;
+}
+
+.delivery-title {
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.delivery-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 3px;
+    background-color: var(--accent);
+    margin: 1rem auto;
+}
+
+.delivery-card {
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.delivery-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.delivery-card-image {
+    position: relative;
+    height: 250px;
+    overflow: hidden;
+}
+
+.delivery-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.delivery-card:hover .delivery-card-image img {
+    transform: scale(1.05);
+}
+
+.delivery-card-content {
+    padding: 1.5rem;
+}
+
+.delivery-card-title {
+    color: var(--accent);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.delivery-info {
+    color: var(--text-main);
+}
+
+.delivery-frequency {
+    font-size: 1.1rem;
+    color: var(--accent-dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.delivery-address {
+    font-size: 1.1rem;
+    color: var(--accent-dark);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.delivery-details {
+    margin-bottom: 1.5rem;
+}
+
+.delivery-details h4 {
+    color: var(--accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.delivery-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.delivery-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.delivery-list li i {
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .delivery-title {
+        font-size: 2rem;
+    }
+    
+    .delivery-card-image {
+        height: 200px;
+    }
+    
+    .delivery-card-content {
+        padding: 1.25rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .delivery-title {
+        font-size: 1.75rem;
+    }
+    
+    .delivery-card-image {
+        height: 180px;
+    }
+}

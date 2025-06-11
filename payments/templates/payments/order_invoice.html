@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 <div class="checkout-container">
-    <h2>Дякуємо за замовлення!</h2>
-    <p>Ми звʼяжемося з вами для виставлення рахунку і надішлемо реквізити для оплати найближчим часом.</p>
-    <a href="/" class="return-home-btn">Повернутись на головну</a>
+    <h2>{% trans "Дякуємо за замовлення!" %}</h2>
+    <p>{% trans "Ми звʼяжемося з вами для виставлення рахунку і надішлемо реквізити для оплати найближчим часом." %}</p>
+    <a href="/" class="return-home-btn">{% trans "Повернутись на головну" %}</a>
 </div>
 <link rel="stylesheet" href="{% static 'payments/payment.css' %}">
 {% endblock %}
