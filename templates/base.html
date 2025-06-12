@@ -24,6 +24,18 @@
     <!-- Main CSS -->
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="{% static 'assortment/product_card.css' %}">
+
+    <script>
+        const translations = {
+            'product_added_to_favorites': '{% trans "Товар додано в обране" %}',
+            'product_removed_from_favorites': '{% trans "Товар видалено з обраного" %}',
+            'error_updating_favorites': '{% trans "Помилка при оновленні обраного" %}',
+            'server_error': '{% trans "Помилка сервера. Спробуйте пізніше." %}',
+            'item_added_to_cart': '{% trans "Item added to" %}',
+            'cart': '{% trans "cart" %}',
+            'item_removed_from_cart': '{% trans "Item removed from cart" %}'
+        };
+    </script>
 </head>
 <body>
 
@@ -435,16 +447,14 @@
         <div class="d-flex">
             <div class="toast-body">
                 {% trans "To add an item to" %} <strong>«{% trans "Favorites" %}»</strong>, {% trans "please" %},
-                <a href="#" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#loginModal">{% trans "login or register" %}</a>!
+                <a href="#" class="text-white text-decoration-underline" data-bs-toggle="modal" data-bs-target="#loginModal" onclick="document.getElementById('loginToast').querySelector('.btn-close').click()">{% trans "login or register" %}</a>!
             </div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>
     <div id="cartToast" class="toast text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
         <div class="d-flex">
-            <div class="toast-body">
-                {% trans "Item added to" %} <a href="{% url 'cart' %}" class="text-white text-decoration-underline">{% trans "cart" %}</a>!
-            </div>
+            <div class="toast-body"></div>
             <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
         </div>
     </div>

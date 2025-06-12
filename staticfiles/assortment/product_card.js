@@ -5,37 +5,33 @@ function getCSRFToken() {
 }
 
 // Добавление товара в корзину
-function addToCart(productId, quantity, variantId = null, grams = '') {
+function addToCart(productId, quantity = 1, variantId = null) {
+    const csrfToken = getCSRFToken();
     // Get current language prefix from URL
     const langPrefix = window.location.pathname.split('/')[1];
     const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
-    
+
     fetch(`${baseUrl}/cart/add/${productId}/`, {
         method: 'POST',
         headers: {
+            'X-CSRFToken': csrfToken,
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken(),
         },
-        body: JSON.stringify({ quantity, variant_id: variantId, grams }),
+        body: JSON.stringify({ quantity, variant_id: variantId }),
     })
     .then(response => response.json())
     .then(data => {
-        showCartToast('Товар додано в кошик');
-        if (data.cart_total_quantity !== undefined) {
-            const cartCount = document.getElementById('cart-item-count');
-            if (cartCount) cartCount.textContent = data.cart_total_quantity;
+        if (data.session_id) {
+            localStorage.setItem('session_id', data.session_id);
         }
+        if (data.cart_item_count !== undefined) {
+            updateCartItemCount(data.cart_item_count);
+        }
+        showCartToast();
     })
-    .catch(err => console.error('Помилка при додаванні:', err));
-}
-
-// Показ тоста
-function showCartToast(message) {
-    const toastEl = document.getElementById('cartToast');
-    if (toastEl) {
-        toastEl.querySelector('.toast-body').textContent = message;
-        new bootstrap.Toast(toastEl).show();
-    }
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 // Обработчики корзины
@@ -64,7 +60,7 @@ function attachQuantityHandlers(productId) {
             const grams = addToCartBtn.getAttribute('data-grams') || '';
             // Не даём добавить в корзину без выбранной граммовки
             if (!variantId && addToCartBtn.hasAttribute('data-variant-id')) {
-                showCartToast('Оберіть грамовку перед додаванням!');
+                showCartToast();
                 return;
             }
             addToCart(productId, parseInt(input.value, 10), variantId, grams);

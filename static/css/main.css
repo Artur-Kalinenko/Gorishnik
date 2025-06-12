@@ -369,12 +369,61 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* === Тосты === */
+.toast-container {
+    z-index: 9999;
+}
+
+.toast {
+    border: none !important;
+    border-radius: 10px !important;
+    box-shadow: 0 4px 12px rgba(122, 78, 45, 0.15) !important;
+    font-family: 'Comfortaa', cursive !important;
+    font-weight: 500 !important;
+}
+
 .toast.bg-success {
     background-color: var(--green) !important;
 }
 
+.toast.bg-success .toast-body {
+    color: var(--white) !important;
+}
+
 .toast.bg-danger {
-    background-color: #c0392b !important;
+    background-color: var(--accent) !important;
+}
+
+.toast.bg-danger .toast-body {
+    color: var(--white) !important;
+}
+
+.toast .btn-close {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.toast .btn-close:hover {
+    opacity: 1;
+}
+
+.toast .btn-close-white {
+    filter: brightness(0) invert(1);
+}
+
+.toast .toast-body a {
+    color: var(--white) !important;
+    text-decoration: underline !important;
+    font-weight: 600 !important;
+    transition: opacity 0.2s ease;
+}
+
+.toast .toast-body a:hover {
+    opacity: 0.8;
+}
+
+.toast .toast-body strong {
+    color: var(--white) !important;
+    font-weight: 600 !important;
 }
 
 /* === Стилизация модального окна логина === */
@@ -577,13 +626,22 @@ header {
 
 /* Стили для хлебных крошек */
 .breadcrumbs {
+    padding-top: 4px;
+    padding-bottom: 4px;
     background-color: var(--bg-subnav) !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumbs > .container {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .breadcrumb {
     margin: 0;
     padding: 0;
+    align-items: center;
+    min-height: 0;
 }
 
 .breadcrumb-item {
@@ -594,6 +652,8 @@ header {
 .breadcrumb-item a {
     color: var(--accent);
     transition: color 0.3s ease;
+    text-decoration: none !important;
+    border-bottom: none !important;
 }
 
 .breadcrumb-item a:hover {
@@ -607,6 +667,12 @@ header {
 .breadcrumb-item + .breadcrumb-item::before {
     content: "›";
     color: var(--accent);
+}
+
+.breadcrumb *, .breadcrumb {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
 /* === Search Suggestions Above All === */

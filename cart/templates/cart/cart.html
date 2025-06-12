@@ -3,6 +3,13 @@
 {% load i18n %}
 {% block title %}{% trans "Cart" %}{% endblock %}
 
+{% block breadcrumbs %}
+    <li class="breadcrumb-item">
+        <a href="{% url 'category_list' %}">{% trans "Categories" %}</a>
+    </li>
+    <li class="breadcrumb-item active">{% trans "Cart" %}</li>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="cart-container">
@@ -37,7 +44,9 @@
                             <button class="quantity-btn update-quantity" data-item-id="{{ item.id }}" data-action="increase">+</button>
                         </div>
                         <div class="cart-card-total">
-                            ₴<span id="total-price-mobile-{{ item.id }}">{{ item.total_price }}</span>
+                            <span class="unit-price">₴{% if item.variant %}{{ item.variant.price }}{% else %}{{ item.product.price }}{% endif %}</span>
+                            <span class="separator">/</span>
+                            <span class="total-price">₴<span id="total-price-mobile-{{ item.id }}">{{ item.total_price }}</span></span>
                         </div>
                     </div>
                 </div>

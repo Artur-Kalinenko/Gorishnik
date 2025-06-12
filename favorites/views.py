@@ -1,10 +1,21 @@
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from functools import wraps
 from .models import Favorite
 from assortment.models import Assortment
 
-@login_required
+def ajax_login_required(view_func):
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'login_required'}, status=403)
+            return login_required(view_func)(request, *args, **kwargs)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
+@ajax_login_required
 def toggle_favorite(request, product_id):
     product = get_object_or_404(Assortment, id=product_id)
     favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)

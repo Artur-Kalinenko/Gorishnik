@@ -2,6 +2,12 @@
 {% load static %}
 {% load i18n %}
 
+{% block title %}{% trans "My Account" %}{% endblock %}
+
+{% block breadcrumbs %}
+    <li class="breadcrumb-item active">{% trans "My Account" %}</li>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h2 class="mb-4">{% trans "My Account" %}</h2>

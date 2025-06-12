@@ -56,7 +56,7 @@ def add_to_cart(request, product_id):
         return JsonResponse({
             'status': 'success',
             'message': 'Продукт додано в кошик!',
-            'cart_total_quantity': total_quantity
+            'cart_item_count': total_quantity
         })
 
     return JsonResponse({'error': 'Неверный запрос'}, status=400)

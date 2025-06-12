@@ -97,7 +97,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function updateCartItemCount(count) {
     const countEl = document.getElementById('cart-item-count');
-    if (countEl) countEl.textContent = count;
+    if (countEl) {
+        countEl.textContent = count;
+        console.log('updateCartItemCount:', count);
+    } else {
+        console.log('updateCartItemCount: element not found');
+    }
 }
 
 function addToCart(productId, quantity = 1, variantId = null) {
@@ -141,7 +146,17 @@ if (window.cartCleared && window.location.pathname === '/cart/') {
     }
 }
 
-// Тосты
+// Toast functions
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
 function showFavoriteToast(message, isAdded) {
     const toastEl = document.getElementById('favorite-toast');
     const toastMessage = document.getElementById('favorite-toast-message');
@@ -168,8 +183,57 @@ function showCartToast() {
     const toastEl = document.getElementById('cartToast');
     if (!toastEl) return;
 
+    const toastBody = toastEl.querySelector('.toast-body');
+    let msg = '';
+    if (typeof translations !== 'undefined' && translations.item_added_to_cart && translations.cart) {
+        msg = translations.item_added_to_cart + ' <a href="/cart/" class="text-white text-decoration-underline">' + translations.cart + '</a>!';
+    } else {
+        msg = 'Товар добавлен в корзину!';
+    }
+    if (toastBody) {
+        toastBody.innerHTML = msg;
+    }
+    console.log('showCartToast:', msg, translations);
     const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
     toast.show();
+}
+
+function showRemoveCartToast() {
+    const toastEl = document.getElementById('removeCartToast');
+    if (!toastEl) return;
+
+    const toastBody = toastEl.querySelector('.toast-body');
+    if (toastBody) {
+        toastBody.textContent = translations.item_removed_from_cart + '!';
+    }
+
+    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
+    toast.show();
+}
+
+// Cart functions
+function updateCart(productId, action) {
+    fetch(`/cart/${action}/${productId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const message = action === 'add' ? translations.item_added_to_cart : translations.item_removed_from_cart;
+            showToast(message);
+            updateCartCount(data.cart_count);
+        } else {
+            showToast(data.error || translations.server_error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast(translations.server_error, 'error');
+    });
 }
 
 // Мобильное меню

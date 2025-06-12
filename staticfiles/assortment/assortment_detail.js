@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const variantId = addToCartBtn.getAttribute('data-variant-id') || null;
                     const grams = addToCartBtn.getAttribute('data-grams') || '';
                     if (!variantId && addToCartBtn.hasAttribute('data-variant-id')) {
-                        showCartToast('Оберіть грамовку перед додаванням!');
+                        showCartToast();
                         return;
                     }
                     addToCart(productId, parseInt(input.value, 10), variantId, grams);
@@ -126,38 +126,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const cookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
         return cookie ? decodeURIComponent(cookie.split('=')[1]) : '';
     }
-    function addToCart(productId, quantity, variantId = null, grams = '') {
+    function addToCart(productId, quantity = 1, variantId = null, grams = '') {
+        const csrfToken = getCSRFToken();
         // Get current language prefix from URL
         const langPrefix = window.location.pathname.split('/')[1];
-        const baseUrl = langPrefix === 'uk' || langPrefix === 'en' ? `/${langPrefix}` : '';
+        const baseUrl = langPrefix === 'uk' || langPrefix === 'ru' ? `/${langPrefix}` : '';
         
         fetch(`${baseUrl}/cart/add/${productId}/`, {
             method: 'POST',
             headers: {
+                'X-CSRFToken': csrfToken,
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken(),
             },
             body: JSON.stringify({ quantity, variant_id: variantId, grams }),
         })
         .then(response => response.json())
         .then(data => {
-            showCartToast('Товар додано в кошик');
-            if (data.cart_total_quantity !== undefined) {
-                const cartCount = document.getElementById('cart-item-count');
-                if (cartCount) cartCount.textContent = data.cart_total_quantity;
+            if (data.session_id) {
+                localStorage.setItem('session_id', data.session_id);
             }
+            if (data.cart_item_count !== undefined) {
+                updateCartItemCount(data.cart_item_count);
+            }
+            showCartToast();
         })
-        .catch(err => console.error('Помилка при додаванні:', err));
-    }
-    function showCartToast(message) {
-        const toastEl = document.getElementById('cartToast');
-        if (toastEl) {
-            toastEl.querySelector('.toast-body').textContent = message;
-            if (typeof bootstrap !== "undefined") {
-                const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
-                toast.show();
-            }
-        }
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 
     // --- КАСТОМНАЯ МОДАЛКА ПОДТВЕРЖДЕНИЯ УДАЛЕНИЯ ОТЗЫВА ---
