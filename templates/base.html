@@ -5,7 +5,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% trans "Gorishnik" %}{% endblock %}</title>
+    <title>{% block title %}{% trans "GORISHNIK — орехи, сухофрукти, солодощі" %}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{% trans "GORISHNIK — інтернет-магазин орехів, сухофруктів, солодощів, спецій та кави з доставкою." %}{% endblock %}">
+    <link rel="canonical" href="{{ request.build_absolute_uri|cut:'?' }}">
+    {% block meta_robots %}{% endblock %}
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -145,7 +148,7 @@
                     <img src="{{ MEDIA_URL }}icons/category_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/category_white.png"
                          data-original="{{ MEDIA_URL }}icons/category_brown.png"
-                         alt="{% trans 'Categories' %}"
+                         alt="{% trans 'Categories menu' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
                     <span class="ms-2">{% trans "Categories" %} </span>
@@ -181,7 +184,7 @@
                     <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
                          data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
-                         alt="{% trans 'Assortment' %}"
+                         alt="{% trans 'Assortment menu' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
                     <span class="ms-2">{% trans "Assortment" %}</span>
@@ -190,7 +193,7 @@
                     <img src="{{ MEDIA_URL }}icons/factory_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/factory_white.png"
                          data-original="{{ MEDIA_URL }}icons/factory_brown.png"
-                         alt="{% trans 'Producers' %}"
+                         alt="{% trans 'Producers menu' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
                     <span class="ms-2">{% trans "Producers" %}</span>
@@ -199,7 +202,7 @@
                     <img src="{{ MEDIA_URL }}icons/truck_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/truck_white.png"
                          data-original="{{ MEDIA_URL }}icons/truck_brown.png"
-                         alt="{% trans 'Delivery' %}"
+                         alt="{% trans 'Delivery menu' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
                     <span class="ms-2">{% trans "Delivery" %}</span>
@@ -208,7 +211,7 @@
                     <img src="{{ MEDIA_URL }}icons/star_brown.png"
                          data-hover="{{ MEDIA_URL }}icons/star_white.png"
                          data-original="{{ MEDIA_URL }}icons/star_brown.png"
-                         alt="{% trans 'Reviews' %}"
+                         alt="{% trans 'Reviews menu' %}"
                          class="category-icon"
                          style="width: 24px; height: 24px;">
                     <span class="ms-2">{% trans "Reviews" %}</span>
@@ -262,7 +265,7 @@
         <h5 class="mb-0">{% trans "Menu" %}</h5>
         <button class="mobile-menu-close">&times;</button>
     </div>
-    
+
     <div class="mobile-menu-search">
         <form method="get" action="{% url 'assortment_list' %}">
             {% csrf_token %}
@@ -408,17 +411,17 @@
         <!-- Вот тут modal-footer: три кнопки одна за другой -->
         <div class="modal-footer flex-column">
           <button type="submit" class="btn btn-primary w-100 mb-2">{% trans "Login" %}</button>
-          
+
           <div class="divider">
             <span>{% trans "Don't have an account yet?" %}</span>
           </div>
-          
+
           <a href="{% url 'register' %}" class="btn btn-outline-success w-100 mb-2">{% trans "Registration" %}</a>
-          
+
           <div class="divider">
             <span>{% trans "or" %}</span>
           </div>
-          
+
           <!-- Кнопка Google сразу после них, без лишних отступов -->
           <button type="button" class="btn btn-danger w-100" onclick="saveSessionAndRedirect()">
             <i class="bi bi-google"></i> {% trans "Login with Google" %}
@@ -483,10 +486,10 @@
                 const currentPath = window.location.pathname;
                 const newLang = this.value;
                 const newPath = currentPath.replace(/^\/(uk|ru)/, '/' + newLang);
-                
+
                 // Обновляем значение next перед отправкой формы
                 form.querySelector('input[name="next"]').value = newPath;
-                
+
                 // Отправляем форму
                 form.submit();
             });

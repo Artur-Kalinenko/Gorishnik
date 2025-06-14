@@ -5,41 +5,39 @@
 <div class="sidebar" id="filters-sidebar" data-view="{% if current_category %}category{% else %}all{% endif %}">
 
 <form method="get" id="filter-form">
-    {% if selected_category %}
-        <input type="hidden" name="category" value="{{ selected_category }}">
-    {% endif %}
     {% if query %}
         <input type="hidden" name="q" value="{{ query }}">
     {% endif %}
 
     {# === Блок производителей — ВСЕГДА открыт на главной === #}
     {% if active_producers %}
-        <div class="filter-group mb-3">
-            <h5 class="filter-header">
-                {% trans "Producers" %}
-            </h5>
+        <div class="filter-group">
+            <div class="filter-group-header" data-bs-toggle="collapse" data-bs-target="#group-producers">
+                <span class="filter-group-title">{% trans "Producers" %}</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
             <div class="filter-options" id="group-producers" style="display: block;">
                 <div class="d-flex flex-wrap gap-2">
-                {% for producer in active_producers %}
-                    {% if producer.id|stringformat:"s" in selected_producer_ids %}
-                        <label class="producer-label producer-label--selected">
-                            <input type="checkbox" name="producer" value="{{ producer.id }}"
-                                   class="d-none"
-                                   checked>
-                            <img src="{{ producer.producer_img.url }}"
-                                 alt="{{ producer.producer_name }}"
-                                 class="producer-img">
-                        </label>
-                    {% else %}
-                        <label class="producer-label">
-                            <input type="checkbox" name="producer" value="{{ producer.id }}"
-                                   class="d-none">
-                            <img src="{{ producer.producer_img.url }}"
-                                 alt="{{ producer.producer_name }}"
-                                 class="producer-img">
-                        </label>
-                    {% endif %}
-                {% endfor %}
+                    {% for producer in active_producers %}
+                        {% if producer.slug in selected_producer_ids %}
+                            <label class="producer-label producer-label--selected">
+                                <input type="checkbox" name="producer" value="{{ producer.slug }}"
+                                       class="d-none"
+                                       checked>
+                                <img src="{{ producer.producer_img.url }}"
+                                     alt="{{ producer.producer_name }}"
+                                     class="producer-img">
+                            </label>
+                        {% else %}
+                            <label class="producer-label">
+                                <input type="checkbox" name="producer" value="{{ producer.slug }}"
+                                       class="d-none">
+                                <img src="{{ producer.producer_img.url }}"
+                                     alt="{{ producer.producer_name }}"
+                                     class="producer-img">
+                            </label>
+                        {% endif %}
+                    {% endfor %}
                 </div>
             </div>
         </div>

@@ -6,6 +6,8 @@ from django.db.models import Avg
 from django import forms
 from .validators import validate_image
 from django.urls import reverse
+from django.utils.text import slugify
+from django.urls import reverse
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 # Основная модель товара
@@ -15,6 +17,7 @@ class Assortment(models.Model):
         verbose_name='Назва продукту',
         help_text='Наприклад: Кешʼю смажений, Фініки королівські'
     )
+    slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name='Slug')
     assortment_categories = models.ManyToManyField(
         'Category', related_name='assortments', verbose_name='Назва категорії',
         help_text='Оберіть одну або декілька категорій'
@@ -86,6 +89,20 @@ class Assortment(models.Model):
         if self.grams is not None and self.grams <= 0:
             raise ValidationError("Грамовка повинна бути більше 0.")
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.assortment_name)
+            slug = base_slug
+            num = 1
+            while Assortment.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('assortment_detail', args=[self.slug])
+
     @property
     def average_rating(self):
         return self.reviews.aggregate(avg=Avg('rating'))['avg'] or 0
@@ -135,6 +152,7 @@ class Tag(models.Model):
 # Категория товара
 class Category(models.Model):
     category = models.CharField(max_length=255, db_index=True, verbose_name='Категорія')
+    slug = models.SlugField(max_length=100, unique=True, blank=True, verbose_name='Slug')
     button_icon_white = models.ImageField(upload_to='assortment/category_icons_white/', null=True, blank=True)
     button_icon_brown = models.ImageField(upload_to='assortment/category_icons_brown/', blank=True, null=True)
     cover_image = models.ImageField(upload_to='assortment/category_covers/', null=True, blank=True,
@@ -150,7 +168,18 @@ class Category(models.Model):
         return self.category
 
     def get_absolute_url(self):
-        return reverse('assortment_list') + f'?category={self.category}'
+        return reverse('category_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.category)
+            slug = base_slug
+            num = 1
+            while Category.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{num}"
+                num += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.assortments.exists():  # ← Используем related_name

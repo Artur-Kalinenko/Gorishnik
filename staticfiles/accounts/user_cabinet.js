@@ -33,14 +33,23 @@ function rebuildFavoritesCarousel(shouldFixActiveSlide = false) {
 
         const parent = container.closest('.card-body');
         // Remove any existing empty message
-        const existingMessage = parent.querySelector('.text-muted');
+        const existingMessage = parent.querySelector('.text-muted, .no-favorites-message');
         if (existingMessage) {
             existingMessage.remove();
         }
 
+        // Определяем язык страницы
+        let lang = document.documentElement.getAttribute('lang') || 'uk';
+        let emptyText = 'У вас ще немає обраних товарів.';
+        if (lang.startsWith('ru')) {
+            emptyText = 'У вас пока нет избранных товаров.';
+        } else if (lang.startsWith('en')) {
+            emptyText = 'You have no favorite products yet.';
+        }
+
         const emptyMessage = document.createElement('p');
-        emptyMessage.className = 'text-center text-muted mt-3';
-        emptyMessage.textContent = 'У вас ще немає обраних товарів.';
+        emptyMessage.className = 'text-center no-favorites-message mt-3';
+        emptyMessage.textContent = emptyText;
         parent.appendChild(emptyMessage);
         return;
     }

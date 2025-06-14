@@ -295,3 +295,12 @@
     outline: none !important;
     box-shadow: none !important;
 }
+
+.favorites-container .product-card:hover {
+    z-index: 10;
+    position: relative;
+}
+
+.favorites-container .row.justify-content-center {
+    justify-content: center !important;
+}

@@ -27,11 +27,11 @@
                             {% if item.product.poster %}
                                 <img src="{{ item.product.poster.url }}" alt="{{ item.product.assortment_name }}" class="cart-product-image">
                             {% else %}
-                                <img src="{% static 'images/default.jpg' %}" alt="{% trans 'No image' %}" class="cart-product-image">
+                                <img src="{% static 'images/default.jpg' }}" alt="{% trans 'No image available' %}" class="cart-product-image">
                             {% endif %}
                         </div>
                         <div class="cart-card-info">
-                            <a href="{% url 'assortment_detail' item.product.pk %}" class="cart-product-name">{{ item.product.assortment_name }}</a>
+                            <a href="{% url 'assortment_detail' item.product.slug %}" class="cart-product-name">{{ item.product.assortment_name }}</a>
                             <div class="cart-card-grams">
                                 {% if item.variant %}{{ item.variant.grams }}г{% else %}{{ item.product.grams }}г{% endif %}
                             </div>

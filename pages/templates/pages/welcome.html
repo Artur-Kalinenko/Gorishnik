@@ -2,7 +2,9 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}{% trans "Welcome" %}{% endblock %}
+{% block title %}{% trans "GORISHNIK — орехи, сухофрукти, солодощі" %}{% endblock %}
+
+{% block meta_description %}{% trans "GORISHNIK — інтернет-магазин орехів, сухофруктів, солодощів, спецій та кави з доставкою." %}{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
@@ -10,7 +12,7 @@
     <div class="welcome-hero-content hero-title-block">
         <h1 class="welcome-title hero-title">{% trans "Welcome to GORISHNIK_UA" %}</h1>
     </div>
-    <img src="/media/pictures/welcome_page/main_pic.png" alt="{% trans 'Welcome' %}" class="welcome-hero-image-full hero-image-rounded">
+    <img src="/media/pictures/welcome_page/main_pic.png" alt="{% trans 'Welcome to GORISHNIK' %}" class="welcome-hero-image-full hero-image-rounded">
     <div class="welcome-hero-content" style="padding-top: 0;">
         <div class="welcome-subtitle hero-subtitle">{% trans "Your reliable partner in the world of quality products" %}</div>
         <a href="{% url 'category_list' %}" class="btn btn-primary btn-lg welcome-main-btn" style="width: 100%; max-width: 100%;">{% trans "View products" %}</a>
@@ -24,23 +26,23 @@
         <div class="row featured-row">
             <div class="category-card">
                 <div class="category-image-wrapper">
-                    <img src="/media/pictures/welcome_page/oreh.png" alt="{% trans 'Nuts' %}" class="category-image">
+                    <img src="/media/pictures/welcome_page/oreh.png" alt="{% trans 'Nuts category' %}" class="category-image">
                 </div>
                 <div class="category-card-content">
                     <h3>{% trans "Nuts" %}</h3>
                     <p>{% trans "Wide selection of fresh and delicious nuts" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Горіхи" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
+                <a href="{% url 'category_detail' 'gorihi' %}" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
             <div class="category-card">
                 <div class="category-image-wrapper">
-                    <img src="/media/pictures/welcome_page/suhofrukt.png" alt="{% trans 'Dried fruits' %}" class="category-image">
+                    <img src="/media/pictures/welcome_page/suhofrukt.png" alt="{% trans 'Dried fruits category' %}" class="category-image">
                 </div>
                 <div class="category-card-content">
                     <h3>{% trans "Dried fruits" %}</h3>
                     <p>{% trans "Natural dried fruits for healthy eating" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Cухофрукти" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
+                <a href="{% url 'category_detail' 'suhofrukti' %}" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
             <div class="category-card">
                 <div class="category-image-wrapper">
@@ -50,7 +52,7 @@
                     <h3>{% trans "European goods and Groceries" %}</h3>
                     <p>{% trans "European goods and groceries for your table" %}</p>
                 </div>
-                <a href="/assortment/items/?category=Євротовари%20та%20Бакалія" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
+                <a href="{% url 'category_detail' 'evrotovari-ta-bakaliya' %}" class="category-view-btn"><span>{% trans "Learn more" %}</span></a>
             </div>
         </div>
     </div>

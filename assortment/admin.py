@@ -76,6 +76,7 @@ class AssortmentImageInline(admin.TabularInline):
 class AssortmentAdmin(admin.ModelAdmin):
     form = AssortmentAdminForm
 
+    prepopulated_fields = {"slug": ("assortment_name",)}
     list_display = ['preview', 'assortment_name', 'get_categories', 'producer', 'price', 'is_available'] # 'old_price', 'is_discounted',
     list_filter = ['producer', 'is_available'] # 'is_discounted'
     search_fields = ['assortment_name']
@@ -87,7 +88,7 @@ class AssortmentAdmin(admin.ModelAdmin):
         ('Основна інформація', {
             'fields': (
                 'assortment_name', 'assortment_name_uk',
-                'assortment_name_ru', 'poster', 'assortment_description', 'assortment_description_uk',
+                'assortment_name_ru', 'slug', 'poster', 'assortment_description', 'assortment_description_uk',
                 'assortment_description_ru', 'assortment_categories', 'filters', 'tags', 'producer'
             )
         }),
@@ -120,6 +121,7 @@ class AssortmentAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("category",)}
     list_display = ['category']
     search_fields = ['category']
 

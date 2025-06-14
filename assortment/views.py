@@ -16,6 +16,7 @@ from django.utils import timezone
 from datetime import timedelta
 from collections import defaultdict
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 def category_list_view(request):
     categories = Category.objects.all().order_by('created_at')
@@ -26,15 +27,15 @@ def chunked(iterable, size):
         yield iterable[i:i + size]
 
 
-def assortment_list(request):
+def assortment_list(request, slug=None, producer_slug=None):
     # 1. Базовые параметры
     all_categories = Category.objects.all().order_by('created_at')
-    selected_category = request.GET.get('category')
+    selected_category = slug or request.GET.get('category')
     selected_filter_ids = list(map(int, request.GET.getlist('filters')))  # список выбранных option.id
-    selected_producer_ids = request.GET.getlist('producer')
+    selected_producer_slugs = request.GET.getlist('producer')
     selected_producers = []
-    if selected_producer_ids:
-        selected_producers = list(Producer.objects.filter(id__in=selected_producer_ids))
+    if selected_producer_slugs:
+        selected_producers = list(Producer.objects.filter(slug__in=selected_producer_slugs))
     query = request.GET.get('q', '')
     sort = request.GET.get('sort')
     new_only = request.GET.get('new') == '1'
@@ -44,12 +45,23 @@ def assortment_list(request):
     # 2. Базовая выборка (до фильтров)
     base_assortments = Assortment.objects.all()
 
+    # Handle producer filtering by slug
+    current_producer = None
+    if producer_slug:
+        current_producer = get_object_or_404(Producer, slug=producer_slug)
+        base_assortments = base_assortments.filter(producer=current_producer)
+    elif selected_producer_slugs:
+        base_assortments = base_assortments.filter(producer__slug__in=selected_producer_slugs)
+
     current_category = None
     if selected_category:
-        base_assortments = base_assortments.filter(
-            assortment_categories__category=selected_category
-        )
-        current_category = all_categories.filter(category=selected_category).first()
+        try:
+            current_category = Category.objects.get(slug=selected_category)
+            base_assortments = base_assortments.filter(
+                assortment_categories=current_category
+            )
+        except Category.DoesNotExist:
+            pass
 
     if query:
         base_assortments = base_assortments.filter(
@@ -73,8 +85,8 @@ def assortment_list(request):
 
     # 3. Фильтруем по производителям (но еще не по фильтрам)
     assortment_for_facet = base_assortments
-    if selected_producer_ids:
-        assortment_for_facet = assortment_for_facet.filter(producer__id__in=selected_producer_ids)
+    if selected_producer_slugs:
+        assortment_for_facet = assortment_for_facet.filter(producer__slug__in=selected_producer_slugs)
 
     # 4. Применяем выбранные фильтры к товарам (итоговый список) с учётом группировки
     assortments = assortment_for_facet
@@ -202,6 +214,7 @@ def assortment_list(request):
         'assortments': assortments,
         'selected_category': selected_category,
         'current_category': current_category,
+        'current_producer': current_producer,
         'total_products': total_products,
         'filter_groups': all_filter_groups,
         'option_counts': option_counts_dict,     # фасетные счётчики (после правки)
@@ -209,7 +222,7 @@ def assortment_list(request):
         'selected_filter_ids': selected_filter_ids,
         'selected_producers': selected_producers,
         'active_producers': sidebar_producers,
-        'selected_producer_ids': selected_producer_ids,
+        'selected_producer_ids': selected_producer_slugs,
         'query': query,
         'sort': sort,
         'new_only': new_only,
@@ -220,15 +233,15 @@ def assortment_list(request):
 
 
 
-def assortment_detail(request, pk):
-    assortment = get_object_or_404(Assortment, pk=pk)
+def assortment_detail(request, slug):
+    assortment = get_object_or_404(Assortment, slug=slug)
     variants = assortment.variants.all()
     reviews = assortment.reviews.select_related('user')
     images = assortment.images.all()
 
     # Обновляем популярность товара раз в 24 часа
     viewed = request.session.get('viewed_products', {})
-    last_viewed_str = viewed.get(str(pk))
+    last_viewed_str = viewed.get(str(assortment.id))
     should_update = False
 
     try:
@@ -242,8 +255,8 @@ def assortment_detail(request, pk):
         should_update = True
 
     if should_update:
-        Assortment.objects.filter(pk=pk).update(popularity=F('popularity') + 1)
-        viewed[str(pk)] = timezone.now().isoformat()
+        Assortment.objects.filter(pk=assortment.id).update(popularity=F('popularity') + 1)
+        viewed[str(assortment.id)] = timezone.now().isoformat()
         request.session['viewed_products'] = viewed
 
     # Форма для отзыва
@@ -261,7 +274,7 @@ def assortment_detail(request, pk):
                 review.assortment = assortment
                 review.save()
                 messages.success(request, "Ваш відгук додано!")
-                return redirect('assortment_detail', pk=pk)
+                return redirect('assortment_detail', slug=slug)
         else:
             form = ReviewForm() if not user_review else None
 
@@ -288,10 +301,10 @@ def delete_review_view(request, review_id):
     review = get_object_or_404(Review, id=review_id)
     if review.user != request.user and not request.user.is_superuser:
         return HttpResponseForbidden("Ви не маєте права видаляти цей відгук.")
-    assortment_id = review.assortment.pk
+    assortment_slug = review.assortment.slug
     review.delete()
     messages.success(request, 'Відгук видалено.')
-    return redirect('assortment_detail', pk=assortment_id)
+    return redirect('assortment_detail', slug=assortment_slug)
 
 # AJAX поиск
 @require_GET
@@ -333,7 +346,7 @@ def search_suggest(request):
             image_url = item.poster.url if item.poster else ''
             results.append({
                 'name': item.assortment_name,
-                'url': f"/assortment/{item.pk}/",
+                'url': reverse('assortment_detail', kwargs={'slug': item.slug}),
                 'categories': categories,
                 'image': image_url,
                 'type': 'exact_match',
@@ -346,7 +359,7 @@ def search_suggest(request):
             image_url = item.poster.url if item.poster else ''
             results.append({
                 'name': item.assortment_name,
-                'url': f"/assortment/{item.pk}/",
+                'url': reverse('assortment_detail', kwargs={'slug': item.slug}),
                 'categories': categories,
                 'image': image_url,
                 'type': 'partial_match',
@@ -355,17 +368,17 @@ def search_suggest(request):
 
         # Add category suggestions if we have less than 6 results
         if len(results) < 6:
+            # Get all categories that match the search query
             category_matches = (
                 Category.objects
                 .filter(category__icontains=q)
-                .exclude(category__in=[cat for result in results for cat in result['categories']])
                 .distinct()[:6 - len(results)]
             )
             
             for category in category_matches:
                 results.append({
                     'name': category.category,
-                    'url': f"/assortment/?category={category.category}",
+                    'url': reverse('category_detail', kwargs={'slug': category.slug}),
                     'type': 'category',
                     'image': '',
                 })

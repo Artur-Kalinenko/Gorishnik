@@ -4,25 +4,37 @@
 {% load dict_extras %}
 {% load i18n %}
 
-{% block title %}
-    {% if current_category %}
-        {{ current_category.category }}
-    {% elif query %}
-        {% trans "Search results for" %}: {{ query }}
-    {% else %}
-        {% trans "Assortment" %}
-    {% endif %}
+{% block title %}{% trans "Всі товари" %} — GORISHNIK{% endblock %}
+
+{% block meta_description %}{% trans "Інтернет-магазин орехів, сухофруктів та солодощів GORISHNIK. Доставка по Україні." %}{% endblock %}
+
+{% block meta_robots %}
+{% if page_obj.has_other_pages or request.GET or query %}
+<meta name="robots" content="noindex, follow">
+{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
-    <li class="breadcrumb-item">
-        <a href="{% url 'category_list' %}">{% trans "Categories" %}</a>
-    </li>
-    {% if current_category %}
-        <li class="breadcrumb-item active">{{ current_category.category }}</li>
-    {% else %}
-        <li class="breadcrumb-item active">{% trans "Всі товари" %}</li>
-    {% endif %}
+<li class="breadcrumb-item">
+    <a href="{% url 'assortment_list' %}">{% trans "Всі товари" %}</a>
+</li>
+{% if current_category %}
+<li class="breadcrumb-item active">{{ current_category.category }}</li>
+{% elif current_producer %}
+<li class="breadcrumb-item active">{{ current_producer.producer_name }}</li>
+{% elif selected_producers %}
+{% if selected_producers|length == 1 %}
+<li class="breadcrumb-item active">{{ selected_producers.0.producer_name }}</li>
+{% else %}
+<li class="breadcrumb-item active">
+    {% for producer in selected_producers %}
+    {{ producer.producer_name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</li>
+{% endif %}
+{% else %}
+<li class="breadcrumb-item active">{% trans "Всі товари" %}</li>
+{% endif %}
 {% endblock %}
 
 {% block content %}

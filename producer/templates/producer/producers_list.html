@@ -14,15 +14,15 @@
     <div class="row producers-grid">
         {% for producer in producers %}
             <div class="col-md producer-card-wrapper">
-                <a href="{% url 'assortment_list' %}?producer={{ producer.id }}" class="producer-card">
+                <a href="{% url 'producer_detail' producer.slug %}" class="producer-card">
                     <div class="producer-logo">
                         {% if producer.producer_img %}
                             <img src="{{ producer.producer_img.url }}"
-                                 alt="{{ producer.producer_name }}"
+                                 alt="{% trans 'Logo' %} {{ producer.producer_name }}"
                                  class="producer-img">
                         {% else %}
                             <img src="{% static 'images/default_producer.jpg' %}"
-                                 alt="{% trans 'No image' %}"
+                                 alt="{% trans 'No image available' %}"
                                  class="producer-img">
                         {% endif %}
                     </div>

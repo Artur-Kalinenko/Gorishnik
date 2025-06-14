@@ -245,7 +245,7 @@ function toggleMobileMenu() {
     // Show mobile menu button only on mobile screens
     if (window.innerWidth <= 480) {
         mobileMenuBtn.style.display = 'flex';
-        } else {
+    } else {
         mobileMenuBtn.style.display = 'none';
     }
 
@@ -253,12 +253,12 @@ function toggleMobileMenu() {
     mobileMenuBtn.addEventListener('click', () => {
         mobileMenu.classList.toggle('active');
         body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
-        });
+    });
 
     // Close mobile menu
     const closeBtn = document.querySelector('.mobile-menu-close');
     closeBtn.addEventListener('click', () => {
-            mobileMenu.classList.remove('active');
+        mobileMenu.classList.remove('active');
         body.style.overflow = '';
     });
 
@@ -266,7 +266,36 @@ function toggleMobileMenu() {
     const tabs = document.querySelectorAll('.mobile-menu-tab');
     const sections = document.querySelectorAll('.mobile-menu-section');
 
+    // Initialize active tab and section
+    const activeTab = document.querySelector('.mobile-menu-tab.active');
+    if (activeTab) {
+        const tabName = activeTab.getAttribute('data-tab');
+        const activeSection = document.getElementById(`${tabName}-section`);
+        if (activeSection) {
+            sections.forEach(section => section.classList.remove('active'));
+            activeSection.classList.add('active');
+        }
+    } else if (tabs.length > 0) {
+        // If no active tab, activate the first one
+        const firstTab = tabs[0];
+        const firstTabName = firstTab.getAttribute('data-tab');
+        const firstSection = document.getElementById(`${firstTabName}-section`);
+        
+        firstTab.classList.add('active');
+        sections.forEach(section => section.classList.remove('active'));
+        if (firstSection) {
+            firstSection.classList.add('active');
+        }
+    }
+
+    // Remove existing click handlers to prevent duplicates
     tabs.forEach(tab => {
+        const newTab = tab.cloneNode(true);
+        tab.parentNode.replaceChild(newTab, tab);
+    });
+
+    // Add click handlers to new tab elements
+    document.querySelectorAll('.mobile-menu-tab').forEach(tab => {
         tab.addEventListener('click', () => {
             const tabName = tab.getAttribute('data-tab');
             
@@ -278,8 +307,8 @@ function toggleMobileMenu() {
             sections.forEach(section => {
                 section.classList.remove('active');
                 if (section.id === `${tabName}-section`) {
-                section.classList.add('active');
-            }
+                    section.classList.add('active');
+                }
             });
         });
     });

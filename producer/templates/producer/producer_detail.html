@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ producer.producer_name }} — GORISHNIK{% endblock %}
+
+{% block meta_description %}{% trans "Товари від виробника" %} {{ producer.producer_name }}.{% endblock %}
+
+{% block content %}
+// ... existing code ... 

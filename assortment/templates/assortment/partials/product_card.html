@@ -22,17 +22,17 @@
     </div>
 
     <!-- Картинка -->
-    <a href="{% url 'assortment_detail' item.pk %}">
+    <a href="{% url 'assortment_detail' item.slug %}">
         {% if item.poster %}
-            <img src="{{ item.poster.url }}" class="product-image">
+            <img src="{{ item.poster.url }}" class="product-image" alt="{{ item.assortment_name }}">
         {% else %}
-            <img src="{% static 'images/default.jpg' %}" class="product-image">
+            <img src="{% static 'images/default.jpg' }}" class="product-image" alt="{% trans 'No image available' %}">
         {% endif %}
     </a>
 
     <div class="product-info">
         <h5 class="product-name">
-            <a href="{% url 'assortment_detail' item.pk %}" class="product-link">
+            <a href="{% url 'assortment_detail' item.slug %}" class="product-link">
                 {{ item.assortment_name }}
             </a>
         </h5>
@@ -64,7 +64,7 @@
                     {% endwith %}
                     <div class="hover-grams-buttons">
                         {% for variant in item.variants.all %}
-                            <a href="{% url 'assortment_detail' item.pk %}"
+                            <a href="{% url 'assortment_detail' item.slug %}"
                                class="gram-button category-btn d-inline-flex align-items-center justify-content-center">
                                 {{ variant.grams }}{% trans "g" %}
                             </a>
@@ -75,12 +75,12 @@
         </div>
 
         <!-- 3) Кнопка «Купити товар» (в потоке product-info, прижата к низу) -->
-        <a href="{% url 'assortment_detail' item.pk %}"
+        <a href="{% url 'assortment_detail' item.slug %}"
            class="buy-button category-btn d-flex align-items-center justify-content-center">
             <img src="{{ MEDIA_URL }}icons/cart_brown.png"
                  data-hover="{{ MEDIA_URL }}icons/cart_white.png"
                  data-original="{{ MEDIA_URL }}icons/cart_brown.png"
-                 alt="{% trans 'Buy' %}"
+                 alt="{% trans 'Add to cart' %}"
                  class="category-icon me-2"
                  style="width: 24px; height: 24px;">
             {% trans "Buy product" %}

@@ -2,9 +2,9 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}
-    {{ assortment.assortment_name }}
-{% endblock %}
+{% block title %}{{ assortment.assortment_name }} — GORISHNIK{% endblock %}
+
+{% block meta_description %}{{ assortment.assortment_description|truncatewords:25 }}{% endblock %}
 
 {% block breadcrumbs %}
     <li class="breadcrumb-item">
@@ -12,7 +12,7 @@
     </li>
     {% for cat in assortment.assortment_categories.all %}
         <li class="breadcrumb-item">
-            <a href="{% url 'assortment_list' %}?category={{ cat.category }}">{{ cat.category }}</a>
+            <a href="{{ cat.get_absolute_url }}">{{ cat.category }}</a>
         </li>
     {% endfor %}
     <li class="breadcrumb-item active">{{ assortment.assortment_name }}</li>
@@ -59,12 +59,12 @@
                             {% if assortment.poster %}
                                 <img src="{{ assortment.poster.url }}"
                                      class="img-thumbnail thumbnail-img active-thumbnail"
-                                     alt="{{ assortment.assortment_name }}">
+                                     alt="{% trans 'Photo' %} {{ assortment.assortment_name }}">
                             {% endif %}
                             {% for img in images %}
                                 <img src="{{ img.image.url }}"
                                      class="img-thumbnail thumbnail-img"
-                                     alt="{{ assortment.assortment_name }}">
+                                     alt="{% trans 'Photo' %} {{ assortment.assortment_name }}">
                             {% endfor %}
                         </div>
                         <button type="button" class="gallery-arrow right-arrow" id="galleryArrowRight" style="display:none;">&#8250;</button>
@@ -79,7 +79,7 @@
                 <h1 class="montserrat-category-title mb-3">{{ assortment.assortment_name }}</h1>
                 <div class="mb-3">
                     {% for cat in assortment.assortment_categories.all %}
-                        <a href="{% url 'category_list' %}?category={{ cat.category }}"
+                        <a href="{{ cat.get_absolute_url }}"
                            class="category-btn category-button d-inline-flex align-items-center me-2 mb-2">
                             {% if cat.button_icon_brown and cat.button_icon_white %}
                                 <img src="{{ cat.button_icon_brown.url }}"
@@ -94,7 +94,13 @@
                 </div>
                 <div class="producer-info mb-3">
                     <span class="text-muted">{% trans "Producer" %}:</span>
-                    <span class="fw-bold">{{ assortment.producer.producer_name }}</span>
+                    {% if assortment.producer %}
+                        <a href="{% url 'producer_detail' assortment.producer.slug %}" class="fw-bold text-decoration-none">
+                            {{ assortment.producer.producer_name }}
+                        </a>
+                    {% else %}
+                        <span class="text-muted">{% trans "Not specified" %}</span>
+                    {% endif %}
                 </div>
                 <div class="availability mb-3">
                     <span class="badge {% if assortment.is_available %}bg-success{% else %}bg-danger{% endif %}">

@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'social_django',
     'django_crontab',
     'modeltranslation',
+    'django.contrib.sitemaps',
     #my_apps
     'assortment.apps.AssortmentConfig',
     'producer',
