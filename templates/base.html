@@ -278,93 +278,91 @@
         <div class="mobile-menu-tab" data-tab="navigation">{% trans "Navigation" %}</div>
     </div>
 
-    <div class="mobile-menu-content">
-        <!-- Секция категорий -->
-        <div class="mobile-menu-section active" id="categories-section" style="max-height: 55vh; overflow-y: auto;">
-            {% for column in categories_columns %}
-                {% for category in column %}
-                    <a href="{{ category.get_absolute_url }}" class="mobile-menu-category category-btn">
-                        {% if category.button_icon_brown %}
-                            <img src="{{ category.button_icon_brown.url }}"
-                                 data-hover="{{ category.button_icon_white.url }}"
-                                 alt="{{ category.category }}"
-                                 class="category-icon"
-                                 style="width: 24px; height: 24px; margin-right: 8px;">
-                        {% endif %}
-                        {{ category.category }}
-                    </a>
-                {% endfor %}
-            {% endfor %}
-        </div>
-
-        <!-- Секция навигации -->
-        <div class="mobile-menu-section" id="navigation-section">
-            <a href="{% url 'category_list' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
-                     data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
-                     data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
-                     alt="{% trans 'Assortment' %}" class="category-icon" style="width: 24px; height: 24px;">
-                <span class="ms-2">{% trans "Assortment" %}</span>
-            </a>
-            <a href="/producer/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                <img src="{{ MEDIA_URL }}icons/factory_brown.png"
-                     data-hover="{{ MEDIA_URL }}icons/factory_white.png"
-                     data-original="{{ MEDIA_URL }}icons/factory_brown.png"
-                     alt="{% trans 'Producers' %}" class="category-icon" style="width: 24px; height: 24px;">
-                <span class="ms-2">{% trans "Producers" %}</span>
-            </a>
-            <a href="/delivery/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                <img src="{{ MEDIA_URL }}icons/truck_brown.png"
-                     data-hover="{{ MEDIA_URL }}icons/truck_white.png"
-                     data-original="{{ MEDIA_URL }}icons/truck_brown.png"
-                     alt="{% trans 'Delivery' %}" class="category-icon" style="width: 24px; height: 24px;">
-                <span class="ms-2">{% trans "Delivery" %}</span>
-            </a>
-            <a href="/reviews/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                <img src="{{ MEDIA_URL }}icons/star_brown.png"
-                     data-hover="{{ MEDIA_URL }}icons/star_white.png"
-                     data-original="{{ MEDIA_URL }}icons/star_brown.png"
-                     alt="{% trans 'Reviews' %}" class="category-icon" style="width: 24px; height: 24px;">
-                <span class="ms-2">{% trans "Reviews" %}</span>
-            </a>
-            {% if user.is_authenticated and not user.is_staff %}
-                <a href="{% url 'user_cabinet' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                    <img src="{{ MEDIA_URL }}icons/user_brown.png"
-                         data-hover="{{ MEDIA_URL }}icons/user_white.png"
-                         data-original="{{ MEDIA_URL }}icons/user_brown.png"
-                         alt="{% trans 'My Cabinet' %}" class="category-icon" style="width: 24px; height: 24px;">
-                    <span class="ms-2">{% trans "My Cabinet" %}</span>
-                </a>
-            {% endif %}
-            {% if request.user.is_staff %}
-                <a href="/admin/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                    <img src="{{ MEDIA_URL }}icons/settings_brown.png"
-                         data-hover="{{ MEDIA_URL }}icons/settings_white.png"
-                         data-original="{{ MEDIA_URL }}icons/settings_brown.png"
-                         alt="{% trans 'Admin' %}" class="category-icon" style="width: 24px; height: 24px;">
-                    <span class="ms-2">{% trans "Admin" %}</span>
-                </a>
-            {% endif %}
-            {% if user.is_authenticated %}
-                <form id="mobile-logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
-                <button type="submit" form="mobile-logout-form" class="mobile-menu-nav-item category-btn d-flex align-items-center">
-                    <img src="{{ MEDIA_URL }}icons/logout_brown.png"
-                         data-hover="{{ MEDIA_URL }}icons/logout_white.png"
-                         data-original="{{ MEDIA_URL }}icons/logout_brown.png"
-                         alt="{% trans 'Logout' %}" class="category-icon" style="width: 24px; height: 24px;">
-                    <span class="ms-2">{% trans "Logout" %}</span>
-                </button>
-            {% else %}
-                <button class="mobile-menu-nav-item category-btn d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#loginModal">
-                    <img src="{{ MEDIA_URL }}icons/login_brown.png"
-                         data-hover="{{ MEDIA_URL }}icons/login_white.png"
-                         data-original="{{ MEDIA_URL }}icons/login_brown.png"
-                         alt="{% trans 'Login' %}" class="category-icon" style="width: 24px; height: 24px;">
-                    <span class="ms-2">{% trans "Login" %}</span>
-                </button>
-            {% endif %}
-        </div>
+    <div class="mobile-menu-content" id="mobile-menu-content">
+        <!-- Секция будет вставляться динамически через JS -->
     </div>
+    <template id="mobile-menu-categories">
+        {% for column in categories_columns %}
+            {% for category in column %}
+                <a href="{{ category.get_absolute_url }}" class="mobile-menu-category category-btn">
+                    {% if category.button_icon_brown %}
+                        <img src="{{ category.button_icon_brown.url }}"
+                             data-hover="{{ category.button_icon_white.url }}"
+                             alt="{{ category.category }}"
+                             class="category-icon"
+                             style="width: 24px; height: 24px; margin-right: 8px;">
+                    {% endif %}
+                    {{ category.category }}
+                </a>
+            {% endfor %}
+        {% endfor %}
+    </template>
+    <template id="mobile-menu-navigation">
+        <a href="{% url 'category_list' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+            <img src="{{ MEDIA_URL }}icons/assortment_brown.png"
+                 data-hover="{{ MEDIA_URL }}icons/assortment_white.png"
+                 data-original="{{ MEDIA_URL }}icons/assortment_brown.png"
+                 alt="{% trans 'Assortment' %}" class="category-icon" style="width: 24px; height: 24px;">
+            <span class="ms-2">{% trans "Assortment" %}</span>
+        </a>
+        <a href="/producer/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+            <img src="{{ MEDIA_URL }}icons/factory_brown.png"
+                 data-hover="{{ MEDIA_URL }}icons/factory_white.png"
+                 data-original="{{ MEDIA_URL }}icons/factory_brown.png"
+                 alt="{% trans 'Producers' %}" class="category-icon" style="width: 24px; height: 24px;">
+            <span class="ms-2">{% trans "Producers" %}</span>
+        </a>
+        <a href="/delivery/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+            <img src="{{ MEDIA_URL }}icons/truck_brown.png"
+                 data-hover="{{ MEDIA_URL }}icons/truck_white.png"
+                 data-original="{{ MEDIA_URL }}icons/truck_brown.png"
+                 alt="{% trans 'Delivery' %}" class="category-icon" style="width: 24px; height: 24px;">
+            <span class="ms-2">{% trans "Delivery" %}</span>
+        </a>
+        <a href="/reviews/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+            <img src="{{ MEDIA_URL }}icons/star_brown.png"
+                 data-hover="{{ MEDIA_URL }}icons/star_white.png"
+                 data-original="{{ MEDIA_URL }}icons/star_brown.png"
+                 alt="{% trans 'Reviews' %}" class="category-icon" style="width: 24px; height: 24px;">
+            <span class="ms-2">{% trans "Reviews" %}</span>
+        </a>
+        {% if user.is_authenticated and not user.is_staff %}
+            <a href="{% url 'user_cabinet' %}" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/user_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/user_white.png"
+                     data-original="{{ MEDIA_URL }}icons/user_brown.png"
+                     alt="{% trans 'My Cabinet' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "My Cabinet" %}</span>
+            </a>
+        {% endif %}
+        {% if request.user.is_staff %}
+            <a href="/admin/" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/settings_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/settings_white.png"
+                     data-original="{{ MEDIA_URL }}icons/settings_brown.png"
+                     alt="{% trans 'Admin' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Admin" %}</span>
+            </a>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <form id="mobile-logout-form" method="post" action="{% url 'logout' %}" style="display: none;">{% csrf_token %}</form>
+            <button type="submit" form="mobile-logout-form" class="mobile-menu-nav-item category-btn d-flex align-items-center">
+                <img src="{{ MEDIA_URL }}icons/logout_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/logout_white.png"
+                     data-original="{{ MEDIA_URL }}icons/logout_brown.png"
+                     alt="{% trans 'Logout' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Logout" %}</span>
+            </button>
+        {% else %}
+            <button class="mobile-menu-nav-item category-btn d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#loginModal">
+                <img src="{{ MEDIA_URL }}icons/login_brown.png"
+                     data-hover="{{ MEDIA_URL }}icons/login_white.png"
+                     data-original="{{ MEDIA_URL }}icons/login_brown.png"
+                     alt="{% trans 'Login' %}" class="category-icon" style="width: 24px; height: 24px;">
+                <span class="ms-2">{% trans "Login" %}</span>
+            </button>
+        {% endif %}
+    </template>
 </div>
 
 <!-- Контент -->

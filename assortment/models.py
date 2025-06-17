@@ -234,13 +234,6 @@ class AssortmentAdminForm(forms.ModelForm):
         model = Assortment
         fields = '__all__'
 
-    def clean_filters(self):
-        filters = self.cleaned_data.get('filters')
-        if not filters:
-            raise forms.ValidationError("Товар повинен мати хоча б один фільтр.")
-        return filters
-
-
 class AssortmentImage(models.Model):
     assortment = models.ForeignKey(Assortment, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='assortment/gallery/', verbose_name='Фото в галереї', validators=[validate_image])

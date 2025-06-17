@@ -111,11 +111,19 @@ def assortment_list(request, slug=None, producer_slug=None):
     filtered_assortment_ids = list(assortments.values_list('id', flat=True))
 
     # 5. Производители для сайдбара (до применения фильтров)
-    sidebar_producers = Producer.objects.filter(
-        assortment__in=base_assortments
-    ).distinct().annotate(
-        product_count=Count('assortment', filter=Q(assortment__in=base_assortments))
-    )
+    # Get all producers that have products in the current category or all products if no category
+    if current_category:
+        sidebar_producers = Producer.objects.filter(
+            assortment__assortment_categories=current_category
+        ).distinct().annotate(
+            product_count=Count('assortment', filter=Q(assortment__assortment_categories=current_category))
+        ).order_by('producer_name')
+    else:
+        sidebar_producers = Producer.objects.filter(
+            assortment__isnull=False
+        ).distinct().annotate(
+            product_count=Count('assortment')
+        ).order_by('producer_name')
 
     # === 6. Считаем фасетные счетчики для всех опций ===
     all_filter_groups = FilterGroup.objects.prefetch_related('options')

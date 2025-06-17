@@ -197,16 +197,28 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-    .category-buttons-wrapper .btn {
-        min-width: 120px !important;
+@media (max-width: 1189px) {
+    .col-md-3 {
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media (max-width: 800px) {
+    .col-md-3 {
+        flex: 0 0 50%;
+        max-width: 50%;
     }
     .card-img-top {
         height: 250px !important;
     }
 }
 
-@media (max-width: 576px) {
+@media (max-width: 500px) {
+    .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
     .card-img-top {
         height: 220px !important;
     }

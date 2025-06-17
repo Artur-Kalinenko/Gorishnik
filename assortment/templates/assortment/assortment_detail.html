@@ -92,6 +92,13 @@
                         </a>
                     {% endfor %}
                 </div>
+                {% if assortment.tags.exists %}
+                <div class="tags-section mb-3">
+                    {% for tag in assortment.tags.all %}
+                        <span class="tag-badge">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <div class="producer-info mb-3">
                     <span class="text-muted">{% trans "Producer" %}:</span>
                     {% if assortment.producer %}

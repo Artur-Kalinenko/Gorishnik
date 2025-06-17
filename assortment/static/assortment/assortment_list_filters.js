@@ -66,6 +66,9 @@ function initFilterToggles() {
             saveOpenedGroups(openedGroups);
         });
     });
+
+    // Удалить data-bs-toggle и data-bs-target с блока производителей, чтобы не было двойного управления раскрытием
+    // Это нужно сделать в шаблоне _sidebar_filters.html
 }
 
 
@@ -142,4 +145,47 @@ document.addEventListener('DOMContentLoaded', () => {
     setupProducerFilterClicks && setupProducerFilterClicks();
     setupUnavailableToggle && setupUnavailableToggle();
     setupFilterAutoSubmit && setupFilterAutoSubmit();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const burgerBtn = document.querySelector('.filter-burger-btn');
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar::before');
+
+    if (burgerBtn && sidebar) {
+        burgerBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            sidebar.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(e) {
+            if (sidebar.classList.contains('active') && 
+                !sidebar.contains(e.target) && 
+                !burgerBtn.contains(e.target)) {
+                burgerBtn.classList.remove('active');
+                sidebar.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                burgerBtn.classList.remove('active');
+                sidebar.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+
+    const closeBtn = document.querySelector('.sidebar-close-btn');
+    if (closeBtn && sidebar) {
+        closeBtn.addEventListener('click', function() {
+            burgerBtn.classList.remove('active');
+            sidebar.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
 });

@@ -241,7 +241,7 @@ function toggleMobileMenu() {
     const mobileMenu = document.querySelector('.mobile-menu');
     const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
     const body = document.body;
-    
+
     // Show mobile menu button only on mobile screens
     if (window.innerWidth <= 480) {
         mobileMenuBtn.style.display = 'flex';
@@ -264,52 +264,34 @@ function toggleMobileMenu() {
 
     // Handle mobile menu tabs
     const tabs = document.querySelectorAll('.mobile-menu-tab');
-    const sections = document.querySelectorAll('.mobile-menu-section');
+    const content = document.getElementById('mobile-menu-content');
 
-    // Initialize active tab and section
-    const activeTab = document.querySelector('.mobile-menu-tab.active');
-    if (activeTab) {
-        const tabName = activeTab.getAttribute('data-tab');
-        const activeSection = document.getElementById(`${tabName}-section`);
-        if (activeSection) {
-            sections.forEach(section => section.classList.remove('active'));
-            activeSection.classList.add('active');
-        }
-    } else if (tabs.length > 0) {
-        // If no active tab, activate the first one
-        const firstTab = tabs[0];
-        const firstTabName = firstTab.getAttribute('data-tab');
-        const firstSection = document.getElementById(`${firstTabName}-section`);
-        
-        firstTab.classList.add('active');
-        sections.forEach(section => section.classList.remove('active'));
-        if (firstSection) {
-            firstSection.classList.add('active');
+    function renderSection(tabName) {
+        if (tabName === 'categories') {
+            const tpl = document.getElementById('mobile-menu-categories');
+            content.innerHTML = tpl ? tpl.innerHTML : '';
+        } else if (tabName === 'navigation') {
+            const tpl = document.getElementById('mobile-menu-navigation');
+            content.innerHTML = tpl ? tpl.innerHTML : '';
         }
     }
 
-    // Remove existing click handlers to prevent duplicates
-    tabs.forEach(tab => {
-        const newTab = tab.cloneNode(true);
-        tab.parentNode.replaceChild(newTab, tab);
-    });
+    // Инициализация: показываем первую вкладку
+    let activeTab = document.querySelector('.mobile-menu-tab.active');
+    if (!activeTab && tabs.length > 0) {
+        activeTab = tabs[0];
+        activeTab.classList.add('active');
+    }
+    if (activeTab) {
+        renderSection(activeTab.getAttribute('data-tab'));
+    }
 
-    // Add click handlers to new tab elements
-    document.querySelectorAll('.mobile-menu-tab').forEach(tab => {
+    // Переключение вкладок
+    tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            const tabName = tab.getAttribute('data-tab');
-            
-            // Update active tab
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-
-            // Show corresponding section
-            sections.forEach(section => {
-                section.classList.remove('active');
-                if (section.id === `${tabName}-section`) {
-                    section.classList.add('active');
-                }
-            });
+            renderSection(tab.getAttribute('data-tab'));
         });
     });
 }

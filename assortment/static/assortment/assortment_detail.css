@@ -638,3 +638,38 @@ input.quantity-input:focus, input.quantity-input:hover {
     color: var(--accent);
     border-color: var(--accent);
 }
+
+/* Tag styles */
+.tags-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background-color: #f5e6d3;
+    border: 1px solid #8B4513;
+    border-radius: 16px;
+    color: #5D4037;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.tag-badge:hover {
+    background-color: #e6d5c3;
+    border-color: #6D4C41;
+    color: #3E2723;
+}
+
+/* Producer link style */
+.producer-info a.fw-bold {
+    color: #8B4513;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.producer-info a.fw-bold:hover {
+    color: #5D4037;
+    text-decoration: underline;
+}

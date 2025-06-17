@@ -1,121 +1,131 @@
 {% load dict_extras %}
 {% load i18n %}
 
+<!-- Burger menu button -->
+<div class="filter-burger-wrapper">
+    <button class="filter-burger-btn show-filters-btn category-btn" id="filter-burger-btn">
+        <span class="filter-burger-icon"></span>
+        <span class="filter-burger-text">{% trans "Show filters" %}</span>
+    </button>
+</div>
+
 <!-- Корневой контейнер фильтров -->
 <div class="sidebar" id="filters-sidebar" data-view="{% if current_category %}category{% else %}all{% endif %}">
+    <div class="sidebar-content">
+        <button type="button" class="sidebar-close-btn" aria-label="Закрити фільтри">&times;</button>
+        <form method="get" id="filter-form">
+            {% if query %}
+                <input type="hidden" name="q" value="{{ query }}">
+            {% endif %}
 
-<form method="get" id="filter-form">
-    {% if query %}
-        <input type="hidden" name="q" value="{{ query }}">
-    {% endif %}
+            {# === Блок производителей — ВСЕГДА открыт на главной === #}
+            {% if active_producers %}
+                <div class="filter-group">
+                    <h5 class="filter-header d-flex justify-content-between align-items-center" data-group-id="producers">
+                        {% trans "Producers" %}
+                        <span class="toggle-icon" id="icon-producers">+</span>
+                    </h5>
+                    <div class="filter-options" id="group-producers" style="display: block;">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for producer in active_producers %}
+                                {% if producer.slug in selected_producer_ids %}
+                                    <label class="producer-label producer-label--selected">
+                                        <input type="checkbox" name="producer" value="{{ producer.slug }}"
+                                               class="d-none"
+                                               checked>
+                                        <img src="{{ producer.producer_img.url }}"
+                                             alt="{{ producer.producer_name }}"
+                                             class="producer-img">
+                                    </label>
+                                {% else %}
+                                    <label class="producer-label">
+                                        <input type="checkbox" name="producer" value="{{ producer.slug }}"
+                                               class="d-none">
+                                        <img src="{{ producer.producer_img.url }}"
+                                             alt="{{ producer.producer_name }}"
+                                             class="producer-img">
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
-    {# === Блок производителей — ВСЕГДА открыт на главной === #}
-    {% if active_producers %}
-        <div class="filter-group">
-            <div class="filter-group-header" data-bs-toggle="collapse" data-bs-target="#group-producers">
-                <span class="filter-group-title">{% trans "Producers" %}</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="filter-options" id="group-producers" style="display: block;">
-                <div class="d-flex flex-wrap gap-2">
-                    {% for producer in active_producers %}
-                        {% if producer.slug in selected_producer_ids %}
-                            <label class="producer-label producer-label--selected">
-                                <input type="checkbox" name="producer" value="{{ producer.slug }}"
-                                       class="d-none"
-                                       checked>
-                                <img src="{{ producer.producer_img.url }}"
-                                     alt="{{ producer.producer_name }}"
-                                     class="producer-img">
-                            </label>
-                        {% else %}
-                            <label class="producer-label">
-                                <input type="checkbox" name="producer" value="{{ producer.slug }}"
-                                       class="d-none">
-                                <img src="{{ producer.producer_img.url }}"
-                                     alt="{{ producer.producer_name }}"
-                                     class="producer-img">
-                            </label>
-                        {% endif %}
-                    {% endfor %}
+            {# === Блок "Додатково" — ВСЕГДА открыт на главной === #}
+            <div class="filter-group mb-3">
+                <h5 class="filter-header">
+                    {% trans "Additional" %}
+                </h5>
+                <div class="filter-options" id="group-additional" style="display: block;">
+                    <label class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
+                        <span class="custom-checkbox"></span>
+                        <span class="form-check-label">{% trans "New items" %}</span>
+                    </label>
+                    {% if user.is_authenticated %}
+                        <label class="form-check mb-1">
+                            <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
+                            <span class="custom-checkbox"></span>
+                            <span class="form-check-label">{% trans "My favorite items" %}</span>
+                        </label>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-    {% endif %}
 
-    {# === Блок "Додатково" — ВСЕГДА открыт на главной === #}
-    <div class="filter-group mb-3">
-        <h5 class="filter-header">
-            {% trans "Additional" %}
-        </h5>
-        <div class="filter-options" id="group-additional" style="display: block;">
-            <label class="form-check mb-1">
-                <input class="form-check-input" type="checkbox" name="new" value="1" {% if request.GET.new %}checked{% endif %}>
-                <span class="custom-checkbox"></span>
-                <span class="form-check-label">{% trans "New items" %}</span>
-            </label>
-            {% if user.is_authenticated %}
-                <label class="form-check mb-1">
-                    <input class="form-check-input" type="checkbox" name="my_favorites" value="1" {% if request.GET.my_favorites == "1" %}checked{% endif %}>
-                    <span class="custom-checkbox"></span>
-                    <span class="form-check-label">{% trans "My favorite items" %}</span>
-                </label>
-            {% endif %}
-        </div>
+            {# === Основные фильтры по группам === #}
+            {% for group in filter_groups %}
+                <div class="filter-group mb-3">
+                    <h5 class="filter-header d-flex justify-content-between align-items-center
+                        {% if current_category and group.category.id == current_category.id %}category-group{% endif %}"
+                        data-group-id="{{ group.id }}" style="cursor: pointer;">
+                        {{ group.name }}
+                        <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
+                    </h5>
+
+                    <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
+                        {% for option in group.options.all %}
+                            {% with count=option_counts|get_item:option.id %}
+                                {% if count == 0 and not option.id in selected_filter_ids %}
+                                    <label class="form-check mb-1 unavailable hidden">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="filters"
+                                               value="{{ option.id }}"
+                                               disabled>
+                                        <span class="custom-checkbox"></span>
+                                        <span class="form-check-label">
+                                            {{ option.name }} ({{ count|default:0 }})
+                                        </span>
+                                    </label>
+                                {% else %}
+                                    <label class="form-check mb-1">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="filters"
+                                               value="{{ option.id }}"
+                                               {% if option.id in selected_filter_ids %}checked{% endif %}>
+                                        <span class="custom-checkbox"></span>
+                                        <span class="form-check-label">
+                                            {{ option.name }} ({{ count|default:0 }})
+                                        </span>
+                                    </label>
+                                {% endif %}
+                            {% endwith %}
+                        {% endfor %}
+
+                        <button type="button"
+                                class="btn btn-link btn-sm show-unavailable"
+                                data-group-id="{{ group.id }}">
+                            {% trans "Show all filters" %}
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
+                {% trans "Clear filters" %}
+            </button>
+        </form>
     </div>
-
-    {# === Основные фильтры по группам === #}
-    {% for group in filter_groups %}
-        <div class="filter-group mb-3">
-            <h5 class="filter-header d-flex justify-content-between align-items-center
-                {% if current_category and group.category.id == current_category.id %}category-group{% endif %}"
-                data-group-id="{{ group.id }}" style="cursor: pointer;">
-                {{ group.name }}
-                <span class="toggle-icon" id="icon-{{ group.id }}">+</span>
-            </h5>
-
-            <div class="filter-options" id="group-{{ group.id }}" style="display: none;">
-                {% for option in group.options.all %}
-                    {% with count=option_counts|get_item:option.id %}
-                        {% if count == 0 and not option.id in selected_filter_ids %}
-                            <label class="form-check mb-1 unavailable hidden">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       name="filters"
-                                       value="{{ option.id }}"
-                                       disabled>
-                                <span class="custom-checkbox"></span>
-                                <span class="form-check-label">
-                                    {{ option.name }} ({{ count|default:0 }})
-                                </span>
-                            </label>
-                        {% else %}
-                            <label class="form-check mb-1">
-                                <input class="form-check-input"
-                                       type="checkbox"
-                                       name="filters"
-                                       value="{{ option.id }}"
-                                       {% if option.id in selected_filter_ids %}checked{% endif %}>
-                                <span class="custom-checkbox"></span>
-                                <span class="form-check-label">
-                                    {{ option.name }} ({{ count|default:0 }})
-                                </span>
-                            </label>
-                        {% endif %}
-                    {% endwith %}
-                {% endfor %}
-
-                <button type="button"
-                        class="btn btn-link btn-sm show-unavailable"
-                        data-group-id="{{ group.id }}">
-                    {% trans "Show all filters" %}
-                </button>
-            </div>
-        </div>
-    {% endfor %}
-
-    <button type="button" id="clear-filters" class="btn btn-outline-danger mt-4">
-        {% trans "Clear filters" %}
-    </button>
-</form>
 </div>

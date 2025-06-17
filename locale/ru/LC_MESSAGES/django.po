@@ -297,8 +297,8 @@ msgstr "Мой аккаунт"
 msgid "Personal Information"
 msgstr "Личная информация"
 
-msgid "(not specified)"
-msgstr "(не указано)"
+msgid "Not specified"
+msgstr "Не указано"
 
 msgid "Favorite Products"
 msgstr "Избранные товары"
@@ -711,3 +711,6 @@ msgstr "Ошибка сервера. Попробуйте позже."
 
 msgid "Товар додано в кошик"
 msgstr "Товар добавлен в корзину"
+
+msgid "Show filters"
+msgstr "Показать фильтры"

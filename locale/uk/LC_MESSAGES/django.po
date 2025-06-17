@@ -327,8 +327,8 @@ msgstr "Мій обліковий запис"
 msgid "Personal Information"
 msgstr "Особиста інформація"
 
-msgid "(not specified)"
-msgstr "(не вказано)"
+msgid "Not specified"
+msgstr "Не вказано"
 
 msgid "Favorite Products"
 msgstr "Обрані товари"
@@ -735,3 +735,6 @@ msgstr "Помилка при оновленні обраного"
 
 msgid "Помилка сервера. Спробуйте пізніше."
 msgstr "Помилка сервера. Спробуйте пізніше."
+
+msgid "Show filters"
+msgstr "Показати фільтри"

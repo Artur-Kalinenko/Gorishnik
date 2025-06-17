@@ -1,14 +1,91 @@
+/* Burger menu styles */
+.filter-burger-wrapper {
+    display: none;
+    margin-bottom: 1rem;
+}
+
+.filter-burger-btn {
+    /* Inherit all from .category-btn, only tweak for icon spacing */
+    gap: 10px;
+    min-width: 270px;
+    height: 42px;
+    padding: 0 24px;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.filter-burger-btn .filter-burger-icon {
+    margin-right: 8px;
+}
+
+.filter-burger-btn:hover .filter-burger-text {
+    color: #fff !important;
+}
+
+/* Sidebar styles */
 .sidebar {
-    background: #F8F6F3;
+    background: var(--bg-main) !important;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(60, 35, 20, 0.04);
     padding: 30px 18px 24px 18px;
     margin: 0 0 32px 0;
-    transition: box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    color: var(--accent-dark) !important;
 }
 
 .sidebar:hover {
     box-shadow: 0 6px 24px rgba(60, 35, 20, 0.08);
+}
+
+.sidebar-content {
+    transition: all 0.3s ease;
+}
+
+.sidebar * {
+    color: var(--accent-dark) !important;
+}
+
+/* Responsive styles */
+@media (max-width: 1189px) {
+    .filter-burger-wrapper {
+        display: block;
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 320px;
+        height: 100vh;
+        z-index: 1000;
+        margin: 0;
+        border-radius: 0;
+        overflow-y: auto;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar::before,
+    .sidebar.active::before {
+        content: none !important;
+        display: none !important;
+        background: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1189px) {
+    .filter-burger-btn {
+        min-width: 320px;
+        font-size: 1.2rem;
+        padding-left: 32px;
+        padding-right: 32px;
+    }
 }
 
 .filter-header {
@@ -19,7 +96,7 @@
     margin-bottom: 12px;
     gap: 8px;
     letter-spacing: 0.5px;
-    color: var(--accent);
+    color: var(--accent-dark) !important;
     position: relative;
     padding-bottom: 8px;
 }
@@ -31,7 +108,7 @@
     left: 0;
     width: 40px;
     height: 2px;
-    background: var(--accent-dark);
+    background: var(--accent-dark) !important;
     transition: width 0.3s ease;
 }
 
@@ -48,6 +125,10 @@
     transform: translateX(4px);
 }
 
+.filter-group:first-child .filter-options {
+    margin-left: 0;
+}
+
 .form-check {
     display: flex;
     align-items: flex-start;   /* было center, стало flex-start */
@@ -57,6 +138,7 @@
     margin-bottom: 8px;
     position: relative;
     width: 100%;               /* чтобы занимали всю ширину контейнера */
+    margin-right: 0 !important;
 }
 
 .form-check-input {
@@ -165,9 +247,12 @@
 .producer-img {
     height: 50px;
     width: 50px;
+    max-width: 100%;
+    max-height: 50px;
     object-fit: contain;
     transition: transform 0.3s ease;
     display: block;
+    margin: 0 auto;
 }
 
 .producer-label:hover .producer-img,
@@ -228,7 +313,7 @@
 .show-unavailable:hover,
 .show-unavailable:focus {
   background-color: var(--accent);
-  color: var(--white);
+  color: var(--white) !important;
   box-shadow: 0 0 0 1px rgba(122, 78, 45, 0.2);
 }
 .show-unavailable:active {
@@ -271,5 +356,50 @@ button.show-unavailable:focus-visible,
     color: var(--white); /* или другой цвет если надо */
     background: var(--accent-dark); /* или другой фон */
     border-color: var(--accent-dark);
+}
+
+.sidebar-close-btn {
+    display: none;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    z-index: 1100;
+    background: none;
+    border: none;
+    color: var(--accent-dark);
+    font-size: 2.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0 8px;
+}
+
+.sidebar-close-btn:hover {
+    color: var(--accent);
+}
+
+@media (max-width: 1189px) {
+    .sidebar-close-btn {
+        display: block;
+    }
+}
+
+.show-filters-btn:hover, .show-filters-btn:focus {
+    color: #fff !important;
+}
+.show-filters-btn:hover *, .show-filters-btn:focus * {
+    color: #fff !important;
+}
+
+.sidebar .show-filters-btn:hover,
+.sidebar .show-filters-btn:focus {
+    color: #fff !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+.sidebar .show-filters-btn:hover *,
+.sidebar .show-filters-btn:focus * {
+    color: #fff !important;
 }
 

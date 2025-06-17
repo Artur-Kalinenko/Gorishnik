@@ -508,3 +508,38 @@
 .category-btn:hover img.category-icon {
     filter: brightness(0) invert(1);
 }
+
+@media (max-width: 1189px) {
+  #product-grid .col {
+    flex-basis: 50%;
+    max-width: 50%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+@media (min-width: 1190px) {
+  #product-grid .col {
+    flex-basis: 25%;
+    max-width: 25%;
+  }
+}
+
+/* Только для кнопки 'Показати всі фільтри' */
+.filter-burger-btn:hover, .filter-burger-btn:focus {
+    color: var(--white) !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+/* Только для кнопки 'Очистити фільтри' */
+#clear-filters:hover, #clear-filters:focus {
+    color: var(--white) !important;
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+
+@media (min-width: 992px) and (max-width: 1189px) {
+  #product-grid.row {
+    --bs-columns: 3;
+  }
+}

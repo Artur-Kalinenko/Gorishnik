@@ -32,3 +32,5 @@ staticfiles/  # сюда попадают файлы из collectstatic
 
 #DB
 backups/
+
+gorishnik_dump.sql
